@@ -1,0 +1,2 @@
+[workspace]
+members = ["stellar_resources"]
