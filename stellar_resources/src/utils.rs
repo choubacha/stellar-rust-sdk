@@ -23,4 +23,10 @@ mod tests {
         let value = Value::String("123".to_string());
         assert_eq!(deserialize_from_str::<Value, u64>(value).unwrap(), 123u64);
     }
+
+    #[test]
+    fn it_returns_err_if_invalid() {
+        let value = Value::String("123abc".to_string());
+        assert!(deserialize_from_str::<Value, u64>(value).is_err());
+    }
 }
