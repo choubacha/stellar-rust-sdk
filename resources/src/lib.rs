@@ -15,6 +15,4 @@ mod account;
 /// A collection of data types and resources used within the stellar api.
 /// All the derives for XDR and JSON are implemented for the resources so that
 /// they can be used with a client. Either for reading or for writing.
-pub mod stellar_resources {
-    pub use account::Account;
-}
+pub use account::Account;

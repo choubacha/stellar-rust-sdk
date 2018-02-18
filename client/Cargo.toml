@@ -1,0 +1,11 @@
+[package]
+name = "stellar-client"
+version = "0.1.0"
+authors = ["Kevin Bacha <chewbacha@gmail.com>"]
+
+[dependencies]
+stellar-resources = { path = "../resources" }
+hyper = "0.11"
+hyper-tls = "0.1"
+tokio-core = "0.1"
+futures = "0.1"

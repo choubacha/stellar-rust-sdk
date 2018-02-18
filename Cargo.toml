@@ -1,2 +1,2 @@
 [workspace]
-members = ["stellar_resources"]
+members = ["resources", "client"]
