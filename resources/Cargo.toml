@@ -1,5 +1,5 @@
 [package]
-name = "stellar_resources"
+name = "stellar-resources"
 version = "0.1.0"
 authors = ["Kevin Choubacha <chewbacha@gmail.com>"]
 
