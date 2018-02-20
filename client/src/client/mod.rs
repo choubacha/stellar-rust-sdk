@@ -1,7 +1,7 @@
 use hyper;
 use hyper_tls::HttpsConnector;
 use tokio_core::reactor::Handle;
-use error::{Result, Error};
+use error::{Error, Result};
 
 #[derive(Debug, Clone, PartialEq)]
 enum Host {
@@ -86,7 +86,6 @@ impl Client {
         self.host == Host::HorizonTest
     }
 
-
     /// Constructs a new stellar client connected to the horizon test network.
     ///
     /// ## Examples
@@ -130,7 +129,7 @@ impl Client {
         match self.host {
             Host::HorizonTest => HORIZON_TEST_URI,
             Host::HorizonProd => HORIZON_URI,
-            Host::Other(ref uri)  => uri,
+            Host::Other(ref uri) => uri,
         }
     }
 }
@@ -160,7 +159,10 @@ mod tests {
     fn it_constructs_a_client_to_other() {
         let core = Core::new().unwrap();
         let client = Client::new("https://www.google.com", &core.handle()).unwrap();
-        assert_eq!(client.host, Host::Other("https://www.google.com".to_string()));
+        assert_eq!(
+            client.host,
+            Host::Other("https://www.google.com".to_string())
+        );
         assert_eq!(client.uri(), "https://www.google.com");
     }
 

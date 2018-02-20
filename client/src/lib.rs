@@ -1,11 +1,11 @@
 #![deny(warnings, missing_docs, missing_debug_implementations)]
 //! Client implementation to the stellar horizon api.
 
+extern crate futures;
 extern crate hyper;
 extern crate hyper_tls;
-extern crate futures;
-extern crate tokio_core;
 extern crate stellar_resources;
+extern crate tokio_core;
 
 mod client;
 pub mod error;
@@ -20,4 +20,4 @@ pub mod error;
 /// 0.2.0 is released with the global event loop, it will add them to the event loop
 /// itself.
 pub use client::Client;
-pub use error::{Result, Error};
+pub use error::{Error, Result};

@@ -2,9 +2,9 @@
 //! Defines the basic resources of stellar's horizon end points and
 //! implements their serialization.
 
+extern crate serde;
 #[macro_use]
 extern crate serde_derive;
-extern crate serde;
 extern crate serde_json;
 
 mod utils;
