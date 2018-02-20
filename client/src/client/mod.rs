@@ -3,12 +3,22 @@ use hyper_tls::HttpsConnector;
 use tokio_core::reactor::Handle;
 use error::{Result, Error};
 
+#[derive(Debug, Clone, PartialEq)]
+enum Host {
+    HorizonTest,
+    HorizonProd,
+    Other(String),
+}
+
 /// A client that can issue requests to a horizon api.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Client {
     inner: hyper::Client<HttpsConnector<hyper::client::HttpConnector>>,
-    uri: hyper::Uri,
+    host: Host,
 }
+
+static HORIZON_TEST_URI: &'static str = "https://horizon-testnet.stellar.org";
+static HORIZON_URI: &'static str = "https://horizon.stellar.org";
 
 impl Client {
     /// Constructs a new stellar client.
@@ -22,14 +32,135 @@ impl Client {
     /// use tokio_core::reactor::Core;
     /// use stellar_client::Client;
     /// let core = Core::new().unwrap();
-    /// let client = Client::new("https://horizon-testnet.stellar.org", &core.handle());
+    /// let client = Client::new("https://horizon-testnet.stellar.org", &core.handle()).unwrap();
     /// # }
     /// ```
     pub fn new(uri: &str, handle: &Handle) -> Result<Self> {
+        // Ensure that the uri passed in can parse.
+        let _: hyper::Uri = uri.parse().map_err(|_| Error::BadUri)?;
+        Self::build(Host::Other(uri.to_string()), &handle)
+    }
+
+    fn build(host: Host, handle: &Handle) -> Result<Self> {
         let inner = hyper::Client::configure()
             .connector(HttpsConnector::new(4, &handle).map_err(|_| Error::BadSSL)?)
             .build(&handle);
-        let uri: hyper::Uri = uri.parse().map_err(|_| Error::BadUri)?;
-        Ok(Client { inner, uri })
+        Ok(Client { host, inner })
+    }
+
+    /// Constructs a new stellar client connected to the horizon test network.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// # extern crate tokio_core;
+    /// # extern crate stellar_client;
+    /// # fn main() {
+    /// use tokio_core::reactor::Core;
+    /// use stellar_client::Client;
+    /// let core = Core::new().unwrap();
+    /// let client = Client::horizon_test(&core.handle()).unwrap();
+    /// # }
+    /// ```
+    pub fn horizon_test(handle: &Handle) -> Result<Self> {
+        Self::build(Host::HorizonTest, &handle)
+    }
+
+    /// Returns true if this is a test client.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// # extern crate tokio_core;
+    /// # extern crate stellar_client;
+    /// # fn main() {
+    /// # use tokio_core::reactor::Core;
+    /// # use stellar_client::Client;
+    /// # let core = Core::new().unwrap();
+    /// let client = Client::horizon_test(&core.handle()).unwrap();
+    /// assert!(!client.is_horizon());
+    /// assert!(client.is_horizon_test());
+    /// # }
+    /// ```
+    pub fn is_horizon_test(&self) -> bool {
+        self.host == Host::HorizonTest
+    }
+
+
+    /// Constructs a new stellar client connected to the horizon test network.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// # extern crate tokio_core;
+    /// # extern crate stellar_client;
+    /// # fn main() {
+    /// use tokio_core::reactor::Core;
+    /// use stellar_client::Client;
+    /// let core = Core::new().unwrap();
+    /// let client = Client::horizon(&core.handle()).unwrap();
+    /// # }
+    /// ```
+    pub fn horizon(handle: &Handle) -> Result<Self> {
+        Self::build(Host::HorizonProd, &handle)
+    }
+
+    /// Returns true if this is a horizon@stellar client.
+    ///
+    /// ## Examples
+    ///
+    /// ```
+    /// # extern crate tokio_core;
+    /// # extern crate stellar_client;
+    /// # fn main() {
+    /// # use tokio_core::reactor::Core;
+    /// # use stellar_client::Client;
+    /// # let core = Core::new().unwrap();
+    /// let client = Client::horizon(&core.handle()).unwrap();
+    /// assert!(client.is_horizon());
+    /// assert!(!client.is_horizon_test());
+    /// # }
+    /// ```
+    pub fn is_horizon(&self) -> bool {
+        self.host == Host::HorizonProd
+    }
+
+    #[allow(dead_code)] // TODO: Used for joining to end points
+    fn uri<'a>(&'a self) -> &'a str {
+        match self.host {
+            Host::HorizonTest => HORIZON_TEST_URI,
+            Host::HorizonProd => HORIZON_URI,
+            Host::Other(ref uri)  => uri,
+        }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use tokio_core::reactor::Core;
+
+    #[test]
+    fn it_constructs_a_test_client() {
+        let core = Core::new().unwrap();
+        let client = Client::horizon_test(&core.handle()).unwrap();
+        assert_eq!(client.host, Host::HorizonTest);
+        assert_eq!(client.uri(), "https://horizon-testnet.stellar.org");
+    }
+
+    #[test]
+    fn it_constructs_a_horizon_client() {
+        let core = Core::new().unwrap();
+        let client = Client::horizon(&core.handle()).unwrap();
+        assert_eq!(client.host, Host::HorizonProd);
+        assert_eq!(client.uri(), "https://horizon.stellar.org");
+    }
+
+    #[test]
+    fn it_constructs_a_client_to_other() {
+        let core = Core::new().unwrap();
+        let client = Client::new("https://www.google.com", &core.handle()).unwrap();
+        assert_eq!(client.host, Host::Other("https://www.google.com".to_string()));
+        assert_eq!(client.uri(), "https://www.google.com");
     }
 }

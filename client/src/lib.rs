@@ -1,4 +1,4 @@
-#![deny(missing_docs, missing_debug_implementations)]
+#![deny(warnings, missing_docs, missing_debug_implementations)]
 //! Client implementation to the stellar horizon api.
 
 extern crate hyper;
