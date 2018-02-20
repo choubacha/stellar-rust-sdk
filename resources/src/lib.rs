@@ -9,6 +9,7 @@ extern crate serde_json;
 
 mod utils;
 mod account;
+mod asset;
 
 /// # Stellar Resources
 ///
@@ -16,3 +17,4 @@ mod account;
 /// All the derives for XDR and JSON are implemented for the resources so that
 /// they can be used with a client. Either for reading or for writing.
 pub use account::Account;
+pub use asset::Asset;
