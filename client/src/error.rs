@@ -10,8 +10,7 @@ pub enum Error {
     /// Was unable to resolve ssl configuration
     BadSSL,
 
-    #[doc(hidden)]
-    __Nonexhaustive,
+    #[doc(hidden)] __Nonexhaustive,
 }
 
 /// A result including client specific errors.
