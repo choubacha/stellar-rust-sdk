@@ -163,4 +163,11 @@ mod tests {
         assert_eq!(client.host, Host::Other("https://www.google.com".to_string()));
         assert_eq!(client.uri(), "https://www.google.com");
     }
+
+    #[test]
+    fn it_errs_if_a_bad_uri_is_provided() {
+        let core = Core::new().unwrap();
+        let result = Client::new("htps:/www", &core.handle());
+        assert!(result.is_err());
+    }
 }
