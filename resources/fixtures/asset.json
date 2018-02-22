@@ -7,6 +7,6 @@
   "num_accounts": 91547871,
   "flags": {
     "auth_required": false,
-    "auth_revocable": false
+    "auth_revocable": true
   }
 }
