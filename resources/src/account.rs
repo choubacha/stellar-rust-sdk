@@ -1,4 +1,4 @@
-use utils;
+use deserialize;
 
 /// In the Stellar network, users interact using accounts which can be controlled by a
 /// corresponding keypair that can authorize transactions.
@@ -7,7 +7,7 @@ use utils;
 pub struct Account {
     id: String,
     account_id: String,
-    #[serde(deserialize_with = "utils::deserialize_from_str")] sequence: u64,
+    #[serde(deserialize_with = "deserialize::from_str")] sequence: u64,
     subentry_count: u64,
 }
 
