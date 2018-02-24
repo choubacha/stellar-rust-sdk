@@ -1,0 +1,29 @@
+{
+  "_links": {
+    "self": {
+      "href": "https://horizon-testnet.stellar.org/offers/121"
+    },
+    "offer_maker": {
+      "href": "https://horizon-testnet.stellar.org/accounts/GCJ34JYMXNI7N55YREWAACMMZECOMTPIYDTFCQBWPUP7BLJQDDTVGUW4"
+    }
+  },
+  "id": 121,
+  "paging_token": "121",
+  "seller": "GCJ34JYMXNI7N55YREWAACMMZECOMTPIYDTFCQBWPUP7BLJQDDTVGUW4",
+  "selling": {
+    "asset_type": "credit_alphanum4",
+    "asset_code": "BAR",
+    "asset_issuer": "GBAUUA74H4XOQYRSOW2RZUA4QL5PB37U3JS5NE3RTB2ELJVMIF5RLMAG"
+  },
+  "buying": {
+    "asset_type": "credit_alphanum4",
+    "asset_code": "FOO",
+    "asset_issuer": "GBAUUA74H4XOQYRSOW2RZUA4QL5PB37U3JS5NE3RTB2ELJVMIF5RLMAG"
+  },
+  "amount": "23.6692509",
+  "price_r": {
+    "n": 387,
+    "d": 50
+  },
+  "price": "7.7400000"
+}
