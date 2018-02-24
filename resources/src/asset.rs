@@ -1,6 +1,4 @@
-use serde::{Deserialize, Deserializer};
-use serde::de;
-use std::str::FromStr;
+use deserialize;
 
 /// Permissions around who can own an asset and whether or
 /// not the asset issuer can freeze the asset.
@@ -19,57 +17,9 @@ pub struct Asset {
     asset_type: String,
     asset_code: String,
     asset_issuer: String,
-    #[serde(deserialize_with = "deserialize_amount")] amount: i64,
+    #[serde(deserialize_with = "deserialize::amount")] amount: i64,
     num_accounts: u32,
     flags: Flag,
-}
-
-fn deserialize_amount<'de, D>(d: D) -> Result<i64, D::Error>
-where
-    D: Deserializer<'de>,
-{
-    // Call string deserialize on the "deserializer".
-    let s = String::deserialize(d)?;
-
-    let length = s.len();
-    let decimal_place = s.rfind('.').unwrap_or(length - 1);
-    let number_decimals = length - (decimal_place + 1);
-    if number_decimals > 7 {
-        return Err(de::Error::custom(
-            "Amount has too many digits of precision.",
-        ));
-    }
-    let s = s.replace(".", "");
-    let parsed_amount =
-        i64::from_str(&s).map_err(|_| de::Error::custom("failed to parse string field"))?;
-    // Stellar sends a float that is reduced from true value by 10^7 so raise by 10
-    // minus the amount we gained from removing decimal
-    let required_power: u32 = (7 - number_decimals) as u32;
-    Ok(parsed_amount * (10_i64.pow(required_power)))
-}
-
-#[cfg(test)]
-mod deserialize_amount_tests {
-    use super::*;
-    use serde_json::value::Value;
-
-    #[test]
-    fn it_raises_amount_by_ten_million() {
-        let value = Value::String("2.12".to_string());
-        assert_eq!(deserialize_amount(value).unwrap(), 21_200_000);
-    }
-
-    #[test]
-    fn it_handles_integer_strings() {
-        let value = Value::String("212".to_string());
-        assert_eq!(deserialize_amount(value).unwrap(), 2_120_000_000);
-    }
-
-    #[test]
-    fn it_errors_floats_with_more_than_7_decimals() {
-        let value = Value::String("0.212847948".to_string());
-        assert!(deserialize_amount(value).is_err());
-    }
 }
 
 impl Asset {
