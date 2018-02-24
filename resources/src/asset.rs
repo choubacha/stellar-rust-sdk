@@ -1,5 +1,38 @@
 use deserialize;
 
+/// Assets are the units that are traded on the Stellar Network.
+/// An asset consists of an type, code, and issuer.
+/// Any asset can be traded for any other asset.
+/// https://www.stellar.org/developers/horizon/reference/resources/asset.html
+///
+/// A partial is just the type, code, issuer
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PartialAsset {
+    asset_type: String,
+    asset_code: String,
+    asset_issuer: String,
+}
+
+impl PartialAsset {
+    /// The type of this asset: “credit_alphanum4”, or “credit_alphanum12”.
+    /// Returns a slice that lives as long as the asset does.
+    pub fn asset_type<'a>(&'a self) -> &'a str {
+        &self.asset_type
+    }
+
+    /// The code of this asset.
+    /// Returns a slice that lives as long as the asset does.
+    pub fn asset_code<'a>(&'a self) -> &'a str {
+        &self.asset_code
+    }
+
+    /// The issuer of this asset.  This corresponds to the id of an account.
+    /// Returns a slice that lives as long as the asset does.
+    pub fn asset_issuer<'a>(&'a self) -> &'a str {
+        &self.asset_issuer
+    }
+}
+
 /// Permissions around who can own an asset and whether or
 /// not the asset issuer can freeze the asset.
 #[derive(Serialize, Deserialize, Debug)]
@@ -97,5 +130,16 @@ mod asset_tests {
         assert_eq!(asset.num_accounts(), 91547871);
         assert!(!asset.is_auth_required());
         assert!(asset.is_auth_revocable());
+    }
+
+    #[test]
+    fn it_parses_a_partial() {
+        let asset: PartialAsset = serde_json::from_str(&asset_json()).unwrap();
+        assert_eq!(asset.asset_type(), "credit_alphanum4");
+        assert_eq!(asset.asset_code(), "USD");
+        assert_eq!(
+            asset.asset_issuer(),
+            "GBAUUA74H4XOQYRSOW2RZUA4QL5PB37U3JS5NE3RTB2ELJVMIF5RLMAG"
+        );
     }
 }
