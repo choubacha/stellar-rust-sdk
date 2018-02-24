@@ -49,6 +49,12 @@ mod deserialize_amount_tests {
     }
 
     #[test]
+    fn it_parses_the_smallest_value() {
+        let value = Value::String("0.0000001".to_string());
+        assert_eq!(super::amount(value).unwrap(), 1);
+    }
+
+    #[test]
     fn it_handles_integer_strings() {
         let value = Value::String("212".to_string());
         assert_eq!(super::amount(value).unwrap(), 2_120_000_000);
