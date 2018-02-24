@@ -11,24 +11,31 @@ pub(crate) fn amount<'de, D>(d: D) -> Result<i64, D::Error>
 where
     D: Deserializer<'de>,
 {
-    // Call string deserialize on the "deserializer".
     let s = String::deserialize(d)?;
-
-    let length = s.len();
-    let decimal_place = s.rfind('.').unwrap_or(length - 1);
-    let number_decimals = length - (decimal_place + 1);
-    if number_decimals > 7 {
-        return Err(de::Error::custom(
-            "Amount has too many digits of precision.",
-        ));
+    match s.rfind('.') {
+        None => {
+            // There is no decimal so just multiply
+            let parsed_amount =
+                i64::from_str(&s).map_err(|_| de::Error::custom("Failed to parse string field"))?;
+            Ok(parsed_amount * 10_000_000)
+        }
+        Some(decimal_place) => {
+            let number_decimals = s.len() - (decimal_place + 1);
+            if number_decimals > 7 {
+                Err(de::Error::custom(
+                    "Amount has too many digits of precision.",
+                ))
+            } else {
+                let s = s.replace(".", "");
+                let parsed_amount = i64::from_str(&s)
+                    .map_err(|_| de::Error::custom("Failed to parse string field"))?;
+                // Stellar sends a float that is reduced from true value by 10^7 so raise by 10
+                // minus the amount we gained from removing decimal
+                let required_power: u32 = (7 - number_decimals) as u32;
+                Ok(parsed_amount * (10_i64.pow(required_power)))
+            }
+        }
     }
-    let s = s.replace(".", "");
-    let parsed_amount =
-        i64::from_str(&s).map_err(|_| de::Error::custom("failed to parse string field"))?;
-    // Stellar sends a float that is reduced from true value by 10^7 so raise by 10
-    // minus the amount we gained from removing decimal
-    let required_power: u32 = (7 - number_decimals) as u32;
-    Ok(parsed_amount * (10_i64.pow(required_power)))
 }
 
 #[cfg(test)]
@@ -65,7 +72,7 @@ where
     // Call string deserialize on the "deserializer".
     let s = String::deserialize(d)?;
     // Now that we have a string, we can call FromStr
-    T::from_str(&s).map_err(|_| de::Error::custom("failed to parse string field"))
+    T::from_str(&s).map_err(|_| de::Error::custom("Failed to parse string field"))
 }
 
 #[cfg(test)]
