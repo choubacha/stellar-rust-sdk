@@ -58,8 +58,8 @@ impl Offer {
         self.amount
     }
 
-    /// How many units of the `buying` asset it takes to get 1 unit of `selling`.
-    /// This is ia number representing division of the price ratio.
+    /// How many units of the `buying` asset it takes to get 10 million of `selling`
+    /// asset. This is the smallest divisible unit of the asset.
     pub fn price(&self) -> i64 {
         self.price
     }
