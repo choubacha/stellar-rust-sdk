@@ -4,9 +4,9 @@ use std::str::FromStr;
 
 /// The stellar ammount fields are represented as strings in the horizon api,
 /// however, they look like floats. But, in the actual ledger they are signed
-/// 64-bit integers. This function can be used to convert what we get from
-/// horizon into a signed integer. The precision of the float is assumed to
-/// by out to 7 digits (but if fewer are found it's ok).
+/// 64-bit integers. This function converst what we get from horizon into a
+/// signed integer. The precision of the float is assumed to be out to 7
+/// digits (but if fewer are found it's ok).
 pub(crate) fn amount<'de, D>(d: D) -> Result<i64, D::Error>
 where
     D: Deserializer<'de>,
@@ -63,7 +63,7 @@ mod deserialize_amount_tests {
 
 /// Some fields in the json are represented as "strings" but are actually
 /// another type. If that type implements the `FromStr` trait, then this
-/// can properly parse it into that type.
+/// function parses it into that type.
 pub(crate) fn from_str<'de, D, T>(d: D) -> Result<T, D::Error>
 where
     D: Deserializer<'de>,
