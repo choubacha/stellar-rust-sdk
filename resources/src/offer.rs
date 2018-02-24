@@ -1,5 +1,5 @@
 use deserialize;
-use asset::PartialAsset;
+use asset::AssetIdentifier;
 
 /// The ratio between the asking and selling price
 #[derive(Serialize, Deserialize, Debug)]
@@ -14,8 +14,8 @@ pub struct Offer {
     id: i64,
     paging_token: String,
     seller: String,
-    selling: PartialAsset,
-    buying: PartialAsset,
+    selling: AssetIdentifier,
+    buying: AssetIdentifier,
     #[serde(deserialize_with = "deserialize::amount")] amount: i64,
     #[serde(rename = "price_r")] price_ratio: PriceRatio,
     #[serde(deserialize_with = "deserialize::amount")] price: i64,
@@ -38,12 +38,12 @@ impl Offer {
     }
 
     /// The asset being sold
-    pub fn selling<'a>(&'a self) -> &'a PartialAsset {
+    pub fn selling<'a>(&'a self) -> &'a AssetIdentifier {
         &self.selling
     }
 
     /// The asset being bought
-    pub fn buying<'a>(&'a self) -> &'a PartialAsset {
+    pub fn buying<'a>(&'a self) -> &'a AssetIdentifier {
         &self.buying
     }
 
