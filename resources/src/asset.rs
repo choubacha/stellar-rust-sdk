@@ -5,15 +5,15 @@ use deserialize;
 /// Any asset can be traded for any other asset.
 /// https://www.stellar.org/developers/horizon/reference/resources/asset.html
 ///
-/// A partial is just the type, code, issuer
+/// An identifer is the type, code, and issuer.
 #[derive(Serialize, Deserialize, Debug)]
-pub struct PartialAsset {
+pub struct AssetIdentifier {
     asset_type: String,
     asset_code: String,
     asset_issuer: String,
 }
 
-impl PartialAsset {
+impl AssetIdentifier {
     /// The type of this asset: “credit_alphanum4”, or “credit_alphanum12”.
     /// Returns a slice that lives as long as the asset does.
     pub fn asset_type<'a>(&'a self) -> &'a str {
@@ -133,8 +133,8 @@ mod asset_tests {
     }
 
     #[test]
-    fn it_parses_a_partial() {
-        let asset: PartialAsset = serde_json::from_str(&asset_json()).unwrap();
+    fn it_parses_an_identifier() {
+        let asset: AssetIdentifier = serde_json::from_str(&asset_json()).unwrap();
         assert_eq!(asset.asset_type(), "credit_alphanum4");
         assert_eq!(asset.asset_code(), "USD");
         assert_eq!(

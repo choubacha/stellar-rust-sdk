@@ -18,5 +18,5 @@ mod offer;
 /// All the derives for XDR and JSON are implemented for the resources so that
 /// they can be used with a client. Either for reading or for writing.
 pub use account::Account;
-pub use asset::{Asset, PartialAsset};
+pub use asset::{Asset, AssetIdentifier};
 pub use offer::Offer;
