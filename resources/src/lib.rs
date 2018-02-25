@@ -9,6 +9,7 @@ extern crate serde_json;
 
 mod deserialize;
 mod account;
+mod amount;
 mod asset;
 mod offer;
 
@@ -20,3 +21,4 @@ mod offer;
 pub use account::Account;
 pub use asset::{Asset, AssetIdentifier};
 pub use offer::Offer;
+pub use amount::Amount;
