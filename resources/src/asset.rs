@@ -1,4 +1,4 @@
-use deserialize;
+use amount::Amount;
 
 /// Assets are the units that are traded on the Stellar Network.
 /// An asset consists of an type, code, and issuer.
@@ -50,7 +50,7 @@ pub struct Asset {
     asset_type: String,
     asset_code: String,
     asset_issuer: String,
-    #[serde(deserialize_with = "deserialize::amount")] amount: i64,
+    amount: Amount,
     num_accounts: u32,
     flags: Flag,
 }
@@ -79,7 +79,7 @@ impl Asset {
     /// user would expect it in
     /// https://www.stellar.org/developers/guides/concepts/assets.html
     /// Returns a signed 64-bit integer.
-    pub fn amount(&self) -> i64 {
+    pub fn amount(&self) -> Amount {
         self.amount
     }
 
@@ -126,7 +126,7 @@ mod asset_tests {
             asset.asset_issuer(),
             "GBAUUA74H4XOQYRSOW2RZUA4QL5PB37U3JS5NE3RTB2ELJVMIF5RLMAG"
         );
-        assert_eq!(asset.amount(), 1000000000);
+        assert_eq!(asset.amount(), Amount::new(1000000000));
         assert_eq!(asset.num_accounts(), 91547871);
         assert!(!asset.is_auth_required());
         assert!(asset.is_auth_revocable());

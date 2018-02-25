@@ -1,4 +1,4 @@
-use deserialize;
+use amount::Amount;
 use asset::AssetIdentifier;
 
 /// The ratio between the asking and selling price
@@ -16,9 +16,9 @@ pub struct Offer {
     seller: String,
     selling: AssetIdentifier,
     buying: AssetIdentifier,
-    #[serde(deserialize_with = "deserialize::amount")] amount: i64,
+    amount: Amount,
     #[serde(rename = "price_r")] price_ratio: PriceRatio,
-    #[serde(deserialize_with = "deserialize::amount")] price: i64,
+    price: Amount,
 }
 
 impl Offer {
@@ -54,13 +54,13 @@ impl Offer {
     }
 
     /// The amount of the `selling` asset willing to be sold
-    pub fn amount(&self) -> i64 {
+    pub fn amount(&self) -> Amount {
         self.amount
     }
 
     /// How many units of the `buying` asset it takes to get 10 million of `selling`
     /// asset. This is the smallest divisible unit of the asset.
-    pub fn price(&self) -> i64 {
+    pub fn price(&self) -> Amount {
         self.price
     }
 }
@@ -82,7 +82,7 @@ mod offer_tests {
         assert_eq!(offer.selling().asset_code(), "BAR");
         assert_eq!(offer.buying().asset_code(), "FOO");
         assert_eq!(offer.price_ratio(), (387, 50));
-        assert_eq!(offer.amount(), 236_692_509);
-        assert_eq!(offer.price(), 77_400_000);
+        assert_eq!(offer.amount(), Amount::new(236_692_509));
+        assert_eq!(offer.price(), Amount::new(77_400_000));
     }
 }
