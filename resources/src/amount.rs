@@ -4,7 +4,7 @@ use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use serde::de;
 use std::str::FromStr;
 
-/// Amounts are used in serveral resources in the stellar ecosystem.  There
+/// Amounts are used in several resources in the stellar ecosystem.  There
 /// are a lot of conversions that must take place to display amounts to users
 /// in a way that makes sense to both users and the horizon API.  That logic is contained
 /// in this module
