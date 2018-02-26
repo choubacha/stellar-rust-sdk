@@ -1,0 +1,30 @@
+{
+  "bids": [
+    {
+      "price_r": {
+        "n": 100000000,
+        "d": 12953367
+      },
+      "price": "7.7200005",
+      "amount": "12.0000000"
+    }
+  ],
+  "asks": [
+    {
+      "price_r": {
+        "n": 194,
+        "d": 25
+      },
+      "price": "7.7600000",
+      "amount": "238.4804125"
+    }
+  ],
+  "base": {
+    "asset_type": "native"
+  },
+  "counter": {
+    "asset_type": "credit_alphanum4",
+    "asset_code": "FOO",
+    "asset_issuer": "GBAUUA74H4XOQYRSOW2RZUA4QL5PB37U3JS5NE3RTB2ELJVMIF5RLMAG"
+  }
+}

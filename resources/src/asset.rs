@@ -9,8 +9,16 @@ use amount::Amount;
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AssetIdentifier {
     asset_type: String,
-    asset_code: String,
-    asset_issuer: String,
+    #[serde(default = "default_asset_code")] asset_code: String,
+    #[serde(default = "default_asset_issuer")] asset_issuer: String,
+}
+
+fn default_asset_code() -> String {
+    "XLM".to_string()
+}
+
+fn default_asset_issuer() -> String {
+    "Stellar Foundation".to_string()
 }
 
 impl AssetIdentifier {

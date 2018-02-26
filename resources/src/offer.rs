@@ -8,6 +8,21 @@ pub struct PriceRatio {
     #[serde(rename = "d")] denominator: u64,
 }
 
+/// Summary of an offer to be shown in an orderbook
+#[derive(Serialize, Deserialize, Debug)]
+pub struct OfferSummary {
+    amount: Amount,
+    #[serde(rename = "price_r")] price_ratio: PriceRatio,
+    price: Amount,
+}
+
+impl OfferSummary {
+    /// Returns the amount of an asset the offer is willing to buy or sell
+    pub fn amount(&self) -> Amount {
+        self.amount
+    }
+}
+
 /// An offer being made for particular assets at a particular exchange rate.
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Offer {
