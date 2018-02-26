@@ -56,8 +56,8 @@ struct Flag {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Asset {
     asset_type: String,
-    asset_code: String,
-    asset_issuer: String,
+    #[serde(default = "default_asset_code")] asset_code: String,
+    #[serde(default = "default_asset_issuer")] asset_issuer: String,
     amount: Amount,
     num_accounts: u32,
     flags: Flag,
@@ -125,6 +125,10 @@ mod asset_tests {
         include_str!("../fixtures/asset.json")
     }
 
+    fn native_asset_json() -> &'static str {
+        include_str!("../fixtures/native_asset.json")
+    }
+
     #[test]
     fn it_parses_an_asset_from_json() {
         let asset: Asset = serde_json::from_str(&asset_json()).unwrap();
@@ -138,6 +142,14 @@ mod asset_tests {
         assert_eq!(asset.num_accounts(), 91547871);
         assert!(!asset.is_auth_required());
         assert!(asset.is_auth_revocable());
+    }
+
+    #[test]
+    fn it_parses_native_assets_from_json() {
+        let native_asset: Asset = serde_json::from_str(&native_asset_json()).unwrap();
+        assert_eq!(native_asset.asset_type(), "native");
+        assert_eq!(native_asset.asset_code(), "XLM");
+        assert_eq!(native_asset.asset_issuer(), "Stellar Foundation");
     }
 
     #[test]
