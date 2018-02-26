@@ -15,6 +15,9 @@ pub struct Amount(i64);
 impl Amount {
     /// Create an amount newtype
     pub fn new(amount: i64) -> Amount {
+        if amount < 0 {
+            panic!("Amount must be greater than zero, got {}.", amount);
+        }
         Amount(amount)
     }
 }
@@ -29,6 +32,11 @@ mod amount_tests {
     #[test]
     fn it_orders_amounts() {
         assert!(Amount::new(12) > Amount(3));
+    }
+    #[test]
+    #[should_panic]
+    fn it_panics_with_negative_amounts() {
+        Amount::new(-1);
     }
 }
 
