@@ -5,7 +5,6 @@ use asset::AssetIdentifier;
 /// and offer to buy (bids) for a particular pair of assets.
 /// The asset pairs are refered to as a base and counter.
 /// https://www.stellar.org/developers/horizon/reference/resources/orderbook.html
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Orderbook {
     bids: Vec<OfferSummary>,
