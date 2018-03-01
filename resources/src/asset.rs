@@ -17,11 +17,11 @@ pub enum AssetIdentifier {
     CreditAlphanum12(AssetId),
 }
 
-/// Struct containing asset_code and asset_issuer
+/// Struct containing code and issuer
 #[derive(Serialize, Deserialize, Debug)]
 pub struct AssetId {
-    asset_code: String,
-    asset_issuer: String,
+    code: String,
+    issuer: String,
 }
 
 /// A convenience struct used for deserializing AssetIdentifier
@@ -56,8 +56,8 @@ impl Serialize for AssetIdentifier {
             },
             _ => IntermediateAssetIdentifier {
                 asset_type: self.asset_type().to_string(),
-                asset_code: Some(self.asset_code().to_string()),
-                asset_issuer: Some(self.asset_issuer().to_string()),
+                asset_code: Some(self.code().to_string()),
+                asset_issuer: Some(self.issuer().to_string()),
             },
         };
         rep.serialize(s)
@@ -77,39 +77,39 @@ impl AssetIdentifier {
 
     /// The code of this asset.
     /// Returns a slice that lives as long as the asset does.
-    pub fn asset_code<'a>(&'a self) -> &'a str {
+    pub fn code<'a>(&'a self) -> &'a str {
         match self {
             &AssetIdentifier::Native => &"XLM",
-            &AssetIdentifier::CreditAlphanum4(ref asset_id) => &asset_id.asset_code,
-            &AssetIdentifier::CreditAlphanum12(ref asset_id) => &asset_id.asset_code,
+            &AssetIdentifier::CreditAlphanum4(ref asset_id) => &asset_id.code,
+            &AssetIdentifier::CreditAlphanum12(ref asset_id) => &asset_id.code,
         }
     }
 
     /// The issuer of this asset.  This corresponds to the id of an account.
     /// Returns a slice that lives as long as the asset does.
-    pub fn asset_issuer<'a>(&'a self) -> &'a str {
+    pub fn issuer<'a>(&'a self) -> &'a str {
         match self {
             &AssetIdentifier::Native => &"Stellar Foundation",
-            &AssetIdentifier::CreditAlphanum4(ref asset_id) => &asset_id.asset_issuer,
-            &AssetIdentifier::CreditAlphanum12(ref asset_id) => &asset_id.asset_issuer,
+            &AssetIdentifier::CreditAlphanum4(ref asset_id) => &asset_id.issuer,
+            &AssetIdentifier::CreditAlphanum12(ref asset_id) => &asset_id.issuer,
         }
     }
 
     /// A new Asset can be a native stellar, or a fully identified asset
     pub fn new(
         asset_type: &str,
-        asset_code: Option<String>,
-        asset_issuer: Option<String>,
+        code: Option<String>,
+        issuer: Option<String>,
     ) -> Result<AssetIdentifier, String> {
         match asset_type {
             "native" => Ok(AssetIdentifier::Native),
             "credit_alphanum4" => Ok(AssetIdentifier::CreditAlphanum4(AssetId {
-                asset_code: asset_code.unwrap(),
-                asset_issuer: asset_issuer.unwrap(),
+                code: code.unwrap(),
+                issuer: issuer.unwrap(),
             })),
             "credit_alphanum12" => Ok(AssetIdentifier::CreditAlphanum12(AssetId {
-                asset_code: asset_code.unwrap(),
-                asset_issuer: asset_issuer.unwrap(),
+                code: code.unwrap(),
+                issuer: issuer.unwrap(),
             })),
             _ => Err("Invalid Asset Type.".to_string()),
         }
@@ -133,17 +133,17 @@ mod asset_identifier_tests {
     fn it_parses_native_assets_from_json() {
         let native_asset: AssetIdentifier = serde_json::from_str(&native_asset_json()).unwrap();
         assert_eq!(native_asset.asset_type(), "native");
-        assert_eq!(native_asset.asset_code(), "XLM");
-        assert_eq!(native_asset.asset_issuer(), "Stellar Foundation");
+        assert_eq!(native_asset.code(), "XLM");
+        assert_eq!(native_asset.issuer(), "Stellar Foundation");
     }
 
     #[test]
     fn it_parses_an_identifier() {
         let asset: AssetIdentifier = serde_json::from_str(&asset_json()).unwrap();
         assert_eq!(asset.asset_type(), "credit_alphanum4");
-        assert_eq!(asset.asset_code(), "USD");
+        assert_eq!(asset.code(), "USD");
         assert_eq!(
-            asset.asset_issuer(),
+            asset.issuer(),
             "GBAUUA74H4XOQYRSOW2RZUA4QL5PB37U3JS5NE3RTB2ELJVMIF5RLMAG"
         );
     }
@@ -227,27 +227,25 @@ impl Serialize for Asset {
     where
         S: Serializer,
     {
-        if self.asset_type() == "native" {
-            let rep = IntermediateAsset {
+        let rep: IntermediateAsset = match self.asset_type() {
+            "native" => IntermediateAsset {
                 asset_type: self.asset_type().to_owned(),
                 asset_code: None,
                 asset_issuer: None,
                 amount: self.amount,
                 num_accounts: self.num_accounts,
                 flags: self.flags.clone(),
-            };
-            return rep.serialize(s);
-        } else {
-            let rep = IntermediateAsset {
+            },
+            _ => IntermediateAsset {
                 asset_type: self.asset_type().to_owned(),
-                asset_code: Some(self.asset_code().to_owned()),
-                asset_issuer: Some(self.asset_issuer().to_owned()),
+                asset_code: Some(self.code().to_owned()),
+                asset_issuer: Some(self.issuer().to_owned()),
                 amount: self.amount,
                 num_accounts: self.num_accounts,
                 flags: self.flags.clone(),
-            };
-            return rep.serialize(s);
+            },
         };
+        rep.serialize(s)
     }
 }
 
@@ -260,14 +258,14 @@ impl Asset {
 
     /// The code of this asset.
     /// Returns a slice that lives as long as the asset does.
-    pub fn asset_code<'a>(&'a self) -> &'a str {
-        &self.asset_identifier.asset_code()
+    pub fn code<'a>(&'a self) -> &'a str {
+        &self.asset_identifier.code()
     }
 
     /// The issuer of this asset.  This corresponds to the id of an account.
     /// Returns a slice that lives as long as the asset does.
-    pub fn asset_issuer<'a>(&'a self) -> &'a str {
-        &self.asset_identifier.asset_issuer()
+    pub fn issuer<'a>(&'a self) -> &'a str {
+        &self.asset_identifier.issuer()
     }
 
     /// The number of units of credit issued for this asset.
@@ -317,9 +315,9 @@ mod asset_tests {
     fn it_parses_an_asset_from_json() {
         let asset: Asset = serde_json::from_str(&asset_json()).unwrap();
         assert_eq!(asset.asset_type(), "credit_alphanum4");
-        assert_eq!(asset.asset_code(), "USD");
+        assert_eq!(asset.code(), "USD");
         assert_eq!(
-            asset.asset_issuer(),
+            asset.issuer(),
             "GBAUUA74H4XOQYRSOW2RZUA4QL5PB37U3JS5NE3RTB2ELJVMIF5RLMAG"
         );
         assert_eq!(asset.amount(), Amount::new(1000000000));
