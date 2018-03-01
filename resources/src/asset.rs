@@ -7,7 +7,7 @@ use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 /// https://www.stellar.org/developers/horizon/reference/resources/asset.html
 
 /// An identifer is the type, code, and issuer.
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq)]
 pub enum AssetIdentifier {
     /// Stellar Lumens!
     Native,
@@ -18,7 +18,7 @@ pub enum AssetIdentifier {
 }
 
 /// Struct containing code and issuer
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
 pub struct AssetId {
     code: String,
     issuer: String,
@@ -95,6 +95,11 @@ impl AssetIdentifier {
         }
     }
 
+    /// Returns true if this is the native lumen on the network
+    pub fn is_native(&self) -> bool {
+        &AssetIdentifier::Native == self
+    }
+
     /// A new Asset can be a native stellar, or a fully identified asset
     pub fn new(
         asset_type: &str,
@@ -135,6 +140,7 @@ mod asset_identifier_tests {
         assert_eq!(native_asset.asset_type(), "native");
         assert_eq!(native_asset.code(), "XLM");
         assert_eq!(native_asset.issuer(), "Stellar Foundation");
+        assert!(native_asset.is_native());
     }
 
     #[test]
@@ -146,6 +152,7 @@ mod asset_identifier_tests {
             asset.issuer(),
             "GBAUUA74H4XOQYRSOW2RZUA4QL5PB37U3JS5NE3RTB2ELJVMIF5RLMAG"
         );
+        assert!(!asset.is_native());
     }
 
     #[test]

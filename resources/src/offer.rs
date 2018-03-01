@@ -2,10 +2,30 @@ use amount::Amount;
 use asset::AssetIdentifier;
 
 /// The ratio between the asking and selling price
-#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
+#[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Copy, Clone)]
 pub struct PriceRatio {
     #[serde(rename = "n")] numerator: u64,
     #[serde(rename = "d")] denominator: u64,
+}
+
+impl PriceRatio {
+    /// Constructs a new price ratio struct
+    pub fn new(numerator: u64, denominator: u64) -> Self {
+        Self {
+            numerator,
+            denominator,
+        }
+    }
+
+    /// The numerator
+    pub fn numerator(&self) -> u64 {
+        self.numerator
+    }
+
+    /// The denominator
+    pub fn denominator(&self) -> u64 {
+        self.denominator
+    }
 }
 
 /// Summary of an offer to be shown in an orderbook
