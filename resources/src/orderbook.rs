@@ -61,7 +61,7 @@ mod orderbook_tests {
             orderbook.asks().first().unwrap().amount(),
             Amount::new(2_384_804_125)
         );
-        assert_eq!(orderbook.base().asset_code(), "XLM".to_string());
-        assert_eq!(orderbook.counter().asset_code(), "FOO".to_string());
+        assert_eq!(orderbook.base().code(), "XLM".to_string());
+        assert_eq!(orderbook.counter().code(), "FOO".to_string());
     }
 }

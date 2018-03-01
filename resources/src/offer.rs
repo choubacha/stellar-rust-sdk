@@ -122,8 +122,8 @@ mod offer_tests {
         let offer: Offer = serde_json::from_str(&offer_json()).unwrap();
         assert_eq!(offer.id(), 121);
         assert_eq!(offer.paging_token(), "121");
-        assert_eq!(offer.selling().asset_code(), "BAR");
-        assert_eq!(offer.buying().asset_code(), "FOO");
+        assert_eq!(offer.selling().code(), "BAR");
+        assert_eq!(offer.buying().code(), "FOO");
         assert_eq!(offer.price_ratio(), (387, 50));
         assert_eq!(offer.amount(), Amount::new(236_692_509));
         assert_eq!(offer.price(), Amount::new(77_400_000));
