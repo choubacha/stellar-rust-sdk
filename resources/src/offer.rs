@@ -2,7 +2,7 @@ use amount::Amount;
 use asset::AssetIdentifier;
 
 /// The ratio between the asking and selling price
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
 pub struct PriceRatio {
     #[serde(rename = "n")] numerator: u64,
     #[serde(rename = "d")] denominator: u64,
@@ -20,6 +20,34 @@ impl OfferSummary {
     /// Returns the amount of an asset the offer is willing to buy or sell
     pub fn amount(&self) -> Amount {
         self.amount
+    }
+
+    /// Returns the amount of an asset the offer is willing to buy or sell
+    pub fn price_ratio(&self) -> PriceRatio {
+        self.price_ratio
+    }
+
+    /// Returns the price for an asset the offer is willing to buy or sell at
+    pub fn price(&self) -> Amount {
+        self.price
+    }
+}
+
+#[cfg(test)]
+mod offer_summary_tests {
+    use super::*;
+    use serde_json;
+
+    fn offer_summary_json() -> &'static str {
+        include_str!("../fixtures/offer_summary.json")
+    }
+
+    #[test]
+    fn it_parses_an_offer_summary_from_json() {
+        let offer_summary: OfferSummary = serde_json::from_str(&offer_summary_json()).unwrap();
+        assert_eq!(offer_summary.price_ratio().numerator, 100000000);
+        assert_eq!(offer_summary.price(), Amount::new(77200005));
+        assert_eq!(offer_summary.amount(), Amount::new(120000000));
     }
 }
 

@@ -15,10 +15,7 @@ pub struct Amount(i64);
 impl Amount {
     /// Create an amount newtype
     pub fn new(amount: i64) -> Amount {
-        assert!(
-            amount >= 0,
-            format!("Amount must be greater than zero, got {}.", amount)
-        );
+        assert!(amount >= 0);
         Amount(amount)
     }
 }
