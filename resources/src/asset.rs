@@ -8,12 +8,23 @@ use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 
 /// An identifer is the type, code, and issuer.
 #[derive(Debug)]
-pub struct AssetIdentifier {
-    asset_type: String,
+pub enum AssetIdentifier {
+    /// Stellar Lumens!
+    Native,
+    /// Asset with a 4 character code
+    CreditAlphanum4(AssetId),
+    /// Asset with a 12 character code
+    CreditAlphanum12(AssetId),
+}
+
+/// Struct containing asset_code and asset_issuer
+#[derive(Serialize, Deserialize, Debug)]
+pub struct AssetId {
     asset_code: String,
     asset_issuer: String,
 }
 
+/// A convenience struct used for deserializing AssetIdentifier
 #[derive(Serialize, Deserialize, Debug)]
 pub struct IntermediateAssetIdentifier {
     asset_type: String,
@@ -27,8 +38,8 @@ impl<'de> Deserialize<'de> for AssetIdentifier {
         D: Deserializer<'de>,
     {
         let rep: IntermediateAssetIdentifier = IntermediateAssetIdentifier::deserialize(d)?;
-        AssetIdentifier::new(rep.asset_type, rep.asset_code, rep.asset_issuer)
-            .map_err(|_| de::Error::custom("Code and issuer are required for non-native assets"))
+        AssetIdentifier::new(&rep.asset_type, rep.asset_code, rep.asset_issuer)
+            .map_err(|err| de::Error::custom(err))
     }
 }
 
@@ -37,21 +48,19 @@ impl Serialize for AssetIdentifier {
     where
         S: Serializer,
     {
-        if self.asset_type == "native".to_string() {
-            let rep = IntermediateAssetIdentifier {
-                asset_type: self.asset_type.to_owned(),
+        let rep = match self {
+            &AssetIdentifier::Native => IntermediateAssetIdentifier {
+                asset_type: "native".to_string(),
                 asset_code: None,
                 asset_issuer: None,
-            };
-            return rep.serialize(s);
-        } else {
-            let rep = IntermediateAssetIdentifier {
-                asset_type: self.asset_type.to_owned(),
-                asset_code: Some(self.asset_code.to_owned()),
-                asset_issuer: Some(self.asset_issuer.to_owned()),
-            };
-            return rep.serialize(s);
+            },
+            _ => IntermediateAssetIdentifier {
+                asset_type: self.asset_type().to_string(),
+                asset_code: Some(self.asset_code().to_string()),
+                asset_issuer: Some(self.asset_issuer().to_string()),
+            },
         };
+        rep.serialize(s)
     }
 }
 
@@ -59,43 +68,50 @@ impl AssetIdentifier {
     /// The type of this asset: “credit_alphanum4”, or “credit_alphanum12”.
     /// Returns a slice that lives as long as the asset does.
     pub fn asset_type<'a>(&'a self) -> &'a str {
-        &self.asset_type
+        match self {
+            &AssetIdentifier::Native => &"native",
+            &AssetIdentifier::CreditAlphanum4(_) => &"credit_alphanum4",
+            &AssetIdentifier::CreditAlphanum12(_) => &"credit_alphanum12",
+        }
     }
 
     /// The code of this asset.
     /// Returns a slice that lives as long as the asset does.
     pub fn asset_code<'a>(&'a self) -> &'a str {
-        &self.asset_code
+        match self {
+            &AssetIdentifier::Native => &"XLM",
+            &AssetIdentifier::CreditAlphanum4(ref asset_id) => &asset_id.asset_code,
+            &AssetIdentifier::CreditAlphanum12(ref asset_id) => &asset_id.asset_code,
+        }
     }
 
     /// The issuer of this asset.  This corresponds to the id of an account.
     /// Returns a slice that lives as long as the asset does.
     pub fn asset_issuer<'a>(&'a self) -> &'a str {
-        &self.asset_issuer
+        match self {
+            &AssetIdentifier::Native => &"Stellar Foundation",
+            &AssetIdentifier::CreditAlphanum4(ref asset_id) => &asset_id.asset_issuer,
+            &AssetIdentifier::CreditAlphanum12(ref asset_id) => &asset_id.asset_issuer,
+        }
     }
 
     /// A new Asset can be a native stellar, or a fully identified asset
     pub fn new(
-        asset_type: String,
+        asset_type: &str,
         asset_code: Option<String>,
         asset_issuer: Option<String>,
     ) -> Result<AssetIdentifier, String> {
-        if asset_type == "native".to_string() {
-            Ok(AssetIdentifier {
-                asset_type: asset_type,
-                asset_code: "XLM".to_string(),
-                asset_issuer: "Stellar Foundation".to_string(),
-            })
-        } else {
-            if asset_code.is_none() || asset_issuer.is_none() {
-                Err("Code and issuer are required for non-native assets".to_owned())
-            } else {
-                Ok(AssetIdentifier {
-                    asset_type: asset_type,
-                    asset_code: asset_code.unwrap(),
-                    asset_issuer: asset_issuer.unwrap(),
-                })
-            }
+        match asset_type {
+            "native" => Ok(AssetIdentifier::Native),
+            "credit_alphanum4" => Ok(AssetIdentifier::CreditAlphanum4(AssetId {
+                asset_code: asset_code.unwrap(),
+                asset_issuer: asset_issuer.unwrap(),
+            })),
+            "credit_alphanum12" => Ok(AssetIdentifier::CreditAlphanum12(AssetId {
+                asset_code: asset_code.unwrap(),
+                asset_issuer: asset_issuer.unwrap(),
+            })),
+            _ => Err("Invalid Asset Type.".to_string()),
         }
     }
 }
@@ -194,7 +210,7 @@ impl<'de> Deserialize<'de> for Asset {
     {
         let rep: IntermediateAsset = IntermediateAsset::deserialize(d)?;
         let asset_identifier: Result<AssetIdentifier, D::Error> =
-            AssetIdentifier::new(rep.asset_type, rep.asset_code, rep.asset_issuer).map_err(|_| {
+            AssetIdentifier::new(&rep.asset_type, rep.asset_code, rep.asset_issuer).map_err(|_| {
                 de::Error::custom("Code and issuer are required for non-native assets")
             });
         Ok(Asset {
@@ -239,19 +255,19 @@ impl Asset {
     /// The type of this asset: “credit_alphanum4”, or “credit_alphanum12”.
     /// Returns a slice that lives as long as the asset does.
     pub fn asset_type<'a>(&'a self) -> &'a str {
-        &self.asset_identifier.asset_type
+        &self.asset_identifier.asset_type()
     }
 
     /// The code of this asset.
     /// Returns a slice that lives as long as the asset does.
     pub fn asset_code<'a>(&'a self) -> &'a str {
-        &self.asset_identifier.asset_code
+        &self.asset_identifier.asset_code()
     }
 
     /// The issuer of this asset.  This corresponds to the id of an account.
     /// Returns a slice that lives as long as the asset does.
     pub fn asset_issuer<'a>(&'a self) -> &'a str {
-        &self.asset_identifier.asset_issuer
+        &self.asset_identifier.asset_issuer()
     }
 
     /// The number of units of credit issued for this asset.
