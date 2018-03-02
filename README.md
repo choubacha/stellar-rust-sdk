@@ -9,6 +9,16 @@ This repository is broken into multiple crates. Each crate is designed to be use
 as a different component. The crates are organized as a virtual workspace so that
 they can be built together and tested at once.
 
+### Resources
+
+Defines the major data types that constitute the horizon API resources. It also enables
+the serialization to and from JSON.
+
+### Client
+
+Defines a connection to a horizon server and manages the interactions to and from it.
+This includes creating new resources and fetching existing resources.
+
 ## Testing
 
 From the main (virtual workspace) run the following command. It should run all the
