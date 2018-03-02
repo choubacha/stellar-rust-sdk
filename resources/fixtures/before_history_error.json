@@ -1,0 +1,7 @@
+{
+  "type": "before_history",
+  "title": "Data Requested Is Before Recorded History",
+  "status": 410,
+  "detail": "This horizon instance is configured to only track a portion of the stellar network's latest history. This request is asking for results prior to the recorded history known to this horizon instance.",
+  "instance": "horizon-testnet-001.prd.stellar001.internal.stellar-ops.com/ngUFNhn76T-078058"
+}
