@@ -299,3 +299,100 @@ mod trade_tests {
         );
     }
 }
+
+/// The aggregation of trades for a specifc base/counter pair of assets over a given
+/// time period.
+#[derive(Deserialize, Serialize, Debug)]
+pub struct TradeAggregation {
+    // Several fields are omitted since they don't seem to be in the actual response from horizon.
+    // Or they don't seem to make sense.
+    //
+    // The rational versions of the prices also only seem to be present in the examples. When
+    // querying the actual horizon API they were absent. They probably don't contain much value
+    // over the "amount" field anyhow so I left them off.
+    timestamp: u64,
+    trade_count: u64,
+    base_volume: Amount,
+    counter_volume: Amount,
+    avg: Amount,
+    high: Amount,
+    low: Amount,
+    open: Amount,
+    close: Amount,
+}
+
+impl TradeAggregation {
+    /// The beginning of this time segment
+    pub fn started_at(&self) -> DateTime<Utc> {
+        let secs = self.timestamp / 1000;
+        let nanos = (self.timestamp % 1000) * 1_000_000;
+        Utc.timestamp(secs as i64, nanos as u32)
+    }
+
+    /// The number of trades during this period
+    pub fn count(&self) -> u64 {
+        self.trade_count
+    }
+
+    /// The amount of base traded across the segment
+    pub fn base_volume(&self) -> Amount {
+        self.base_volume
+    }
+
+    /// The amount of counter traded across the segment
+    pub fn counter_volume(&self) -> Amount {
+        self.counter_volume
+    }
+
+    /// The weighted average price of counter in terms of base.
+    pub fn average(&self) -> Amount {
+        self.avg
+    }
+
+    /// The highest price for this segment
+    pub fn high(&self) -> Amount {
+        self.high
+    }
+
+    /// The lowest price for this segment
+    pub fn low(&self) -> Amount {
+        self.low
+    }
+
+    /// The opening price for this segment
+    pub fn open(&self) -> Amount {
+        self.open
+    }
+
+    /// The closing price for this segment
+    pub fn close(&self) -> Amount {
+        self.close
+    }
+}
+
+#[cfg(test)]
+mod trade_aggregation_tests {
+    use super::*;
+    use serde_json;
+
+    fn trade_aggregation_json() -> &'static str {
+        include_str!("../fixtures/trade_aggregation.json")
+    }
+
+    #[test]
+    fn it_parses_into_a_trade() {
+        let trade_agg: TradeAggregation = serde_json::from_str(&trade_aggregation_json()).unwrap();
+        assert_eq!(
+            trade_agg.started_at(),
+            Utc.ymd(2018, 2, 1).and_hms(22, 0, 0)
+        );
+        assert_eq!(trade_agg.count(), 26);
+        assert_eq!(trade_agg.base_volume(), Amount::new(275750201596));
+        assert_eq!(trade_agg.counter_volume(), Amount::new(50856410385));
+        assert_eq!(trade_agg.average(), Amount::new(1844293));
+        assert_eq!(trade_agg.high(), Amount::new(1915709));
+        assert_eq!(trade_agg.low(), Amount::new(1506024));
+        assert_eq!(trade_agg.open(), Amount::new(1724138));
+        assert_eq!(trade_agg.close(), Amount::new(1506024));
+    }
+}

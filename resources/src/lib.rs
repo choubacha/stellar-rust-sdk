@@ -26,4 +26,4 @@ pub use asset::{Asset, AssetIdentifier};
 pub use offer::Offer;
 pub use amount::Amount;
 pub use orderbook::Orderbook;
-pub use trade::{Seller as TradeSeller, Trade};
+pub use trade::{Seller as TradeSeller, Trade, TradeAggregation};
