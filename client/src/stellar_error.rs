@@ -30,7 +30,7 @@ pub enum ErrorType {
     StaleHistory,
     TransactionFailed,
     TransactionMalformed,
-    NotAValidErrorType,
+    OtherError(String),
 }
 
 #[derive(Deserialize)]
@@ -80,18 +80,15 @@ impl StellarError {
             "stale_history" => ErrorType::StaleHistory,
             "transaction_failed" => ErrorType::TransactionFailed,
             "transaction_malformed" => ErrorType::TransactionMalformed,
-            _ => ErrorType::NotAValidErrorType,
+            _ => ErrorType::OtherError(error_type.to_owned()),
         };
-        match type_enum {
-            ErrorType::NotAValidErrorType => Err("Invalid Error Type".to_string()),
-            _ => Ok(StellarError {
-                error_type: type_enum,
-                title: title,
-                status: status,
-                detail: detail,
-                instance: instance,
-            }),
-        }
+        Ok(StellarError {
+            error_type: type_enum,
+            title: title,
+            status: status,
+            detail: detail,
+            instance: instance,
+        })
     }
     /// If Horizon cannot understand a request due to invalid parameters, it will return a
     /// bad_request error. This is analogous to the HTTP 400 Error.
@@ -233,12 +230,15 @@ mod asset_identifier_tests {
     #[test]
     fn it_will_not_instantiate_invalid_errors() {
         let stellar_error = StellarError::new(
-            "bad type",
+            "New Stellar Error",
             "title".to_string(),
             400,
             "detail".to_string(),
             "instance".to_string(),
         );
-        assert!(stellar_error.is_err());
+        assert_eq!(
+            stellar_error.unwrap().error_type,
+            ErrorType::OtherError("New Stellar Error".to_string())
+        );
     }
 }
