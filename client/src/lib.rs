@@ -4,10 +4,13 @@
 extern crate futures;
 extern crate hyper;
 extern crate hyper_tls;
+extern crate serde;
+extern crate serde_json;
 extern crate stellar_resources;
 extern crate tokio_core;
 
 mod client;
+pub mod endpoint;
 pub mod error;
 
 /// The stellar client is a data structure that wraps the logic and state of the

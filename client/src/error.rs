@@ -1,5 +1,7 @@
 //! Error and result module
 use std::error::Error as StdError;
+use hyper::error::UriError;
+use hyper;
 use std::fmt;
 
 /// A set of errors for use in the client
@@ -29,5 +31,17 @@ impl StdError for Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         f.write_str(self.description())
+    }
+}
+
+impl From<UriError> for Error {
+    fn from(_: UriError) -> Self {
+        Error::BadUri
+    }
+}
+
+impl From<hyper::Error> for Error {
+    fn from(_: hyper::Error) -> Self {
+        Error::BadUri
     }
 }
