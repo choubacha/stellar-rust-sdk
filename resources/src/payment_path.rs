@@ -20,23 +20,9 @@ impl PaymentPath {
         path: Vec<AssetIdentifier>,
         source_amount: Amount,
         destination_amount: Amount,
-        destination_asset_type: String,
-        destination_asset_code: Option<String>,
-        destination_asset_issuer: Option<String>,
-        source_asset_type: String,
-        source_asset_code: Option<String>,
-        source_asset_issuer: Option<String>,
+        destination_asset: AssetIdentifier,
+        source_asset: AssetIdentifier,
     ) -> Result<PaymentPath, String> {
-        let destination_asset = AssetIdentifier::new(
-            destination_asset_type.as_str(),
-            destination_asset_code,
-            destination_asset_issuer,
-        )?;
-        let source_asset = AssetIdentifier::new(
-            source_asset_type.as_str(),
-            source_asset_code,
-            source_asset_issuer,
-        )?;
         Ok(PaymentPath {
             path,
             source_amount,
@@ -73,7 +59,7 @@ impl PaymentPath {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-pub struct IntermediatePaymentPath {
+struct IntermediatePaymentPath {
     path: Vec<AssetIdentifier>,
     destination_amount: Amount,
     destination_asset_type: String,
@@ -91,16 +77,22 @@ impl<'de> Deserialize<'de> for PaymentPath {
         D: Deserializer<'de>,
     {
         let rep: IntermediatePaymentPath = IntermediatePaymentPath::deserialize(d)?;
+        let destination_asset = AssetIdentifier::new(
+            rep.destination_asset_type.as_str(),
+            rep.destination_asset_code,
+            rep.destination_asset_issuer,
+        ).map_err(|err| de::Error::custom(err))?;
+        let source_asset = AssetIdentifier::new(
+            rep.source_asset_type.as_str(),
+            rep.source_asset_code,
+            rep.source_asset_issuer,
+        ).map_err(|err| de::Error::custom(err))?;
         PaymentPath::new(
             rep.path,
             rep.source_amount,
             rep.destination_amount,
-            rep.destination_asset_type,
-            rep.destination_asset_code,
-            rep.destination_asset_issuer,
-            rep.source_asset_type,
-            rep.source_asset_code,
-            rep.source_asset_issuer,
+            destination_asset,
+            source_asset,
         ).map_err(|err| de::Error::custom(err))
     }
 }
