@@ -7,7 +7,7 @@ use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 /// https://www.stellar.org/developers/horizon/reference/resources/asset.html
 
 /// An identifer is the type, code, and issuer.
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum AssetIdentifier {
     /// Stellar Lumens!
     Native,
@@ -18,7 +18,7 @@ pub enum AssetIdentifier {
 }
 
 /// Struct containing code and issuer
-#[derive(Serialize, Deserialize, Debug, PartialEq, Eq)]
+#[derive(Serialize, Deserialize, Debug, PartialEq, Eq, Clone)]
 pub struct AssetId {
     code: String,
     issuer: String,
@@ -85,6 +85,15 @@ impl AssetIdentifier {
         }
     }
 
+    /// The code of this asset as a result.
+    pub fn asset_code(&self) -> Option<String> {
+        match self {
+            &AssetIdentifier::Native => None,
+            &AssetIdentifier::CreditAlphanum4(ref asset_id) => Some(asset_id.code.clone()),
+            &AssetIdentifier::CreditAlphanum12(ref asset_id) => Some(asset_id.code.clone()),
+        }
+    }
+
     /// The issuer of this asset.  This corresponds to the id of an account.
     /// Returns a slice that lives as long as the asset does.
     pub fn issuer<'a>(&'a self) -> &'a str {
@@ -92,6 +101,15 @@ impl AssetIdentifier {
             &AssetIdentifier::Native => &"Stellar Foundation",
             &AssetIdentifier::CreditAlphanum4(ref asset_id) => &asset_id.issuer,
             &AssetIdentifier::CreditAlphanum12(ref asset_id) => &asset_id.issuer,
+        }
+    }
+
+    /// The issuer of this asset as a result
+    pub fn asset_issuer(&self) -> Option<String> {
+        match self {
+            &AssetIdentifier::Native => None,
+            &AssetIdentifier::CreditAlphanum4(ref asset_id) => Some(asset_id.issuer.clone()),
+            &AssetIdentifier::CreditAlphanum12(ref asset_id) => Some(asset_id.issuer.clone()),
         }
     }
 
@@ -139,7 +157,9 @@ mod asset_identifier_tests {
         let native_asset: AssetIdentifier = serde_json::from_str(&native_asset_json()).unwrap();
         assert_eq!(native_asset.asset_type(), "native");
         assert_eq!(native_asset.code(), "XLM");
+        assert_eq!(native_asset.asset_code(), None);
         assert_eq!(native_asset.issuer(), "Stellar Foundation");
+        assert_eq!(native_asset.asset_issuer(), None);
         assert!(native_asset.is_native());
     }
 
