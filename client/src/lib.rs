@@ -5,6 +5,8 @@ extern crate futures;
 extern crate hyper;
 extern crate hyper_tls;
 extern crate serde;
+#[macro_use]
+extern crate serde_derive;
 extern crate serde_json;
 extern crate stellar_resources;
 extern crate tokio_core;
@@ -12,6 +14,7 @@ extern crate tokio_core;
 mod client;
 pub mod endpoint;
 pub mod error;
+mod stellar_error;
 
 /// The stellar client is a data structure that wraps the logic and state of the
 /// stellar horizon api. Interaction generally relies on building resources from
@@ -24,3 +27,4 @@ pub mod error;
 /// itself.
 pub use client::Client;
 pub use error::{Error, Result};
+pub use stellar_error::StellarError;
