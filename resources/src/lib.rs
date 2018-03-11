@@ -8,15 +8,16 @@ extern crate serde;
 extern crate serde_derive;
 extern crate serde_json;
 
-mod deserialize;
 mod account;
 mod amount;
 mod asset;
+mod deserialize;
+mod ledger;
 mod offer;
 mod orderbook;
+mod payment_path;
 mod trade;
 mod transaction;
-mod payment_path;
 
 /// # Stellar Resources
 ///
@@ -24,10 +25,11 @@ mod payment_path;
 /// All the derives for XDR and JSON are implemented for the resources so that
 /// they can be used with a client. Either for reading or for writing.
 pub use account::Account;
-pub use asset::{Asset, AssetIdentifier};
-pub use offer::Offer;
 pub use amount::Amount;
+pub use asset::{Asset, AssetIdentifier};
+pub use ledger::Ledger;
+pub use offer::Offer;
+pub use payment_path::PaymentPath;
 pub use orderbook::Orderbook;
 pub use trade::{Seller as TradeSeller, Trade, TradeAggregation};
-pub use payment_path::PaymentPath;
 pub use transaction::Transaction;
