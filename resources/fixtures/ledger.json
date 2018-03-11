@@ -1,0 +1,17 @@
+{
+	"id": "eee9e6e02899365ecae4c37e52db7d99e2d130baf4ec1856d311bb546df1d0ad",
+	"paging_token": "300042120331264",
+	"hash": "eee9e6e02899365ecae4c37e52db7d99e2d130baf4ec1856d311bb546df1d0ad",
+	"prev_hash": "3d4de1c6b97d69e86e341c6963f5c669c5c7aac4dc84ddd4c3fe70a5b2bc988f",
+	"sequence": 69859,
+	"transaction_count": 0,
+	"operation_count": 0,
+	"closed_at": "2017-03-23T20:13:23Z",
+	"total_coins": "100000000000.0000000",
+	"fee_pool": "1800.0080200",
+	"base_fee_in_stroops": 100,
+	"base_reserve_in_stroops": 100000000,
+	"max_tx_set_size": 50,
+	"protocol_version": 4,
+	"header_xdr": ""
+}
