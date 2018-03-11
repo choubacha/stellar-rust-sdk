@@ -42,7 +42,8 @@ impl Account {
         self.sequence
     }
 
-    /// The number of account subentries.
+    /// The number of account subentries.  This number is multiplied by
+    /// 0.5 to determine the minimum required balance.
     pub fn subentry_count(&self) -> u64 {
         self.subentry_count
     }
