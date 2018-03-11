@@ -15,6 +15,7 @@ mod asset;
 mod offer;
 mod orderbook;
 mod trade;
+mod transaction;
 mod payment_path;
 
 /// # Stellar Resources
@@ -29,3 +30,4 @@ pub use amount::Amount;
 pub use orderbook::Orderbook;
 pub use trade::{Seller as TradeSeller, Trade, TradeAggregation};
 pub use payment_path::PaymentPath;
+pub use transaction::Transaction;
