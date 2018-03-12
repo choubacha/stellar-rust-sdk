@@ -1,8 +1,8 @@
 use error::Result;
-use hyper::Uri;
 use std::str::FromStr;
 use stellar_resources::Account;
 use super::EndPoint;
+use http::{Request, Uri};
 
 /// An endpoint that accesses a single accounts details.
 #[derive(Debug)]
@@ -20,10 +20,12 @@ impl AccountDetails {
 
 impl<'de> EndPoint<'de> for AccountDetails {
     type Response = Account;
+    type RequestBody = ();
 
-    fn to_uri(&self, host: &str) -> Result<Uri> {
-        let uri = Uri::from_str(&format!("{host}/accounts/{id}", host = host, id = self.id))?;
-        Ok(uri)
+    fn into_request(self, host: &str) -> Result<Request<()>> {
+        let uri = Uri::from_str(&format!("{}/accounts/{}", host, self.id))?;
+        let request = Request::get(uri).body(())?;
+        Ok(request)
     }
 }
 
@@ -34,11 +36,10 @@ mod tests {
     #[test]
     fn it_can_make_an_account_uri() {
         let details = AccountDetails::new("abc123");
-        assert_eq!(
-            details
-                .to_uri("https://horizon-testnet.stellar.org")
-                .unwrap(),
-            "https://horizon-testnet.stellar.org/accounts/abc123"
-        );
+        let request = details
+            .into_request("https://horizon-testnet.stellar.org")
+            .unwrap();
+        assert_eq!(request.uri().host().unwrap(), "horizon-testnet.stellar.org");
+        assert_eq!(request.uri().path(), "/accounts/abc123");
     }
 }
