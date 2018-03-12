@@ -2,6 +2,7 @@
 //! Client implementation to the stellar horizon api.
 
 extern crate futures;
+extern crate http;
 extern crate hyper;
 extern crate hyper_tls;
 extern crate serde;

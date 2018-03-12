@@ -5,6 +5,7 @@ authors = ["Kevin Bacha <chewbacha@gmail.com>"]
 
 [dependencies]
 stellar-resources = { path = "../resources" }
+http = "0.1"
 hyper = "0.11"
 hyper-tls = "0.1"
 tokio-core = "0.1"
