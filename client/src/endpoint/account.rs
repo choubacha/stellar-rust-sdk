@@ -18,7 +18,7 @@ impl AccountDetails {
     }
 }
 
-impl<'de> EndPoint<'de> for AccountDetails {
+impl EndPoint for AccountDetails {
     type Response = Account;
     type RequestBody = ();
 
