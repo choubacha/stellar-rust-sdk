@@ -5,6 +5,7 @@ extern crate futures;
 extern crate http;
 extern crate hyper;
 extern crate hyper_tls;
+extern crate reqwest;
 extern crate serde;
 #[macro_use]
 extern crate serde_derive;
@@ -12,7 +13,7 @@ extern crate serde_json;
 extern crate stellar_resources;
 extern crate tokio_core;
 
-mod client;
+pub mod client;
 pub mod endpoint;
 pub mod error;
 mod stellar_error;
@@ -26,6 +27,6 @@ mod stellar_error;
 /// need to hand it the tokio handle and execute the futures on your own. Once tokio
 /// 0.2.0 is released with the global event loop, it will add them to the event loop
 /// itself.
-pub use client::Client;
+pub use client::{async, sync};
 pub use error::{Error, Result};
 pub use stellar_error::StellarError;
