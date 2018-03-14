@@ -2,13 +2,23 @@ use amount::Amount;
 use asset::AssetIdentifier;
 use serde::{de, Deserialize, Deserializer};
 use offer::PriceRatio;
+mod create_account;
+use self::create_account::CreateAccountFields;
 
 /// Operations are objects that represent a desired change to the ledger: payments, offers to
 /// exchange currency, changes made to account options, etc. Operations are submitted to the
 /// Stellar network grouped in a Transaction.
 
 #[derive(Debug, Serialize)]
-pub enum Operation {
+pub struct Operation {
+    id: i64,
+    paging_token: String,
+    type_i: u32,
+    operation_detail: OperationDetail,
+}
+
+#[derive(Debug, Deserialize, Serialize)]
+pub enum OperationDetail {
     /// Create Account operation represents a new account creation.
     CreateAccount(CreateAccountFields),
     /// A payment operation represents a payment from one account to another. This payment can be
@@ -16,97 +26,105 @@ pub enum Operation {
     Payment(PaymentFields),
 }
 
-impl Operation {
-    /// The account that was created by this operation
-    pub fn is_create_account(&self) -> bool {
-        match self {
-            &Operation::CreateAccount(_) => true,
-            _ => false,
-        }
-    }
-}
-
 #[derive(Debug, Deserialize)]
-struct IntermediateOperation {
+pub struct IntermediateOperation {
     id: i64,
     paging_token: String,
-    #[serde(rename="type")] operation_type: String,
+    #[serde(rename = "type")] operation_type: String,
     type_i: u32,
     account: Option<String>,
     funder: Option<String>,
     starting_balance: Option<Amount>,
 }
 
+impl Operation {
+    /// The canonical id of this operation, suitable for use as the :id parameter for url templates
+    /// that require an operation’s ID.
+    pub fn id(&self) -> i64 {
+        self.id
+    }
+
+    /// A paging token suitable for use as a cursor parameter.
+    pub fn paging_token(&self) -> &String {
+        &self.paging_token
+    }
+
+    /// Specifies the type of operation, See “Types” section below for reference.
+    pub fn type_i(&self) -> u32 {
+        self.type_i
+    }
+
+    /// Returns true if the operation is a create_account operation
+    pub fn is_create_account(&self) -> bool {
+        match self.operation_detail {
+            OperationDetail::CreateAccount(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns the public address of the account in the operation.
+    /// Returns None if the operation does not have an account attribute.
+    pub fn account(&self) -> Option<&String> {
+        match self.operation_detail {
+            OperationDetail::CreateAccount(ref create_account_fields) => {
+                Some(create_account_fields.account())
+            }
+            _ => None,
+        }
+    }
+
+    /// Returns the public address of the funding account in the operation.
+    /// Returns None if the operation does not have a funder attribute.
+    pub fn funder(&self) -> Option<&String> {
+        match self.operation_detail {
+            OperationDetail::CreateAccount(ref create_account_fields) => {
+                Some(create_account_fields.funder())
+            }
+            _ => None,
+        }
+    }
+
+    /// Returns the starting_balance of the account in the operation.
+    /// Returns None if the operation does not have a starting_balance attribute.
+    pub fn starting_balance(&self) -> Option<Amount> {
+        match self.operation_detail {
+            OperationDetail::CreateAccount(ref create_account_fields) => {
+                Some(create_account_fields.starting_balance())
+            }
+            _ => None,
+        }
+    }
+}
 
 impl<'de> Deserialize<'de> for Operation {
     fn deserialize<D>(d: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
-
     {
         let rep: IntermediateOperation = IntermediateOperation::deserialize(d)?;
-        let base_operation = BaseOperation {
-            id: rep.id,
-            paging_token: rep.paging_token,
-            type_i: rep.type_i,
-        };
         match &rep.operation_type[..] {
-            "create_account" =>  {
-                Ok(Operation::CreateAccount(
-                    CreateAccountFields {
-                        base_operation: base_operation,
-                        account: rep.account.unwrap(),
-                        funder: rep.funder.unwrap(),
-                        starting_balance: rep.starting_balance.unwrap(),
-                    }
-                )
-            )},
-            _ => Err(de::Error::custom("Invalid operation type."))
+            "create_account" => {
+                let operation_detail =
+                    CreateAccountFields::new(rep.account, rep.funder, rep.starting_balance)
+                        .map_err(|err| de::Error::custom(err))?;
+                Ok(Operation {
+                    id: rep.id,
+                    paging_token: rep.paging_token,
+                    type_i: rep.type_i,
+                    operation_detail: OperationDetail::CreateAccount(operation_detail),
+                })
+            }
+            _ => Err(de::Error::custom("Invalid operation type.")),
         }
     }
 }
 
-/// This struct contains the fields that are common to all operation types
-#[derive(Debug, Deserialize, Serialize)]
-struct BaseOperation {
-    id: i64,
-    paging_token: String,
-    type_i: u32,
-}
-
-
-#[derive(Debug, Deserialize, Serialize)]
-pub struct CreateAccountFields {
-    base_operation: BaseOperation,
-    account: String,
-    funder: String,
-    starting_balance: Amount,
-}
-
-#[cfg(test)]
-mod create_account_tests {
-    use super::*;
-    use serde_json;
-
-    fn create_account_json() -> &'static str {
-        include_str!("../fixtures/operations/create_account.json")
-    }
-
-    #[test]
-    fn it_parses_create_account_from_json() {
-        let operation: Operation = serde_json::from_str(&create_account_json()).unwrap();
-        assert_eq!(operation.is_create_account(), true);
-    }
-}
-
-
 #[derive(Debug, Deserialize, Serialize)]
 pub struct PaymentFields {
-    base_operation: BaseOperation,
     from: String,
     to: String,
     asset: AssetIdentifier,
-    amount:  Amount,
+    amount: Amount,
 }
 
 /// A path payment operation represents a payment from one account to another through a path. This
@@ -114,7 +132,6 @@ pub struct PaymentFields {
 /// other assets that are traded into and out of along the path.
 #[derive(Debug, Deserialize, Serialize)]
 struct PathPayment {
-    base_operation: BaseOperation,
     from: String,
     to: String,
     destination_asset: AssetIdentifier,
@@ -128,7 +145,6 @@ struct PathPayment {
 /// network. It specifies an issuer, a price and amount of a given asset to buy or sell.
 #[derive(Debug, Deserialize, Serialize)]
 struct ManageOffer {
-    base_operation: BaseOperation,
     offer_id: i64,
     selling: AssetIdentifier,
     buying: AssetIdentifier,
@@ -136,14 +152,12 @@ struct ManageOffer {
     #[serde(rename = "price_r")] price_ratio: PriceRatio,
     price: Amount,
 }
-
 
 /// “Create Passive Offer” operation creates an offer that won’t consume a counter offer that
 /// exactly matches this offer. This is useful for offers just used as 1:1 exchanges for path
 /// payments. Use Manage Offer to manage this offer after using this operation to create it.
 #[derive(Debug, Deserialize, Serialize)]
 struct CreatePassiveOffer {
-    base_operation: BaseOperation,
     offer_id: i64,
     selling: AssetIdentifier,
     buying: AssetIdentifier,
@@ -151,7 +165,6 @@ struct CreatePassiveOffer {
     #[serde(rename = "price_r")] price_ratio: PriceRatio,
     price: Amount,
 }
-
 
 /// Use “Set Options” operation to set following options to your account:
 ///
@@ -165,7 +178,6 @@ struct CreatePassiveOffer {
 /// Set home domain.
 #[derive(Debug, Deserialize, Serialize)]
 struct SetOptions {
-    base_operation: BaseOperation,
     signer_key: String,
     signer_weight: u8,
     master_key_weight: u8,
@@ -183,7 +195,6 @@ struct SetOptions {
 /// another. The issuer being trusted and the asset code are in the given Asset object.
 #[derive(Debug, Deserialize, Serialize)]
 struct ChangeTrust {
-    base_operation: BaseOperation,
     asset: AssetIdentifier,
     trustee: String,
     trustor: String,
@@ -193,22 +204,17 @@ struct ChangeTrust {
 /// Removes the account and transfers all remaining XLM to the destination account.
 #[derive(Debug, Deserialize, Serialize)]
 struct AccountMerge {
-    base_operation: BaseOperation,
     account: String,
     into: String,
 }
 
 /// Runs inflation
 #[derive(Debug, Deserialize, Serialize)]
-struct Inflation {
-    base_operation: BaseOperation,
-}
+struct Inflation {}
 
 /// Set, modify or delete a Data Entry (name/value pair) for an account.
 #[derive(Debug, Deserialize, Serialize)]
 struct ManageData {
-    base_operation: BaseOperation,
     name: String,
     value: String,
 }
-
