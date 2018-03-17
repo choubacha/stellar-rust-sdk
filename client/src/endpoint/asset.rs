@@ -46,6 +46,28 @@ use http::{Request, Uri};
 /// # assert_eq!(records.records()[0].issuer(), issuer);
 /// ```
 ///
+/// #### Cursor
+///
+/// Starts the page of results at a given cursor
+///
+/// ```
+/// # use stellar_client::sync::Client;
+/// # use stellar_client::endpoint::AllAssets;
+/// #
+/// let client      = Client::horizon_test().unwrap();
+/// #
+/// # // grab first page and extract cursor
+/// # let endpoint      = AllAssets::default().limit(1);
+/// # let first_page    = client.request(endpoint).unwrap();
+/// # let cursor        = first_page.next_cursor();
+/// #
+/// let endpoint    = AllAssets::default().cursor(cursor);
+/// let records     = client.request(endpoint).unwrap();
+/// #
+/// # assert!(records.records().len() > 0);
+/// # assert_ne!(records.next_cursor(), cursor);
+/// ```
+///
 /// #### Order
 ///
 /// Fetches all records in a set order, either ascending or descending.
