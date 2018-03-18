@@ -1,0 +1,30 @@
+{
+  "_links": {
+    "effects": {
+      "href": "/operations/34359742465/effects/{?cursor,limit,order}",
+      "templated": true
+    },
+    "precedes": {
+      "href": "/operations?cursor=34359742465\u0026order=asc"
+    },
+    "self": {
+      "href": "/operations/34359742465"
+    },
+    "succeeds": {
+      "href": "/operations?cursor=34359742465\u0026order=desc"
+    },
+    "transaction": {
+      "href": "/transactions/34359742464"
+    }
+  },
+  "asset_code": "USD",
+  "asset_issuer": "GC23QF2HUE52AMXUFUH3AYJAXXGXXV2VHXYYR6EYXETPKDXZSAW67XO4",
+  "asset_type": "credit_alphanum4",
+  "authorize": true,
+  "id": 34359742465,
+  "paging_token": "34359742465",
+  "trustee": "GC23QF2HUE52AMXUFUH3AYJAXXGXXV2VHXYYR6EYXETPKDXZSAW67XO4",
+  "trustor": "GBXGQJWVLWOYHFLVTKWV5FGHA3LNYY2JQKM7OAJAUEQFU6LPCSEFVXON",
+  "type_i": 7,
+  "type": "allow_trust"
+}

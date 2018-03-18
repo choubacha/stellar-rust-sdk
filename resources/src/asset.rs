@@ -202,10 +202,19 @@ mod asset_identifier_tests {
 
 /// Permissions around who can own an asset and whether or
 /// not the asset issuer can freeze the asset.
-#[derive(Serialize, Deserialize, Debug, Copy, Clone)]
-struct Flag {
+#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Eq)]
+pub struct Flag {
     auth_required: bool,
     auth_revocable: bool,
+}
+
+impl Flag {
+    pub fn new(auth_required: bool, auth_revocable: bool) -> Flag {
+        Flag {
+            auth_required: auth_required,
+            auth_revocable: auth_revocable,
+        }
+    }
 }
 
 /// Assets are the units that are traded on the Stellar Network.

@@ -1,0 +1,26 @@
+{
+  "_links": {
+    "effects": {
+      "href": "/operations/799357838299137/effects{?cursor,limit,order}",
+      "templated": true
+    },
+    "precedes": {
+      "href": "/operations?cursor=799357838299137\u0026order=asc"
+    },
+    "self": {
+      "href": "/operations/799357838299137"
+    },
+    "succeeds": {
+      "href": "/operations?cursor=799357838299137\u0026order=desc"
+    },
+    "transaction": {
+      "href": "/transactions/799357838299136"
+    }
+  },
+  "account": "GBCR5OVQ54S2EKHLBZMK6VYMTXZHXN3T45Y6PRX4PX4FXDMJJGY4FD42",
+  "id": 799357838299137,
+  "into": "GBS43BF24ENNS3KPACUZVKK2VYPOZVBQO2CISGZ777RYGOPYC2FT6S3K",
+  "paging_token": "799357838299137",
+  "type_i": 8,
+  "type": "account_merge"
+}

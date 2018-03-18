@@ -1,0 +1,30 @@
+{
+  "_links": {
+    "effects": {
+      "href": "/operations/574731048718337/effects{?cursor,limit,order}",
+      "templated": true
+    },
+    "precedes": {
+      "href": "/operations?cursor=574731048718337\u0026order=asc"
+    },
+    "self": {
+      "href": "/operations/574731048718337"
+    },
+    "succeeds": {
+      "href": "/operations?cursor=574731048718337\u0026order=desc"
+    },
+    "transaction": {
+      "href": "/transactions/574731048718336"
+    }
+  },
+  "asset_code": "CHP",
+  "asset_issuer": "GAC2ZUXVI5266NMMGDPBMXHH4BTZKJ7MMTGXRZGX2R5YLMFRYLJ7U5EA",
+  "asset_type": "credit_alphanum4",
+  "id": 574731048718337,
+  "limit": "5.0",
+  "paging_token": "574731048718337",
+  "trustee": "GAC2ZUXVI5266NMMGDPBMXHH4BTZKJ7MMTGXRZGX2R5YLMFRYLJ7U5EA",
+  "trustor": "GDVXG2FMFFSUMMMBIUEMWPZAIU2FNCH7QNGJMWRXRD6K5FZK5KJS4DDR",
+  "type_i": 6,
+  "type": "change_trust"
+}
