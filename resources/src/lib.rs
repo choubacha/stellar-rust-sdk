@@ -32,7 +32,7 @@ pub use asset::{Asset, AssetIdentifier};
 pub use ledger::Ledger;
 pub use offer::Offer;
 pub use payment_path::PaymentPath;
-pub use operation::{Operation, OperationDetail};
+pub use operation::{Operation, OperationKind};
 pub use orderbook::Orderbook;
 pub use trade::{Seller as TradeSeller, Trade, TradeAggregation};
 pub use transaction::Transaction;

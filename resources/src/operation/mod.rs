@@ -34,12 +34,13 @@ mod test;
 pub struct Operation {
     id: i64,
     paging_token: String,
-    detail: OperationDetail,
+    kind: Kind,
 }
 
-/// Each operation type has additional details and fields that are associated with it.
+/// Each operation type is representing by a kind and captures data specific to that
+/// type within it's newtype.
 #[derive(Debug, Deserialize)]
-pub enum OperationDetail {
+pub enum OperationKind {
     /// A create account operation represents a new account creation.
     CreateAccount(CreateAccount),
     /// A payment operation represents a payment from one account to another. This payment can be
@@ -79,6 +80,8 @@ pub enum OperationDetail {
     /// Set, modify or delete a Data Entry (name/value pair) for an account.
     ManageData(ManageData),
 }
+// Use inside file to be brief
+use self::OperationKind as Kind;
 
 impl Operation {
     /// that require an operation’s ID.
@@ -93,120 +96,122 @@ impl Operation {
 
     /// Specifies the type of operation, See “Types” section below for reference.
     pub fn type_i(&self) -> u32 {
-        match &self.detail {
-            &OperationDetail::CreateAccount(_) => 0,
-            &OperationDetail::Payment(_) => 1,
-            &OperationDetail::PathPayment(_) => 2,
-            &OperationDetail::ManageOffer(_) => 3,
-            &OperationDetail::CreatePassiveOffer(_) => 4,
-            &OperationDetail::SetOptions(_) => 5,
-            &OperationDetail::ChangeTrust(_) => 6,
-            &OperationDetail::AllowTrust(_) => 7,
-            &OperationDetail::AccountMerge(_) => 8,
-            &OperationDetail::Inflation => 9,
-            &OperationDetail::ManageData(_) => 10,
+        match &self.kind {
+            &Kind::CreateAccount(_) => 0,
+            &Kind::Payment(_) => 1,
+            &Kind::PathPayment(_) => 2,
+            &Kind::ManageOffer(_) => 3,
+            &Kind::CreatePassiveOffer(_) => 4,
+            &Kind::SetOptions(_) => 5,
+            &Kind::ChangeTrust(_) => 6,
+            &Kind::AllowTrust(_) => 7,
+            &Kind::AccountMerge(_) => 8,
+            &Kind::Inflation => 9,
+            &Kind::ManageData(_) => 10,
         }
     }
 
-    /// Returns the details of the operation
-    pub fn detail(&self) -> &OperationDetail {
-        &self.detail
+    /// Returns the kind of the operation
+    pub fn kind(&self) -> &Kind {
+        &self.kind
     }
 
     /// Returns true if the operation is a create_account operation
     pub fn is_create_account(&self) -> bool {
-        match self.detail {
-            OperationDetail::CreateAccount(_) => true,
+        match self.kind {
+            Kind::CreateAccount(_) => true,
             _ => false,
         }
     }
 
     /// Returns true if the operation is a payment operation
     pub fn is_payment(&self) -> bool {
-        match self.detail {
-            OperationDetail::Payment(_) => true,
+        match self.kind {
+            Kind::Payment(_) => true,
             _ => false,
         }
     }
 
     /// Returns true if the operation is a path payment operation
     pub fn is_path_payment(&self) -> bool {
-        match self.detail {
-            OperationDetail::PathPayment(_) => true,
+        match self.kind {
+            Kind::PathPayment(_) => true,
             _ => false,
         }
     }
 
     /// Returns true if the operation is a manage offer operation
     pub fn is_manage_offer(&self) -> bool {
-        match self.detail {
-            OperationDetail::ManageOffer(_) => true,
+        match self.kind {
+            Kind::ManageOffer(_) => true,
             _ => false,
         }
     }
 
     /// Returns true if the operation is a create passive offer operation
     pub fn is_create_passive_offer(&self) -> bool {
-        match self.detail {
-            OperationDetail::CreatePassiveOffer(_) => true,
+        match self.kind {
+            Kind::CreatePassiveOffer(_) => true,
             _ => false,
         }
     }
 
     /// Returns true if the operation is a set options offer operation
     pub fn is_set_options(&self) -> bool {
-        match self.detail {
-            OperationDetail::SetOptions(_) => true,
+        match self.kind {
+            Kind::SetOptions(_) => true,
             _ => false,
         }
     }
 
     /// Returns true if the operation is an inflation operation
     pub fn is_inflation(&self) -> bool {
-        match self.detail {
-            OperationDetail::Inflation => true,
+        match self.kind {
+            Kind::Inflation => true,
             _ => false,
         }
     }
 
     /// Returns true if the operation is a change trust operation
     pub fn is_change_trust(&self) -> bool {
-        match self.detail {
-            OperationDetail::ChangeTrust(_) => true,
+        match self.kind {
+            Kind::ChangeTrust(_) => true,
             _ => false,
         }
     }
 
     /// Returns true if the operation is an allow trust operation
     pub fn is_allow_trust(&self) -> bool {
-        match self.detail {
-            OperationDetail::AllowTrust(_) => true,
+        match self.kind {
+            Kind::AllowTrust(_) => true,
             _ => false,
         }
     }
 
     /// Returns true if the operation is an account merge operation
     pub fn is_account_merge(&self) -> bool {
-        match self.detail {
-            OperationDetail::AccountMerge(_) => true,
+        match self.kind {
+            Kind::AccountMerge(_) => true,
             _ => false,
         }
     }
 
     /// Returns true if the operation is a manage data operation
     pub fn is_manage_data(&self) -> bool {
-        match self.detail {
-            OperationDetail::ManageData(_) => true,
+        match self.kind {
+            Kind::ManageData(_) => true,
             _ => false,
         }
     }
 }
 
+/// Represents the actual structure of the json api. This allows us to parse
+/// directly from the captured json into our own types.
 #[derive(Debug, Deserialize, Clone)]
-struct IntermediateOperation<'a> {
+struct Intermediate<'a> {
     id: i64,
     paging_token: String,
-    #[serde(rename = "type")] operation_type: &'a str,
+    #[serde(rename = "type")] kind: &'a str,
     account: Option<String>,
     funder: Option<String>,
     starting_balance: Option<Amount>,
@@ -255,22 +260,18 @@ impl<'de> Deserialize<'de> for Operation {
     where
         D: Deserializer<'de>,
     {
-        let rep = IntermediateOperation::deserialize(d)?;
+        let rep = Intermediate::deserialize(d)?;
 
-        let operation_detail = match rep {
-            IntermediateOperation {
-                operation_type: "create_account",
+        let kind = match rep {
+            Intermediate {
+                kind: "create_account",
                 account: Some(account),
                 funder: Some(funder),
                 starting_balance: Some(starting_balance),
                 ..
-            } => OperationDetail::CreateAccount(CreateAccount::new(
-                account,
-                funder,
-                starting_balance,
-            )),
-            IntermediateOperation {
-                operation_type: "create_account",
+            } => Kind::CreateAccount(CreateAccount::new(account, funder, starting_balance)),
+            Intermediate {
+                kind: "create_account",
                 ..
             } => {
                 return Err(de::Error::custom(
@@ -278,8 +279,8 @@ impl<'de> Deserialize<'de> for Operation {
                 ))
             }
 
-            IntermediateOperation {
-                operation_type: "path_payment",
+            Intermediate {
+                kind: "path_payment",
                 from: Some(from),
                 to: Some(to),
                 asset_code,
@@ -301,7 +302,7 @@ impl<'de> Deserialize<'de> for Operation {
                     source_asset_code,
                     source_asset_issuer,
                 ).map_err(|err| de::Error::custom(err))?;
-                OperationDetail::PathPayment(PathPayment::new(
+                Kind::PathPayment(PathPayment::new(
                     from,
                     to,
                     destination_asset_identifier,
@@ -311,8 +312,8 @@ impl<'de> Deserialize<'de> for Operation {
                     source_max,
                 ))
             }
-            IntermediateOperation {
-                operation_type: "path_payment",
+            Intermediate {
+                kind: "path_payment",
                 ..
             } => {
                 return Err(de::Error::custom(
@@ -320,8 +321,8 @@ impl<'de> Deserialize<'de> for Operation {
                 ))
             }
 
-            IntermediateOperation {
-                operation_type: "payment",
+            Intermediate {
+                kind: "payment",
                 from: Some(from),
                 to: Some(to),
                 asset_code,
@@ -332,15 +333,14 @@ impl<'de> Deserialize<'de> for Operation {
             } => {
                 let asset_identifier = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
                     .map_err(|err| de::Error::custom(err))?;
-                OperationDetail::Payment(Payment::new(from, to, asset_identifier, amount))
+                Kind::Payment(Payment::new(from, to, asset_identifier, amount))
             }
-            IntermediateOperation {
-                operation_type: "payment",
-                ..
+            Intermediate {
+                kind: "payment", ..
             } => return Err(de::Error::custom("Missing fields for payment operation.")),
 
-            IntermediateOperation {
-                operation_type: operation_type @ "create_passive_offer",
+            Intermediate {
+                kind: kind @ "create_passive_offer",
                 offer_id: Some(offer_id),
                 buying_asset_code,
                 buying_asset_issuer,
@@ -353,8 +353,8 @@ impl<'de> Deserialize<'de> for Operation {
                 price: Some(price),
                 ..
             }
-            | IntermediateOperation {
-                operation_type: operation_type @ "manage_offer",
+            | Intermediate {
+                kind: kind @ "manage_offer",
                 offer_id: Some(offer_id),
                 buying_asset_code,
                 buying_asset_issuer,
@@ -379,18 +379,16 @@ impl<'de> Deserialize<'de> for Operation {
                     selling_asset_issuer,
                 ).map_err(|err| de::Error::custom(err))?;
 
-                match operation_type {
-                    "create_passive_offer" => {
-                        OperationDetail::CreatePassiveOffer(CreatePassiveOffer::new(
-                            offer_id,
-                            selling_asset_identifier,
-                            buying_asset_identifier,
-                            amount,
-                            price_ratio,
-                            price,
-                        ))
-                    }
-                    "manage_offer" => OperationDetail::ManageOffer(ManageOffer::new(
+                match kind {
+                    "create_passive_offer" => Kind::CreatePassiveOffer(CreatePassiveOffer::new(
+                        offer_id,
+                        selling_asset_identifier,
+                        buying_asset_identifier,
+                        amount,
+                        price_ratio,
+                        price,
+                    )),
+                    "manage_offer" => Kind::ManageOffer(ManageOffer::new(
                         offer_id,
                         selling_asset_identifier,
                         buying_asset_identifier,
@@ -401,16 +399,16 @@ impl<'de> Deserialize<'de> for Operation {
                     _ => unreachable!(),
                 }
             }
-            IntermediateOperation {
-                operation_type: "create_passive_offer",
+            Intermediate {
+                kind: "create_passive_offer",
                 ..
             } => {
                 return Err(de::Error::custom(
                     "Missing fields for create passive offer operation.",
                 ))
             }
-            IntermediateOperation {
-                operation_type: "manage_offer",
+            Intermediate {
+                kind: "manage_offer",
                 ..
             } => {
                 return Err(de::Error::custom(
@@ -418,8 +416,8 @@ impl<'de> Deserialize<'de> for Operation {
                 ))
             }
 
-            IntermediateOperation {
-                operation_type: "set_options",
+            Intermediate {
+                kind: "set_options",
                 set_flags_s,
                 clear_flags_s,
                 signer_key: Some(signer_key),
@@ -455,7 +453,7 @@ impl<'de> Deserialize<'de> for Operation {
                     }
                     None => None,
                 };
-                OperationDetail::SetOptions(SetOptions::new(
+                Kind::SetOptions(SetOptions::new(
                     signer_key,
                     signer_weight,
                     master_key_weight,
@@ -467,8 +465,8 @@ impl<'de> Deserialize<'de> for Operation {
                     clear_flags,
                 ))
             }
-            IntermediateOperation {
-                operation_type: "set_options",
+            Intermediate {
+                kind: "set_options",
                 ..
             } => {
                 return Err(de::Error::custom(
@@ -476,8 +474,8 @@ impl<'de> Deserialize<'de> for Operation {
                 ))
             }
 
-            IntermediateOperation {
-                operation_type: "change_trust",
+            Intermediate {
+                kind: "change_trust",
                 limit: Some(limit),
                 asset_code,
                 asset_issuer,
@@ -488,10 +486,10 @@ impl<'de> Deserialize<'de> for Operation {
             } => {
                 let asset = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
                     .map_err(|err| de::Error::custom(err))?;
-                OperationDetail::ChangeTrust(ChangeTrust::new(trustee, trustor, asset, limit))
+                Kind::ChangeTrust(ChangeTrust::new(trustee, trustor, asset, limit))
             }
-            IntermediateOperation {
-                operation_type: "change_trust",
+            Intermediate {
+                kind: "change_trust",
                 ..
             } => {
                 return Err(de::Error::custom(
@@ -499,8 +497,8 @@ impl<'de> Deserialize<'de> for Operation {
                 ))
             }
 
-            IntermediateOperation {
-                operation_type: "allow_trust",
+            Intermediate {
+                kind: "allow_trust",
                 authorize: Some(authorize),
                 asset_code,
                 asset_issuer,
@@ -511,10 +509,10 @@ impl<'de> Deserialize<'de> for Operation {
             } => {
                 let asset = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
                     .map_err(|err| de::Error::custom(err))?;
-                OperationDetail::AllowTrust(AllowTrust::new(trustee, trustor, asset, authorize))
+                Kind::AllowTrust(AllowTrust::new(trustee, trustor, asset, authorize))
             }
-            IntermediateOperation {
-                operation_type: "allow_trust",
+            Intermediate {
+                kind: "allow_trust",
                 ..
             } => {
                 return Err(de::Error::custom(
@@ -522,15 +520,15 @@ impl<'de> Deserialize<'de> for Operation {
                 ))
             }
 
-            IntermediateOperation {
-                operation_type: "account_merge",
+            Intermediate {
+                kind: "account_merge",
                 account: Some(account),
                 into: Some(into),
                 ..
-            } => OperationDetail::AccountMerge(AccountMerge::new(account, into)),
+            } => Kind::AccountMerge(AccountMerge::new(account, into)),
 
-            IntermediateOperation {
-                operation_type: "account_merge",
+            Intermediate {
+                kind: "account_merge",
                 ..
             } => {
                 return Err(de::Error::custom(
@@ -538,15 +536,15 @@ impl<'de> Deserialize<'de> for Operation {
                 ))
             }
 
-            IntermediateOperation {
-                operation_type: "manage_data",
+            Intermediate {
+                kind: "manage_data",
                 name: Some(name),
                 value: Some(value),
                 ..
-            } => OperationDetail::ManageData(ManageData::new(name, value)),
+            } => Kind::ManageData(ManageData::new(name, value)),
 
-            IntermediateOperation {
-                operation_type: "manage_data",
+            Intermediate {
+                kind: "manage_data",
                 ..
             } => {
                 return Err(de::Error::custom(
@@ -554,10 +552,9 @@ impl<'de> Deserialize<'de> for Operation {
                 ))
             }
 
-            IntermediateOperation {
-                operation_type: "inflation",
-                ..
-            } => OperationDetail::Inflation,
+            Intermediate {
+                kind: "inflation", ..
+            } => Kind::Inflation,
 
             _ => return Err(de::Error::custom("Unknown operation type.")),
         };
@@ -565,7 +562,7 @@ impl<'de> Deserialize<'de> for Operation {
         Ok(Operation {
             id: rep.id,
             paging_token: rep.paging_token,
-            detail: operation_detail,
+            kind,
         })
     }
 }
