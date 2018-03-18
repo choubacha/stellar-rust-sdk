@@ -246,9 +246,8 @@ impl<'de> Deserialize<'de> for Asset {
     {
         let rep: IntermediateAsset = IntermediateAsset::deserialize(d)?;
         let asset_identifier: Result<AssetIdentifier, D::Error> =
-            AssetIdentifier::new(&rep.asset_type, rep.asset_code, rep.asset_issuer).map_err(|_| {
-                de::Error::custom("Code and issuer are required for non-native assets")
-            });
+            AssetIdentifier::new(&rep.asset_type, rep.asset_code, rep.asset_issuer)
+                .map_err(|err| de::Error::custom(err));
         Ok(Asset {
             asset_identifier: asset_identifier.unwrap(),
             amount: rep.amount,
