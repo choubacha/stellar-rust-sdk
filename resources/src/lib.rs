@@ -14,6 +14,8 @@ mod asset;
 mod deserialize;
 mod ledger;
 mod offer;
+/// An ooperation is an individual command that mutates the ledger.
+pub mod operation;
 mod orderbook;
 mod payment_path;
 mod trade;
@@ -30,6 +32,7 @@ pub use asset::{Asset, AssetIdentifier};
 pub use ledger::Ledger;
 pub use offer::Offer;
 pub use payment_path::PaymentPath;
+pub use operation::{Operation, OperationDetail};
 pub use orderbook::Orderbook;
 pub use trade::{Seller as TradeSeller, Trade, TradeAggregation};
 pub use transaction::Transaction;

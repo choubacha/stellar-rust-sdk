@@ -1,0 +1,37 @@
+{
+  "_links": {
+    "effects": {
+      "href": "/operations/592323234762753/effects{?cursor,limit,order}",
+      "templated": true
+    },
+    "precedes": {
+      "href": "/operations?cursor=592323234762753\u0026order=asc"
+    },
+    "self": {
+      "href": "/operations/592323234762753"
+    },
+    "succeeds": {
+      "href": "/operations?cursor=592323234762753\u0026order=desc"
+    },
+    "transaction": {
+      "href": "/transactions/592323234762752"
+    }
+  },
+  "amount": "100.0",
+  "buying_asset_code": "CHP",
+  "buying_asset_issuer": "GAC2ZUXVI5266NMMGDPBMXHH4BTZKJ7MMTGXRZGX2R5YLMFRYLJ7U5EA",
+  "buying_asset_type": "credit_alphanum4",
+  "id": 592323234762753,
+  "offer_id": 8,
+  "paging_token": "592323234762753",
+  "price": "2.0",
+  "price_r": {
+    "d": 1,
+    "n": 2
+  },
+  "selling_asset_code": "YEN",
+  "selling_asset_issuer": "GDVXG2FMFFSUMMMBIUEMWPZAIU2FNCH7QNGJMWRXRD6K5FZK5KJS4DDR",
+  "selling_asset_type": "credit_alphanum4",
+  "type_i": 3,
+  "type": "manage_offer"
+}

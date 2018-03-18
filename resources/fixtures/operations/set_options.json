@@ -1,0 +1,37 @@
+{
+  "_links": {
+    "effects": {
+      "href": "/operations/696867033714691/effects{?cursor,limit,order}",
+      "templated": true
+    },
+    "precedes": {
+      "href": "/operations?cursor=696867033714691\u0026order=asc"
+    },
+    "self": {
+      "href": "/operations/696867033714691"
+    },
+    "succeeds": {
+      "href": "/operations?cursor=696867033714691\u0026order=desc"
+    },
+    "transaction": {
+      "href": "/transactions/696867033714688"
+    }
+  },
+  "signer_key": "GA5WBPYA5Y4WAEHXWR2UKO2UO4BUGHUQ74EUPKON2QHV4WRHOIRNKKH2",
+  "signer_weight": 1,
+  "master_key_weight": 2,
+  "high_threshold": 3,
+  "home_domain": "stellar.org",
+  "id": 696867033714691,
+  "low_threshold": 0,
+  "med_threshold": 3,
+  "paging_token": "696867033714691",
+  "set_flags": [
+    1
+  ],
+  "set_flags_s": [
+    "auth_required_flag"
+  ],
+  "type_i": 5,
+  "type": "set_options"
+}
