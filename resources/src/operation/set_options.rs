@@ -94,35 +94,3 @@ impl SetOptions {
         self.clear_flags
     }
 }
-
-#[cfg(test)]
-mod set_options_tests {
-    use serde_json;
-    use operation::{Operation, OperationDetail};
-    use super::*;
-
-    fn set_options_json() -> &'static str {
-        include_str!("../../fixtures/operations/set_options.json")
-    }
-
-    #[test]
-    fn it_parses_a_set_options_from_json() {
-        let operation: Operation = serde_json::from_str(&set_options_json()).unwrap();
-        assert!(operation.is_set_options());
-        assert_eq!(operation.type_i(), 5);
-        if let &OperationDetail::SetOptions(ref account_details) = operation.detail() {
-            assert_eq!(
-                account_details.signer_key(),
-                "GA5WBPYA5Y4WAEHXWR2UKO2UO4BUGHUQ74EUPKON2QHV4WRHOIRNKKH2"
-            );
-            assert_eq!(account_details.signer_weight(), 1);
-            assert_eq!(account_details.master_key_weight(), 2);
-            assert_eq!(account_details.low_threshold(), 0);
-            assert_eq!(account_details.med_threshold(), 3);
-            assert_eq!(account_details.high_threshold(), 3);
-            assert_eq!(account_details.home_domain(), "stellar.org");
-            assert!(account_details.clear_flags().is_none());
-            assert_eq!(account_details.set_flags().unwrap(), Flag::new(true, false));
-        }
-    }
-}

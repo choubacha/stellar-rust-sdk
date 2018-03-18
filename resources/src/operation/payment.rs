@@ -42,33 +42,3 @@ impl Payment {
         self.amount
     }
 }
-
-#[cfg(test)]
-mod payment_tests {
-    use serde_json;
-    use operation::{Operation, OperationDetail};
-    use super::*;
-
-    fn payment_json() -> &'static str {
-        include_str!("../../fixtures/operations/payment.json")
-    }
-
-    #[test]
-    fn it_parses_a_payment_from_json() {
-        let operation: Operation = serde_json::from_str(&payment_json()).unwrap();
-        assert!(operation.is_payment());
-        assert_eq!(operation.type_i(), 1);
-        if let &OperationDetail::Payment(ref account_details) = operation.detail() {
-            assert_eq!(
-                account_details.from(),
-                "GAKLBGHNHFQ3BMUYG5KU4BEWO6EYQHZHAXEWC33W34PH2RBHZDSQBD75"
-            );
-            assert_eq!(
-                account_details.to(),
-                "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
-            );
-            assert_eq!(account_details.asset().code(), "XLM");
-            assert_eq!(account_details.amount(), Amount::new(2_000_000_000));
-        }
-    }
-}

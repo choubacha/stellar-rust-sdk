@@ -32,35 +32,3 @@ impl CreateAccount {
         self.starting_balance
     }
 }
-
-#[cfg(test)]
-mod create_account_tests {
-    use serde_json;
-    use operation::{Operation, OperationDetail};
-    use amount::Amount;
-
-    fn create_account_json() -> &'static str {
-        include_str!("../../fixtures/operations/create_account.json")
-    }
-
-    #[test]
-    fn it_parses_create_account_from_json() {
-        let operation: Operation = serde_json::from_str(&create_account_json()).unwrap();
-        assert!(operation.is_create_account());
-        assert_eq!(operation.type_i(), 0);
-        if let &OperationDetail::CreateAccount(ref account_details) = operation.detail() {
-            assert_eq!(
-                account_details.account(),
-                "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
-            );
-            assert_eq!(
-                account_details.funder(),
-                "GBIA4FH6TV64KSPDAJCNUQSM7PFL4ILGUVJDPCLUOPJ7ONMKBBVUQHRO"
-            );
-            assert_eq!(
-                account_details.starting_balance(),
-                Amount::new(100_000_000_000)
-            );
-        }
-    }
-}
