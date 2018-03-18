@@ -71,39 +71,3 @@ impl PathPayment {
         self.source_max
     }
 }
-
-#[cfg(test)]
-mod payment_path_tests {
-    use serde_json;
-    use operation::{Operation, OperationDetail};
-    use super::*;
-
-    fn path_payment_json() -> &'static str {
-        include_str!("../../fixtures/operations/path_payment.json")
-    }
-
-    #[test]
-    fn it_parses_a_path_payment_from_json() {
-        let operation: Operation = serde_json::from_str(&path_payment_json()).unwrap();
-        assert!(operation.is_path_payment());
-        assert_eq!(operation.type_i(), 2);
-        if let &OperationDetail::PathPayment(ref account_details) = operation.detail() {
-            assert_eq!(
-                account_details.from(),
-                "GCXKG6RN4ONIEPCMNFB732A436Z5PNDSRLGWK7GBLCMQLIFO4S7EYWVU"
-            );
-            assert_eq!(
-                account_details.to(),
-                "GA5WBPYA5Y4WAEHXWR2UKO2UO4BUGHUQ74EUPKON2QHV4WRHOIRNKKH2"
-            );
-            assert_eq!(account_details.destination_asset().code(), "EUR");
-            assert_eq!(
-                account_details.destination_amount(),
-                Amount::new(100_000_000)
-            );
-            assert_eq!(account_details.source_asset().code(), "USD");
-            assert_eq!(account_details.source_amount(), Amount::new(100_000_000));
-            assert_eq!(account_details.source_max(), Amount::new(100_000_000));
-        }
-    }
-}

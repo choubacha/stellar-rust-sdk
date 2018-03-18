@@ -63,29 +63,3 @@ impl ManageOffer {
         self.price
     }
 }
-
-#[cfg(test)]
-mod manage_offer_tests {
-    use serde_json;
-    use operation::{Operation, OperationDetail};
-    use super::*;
-
-    fn manage_offer_json() -> &'static str {
-        include_str!("../../fixtures/operations/manage_offer.json")
-    }
-
-    #[test]
-    fn it_parses_a_manage_offer_from_json() {
-        let operation: Operation = serde_json::from_str(&manage_offer_json()).unwrap();
-        assert!(operation.is_manage_offer());
-        assert_eq!(operation.type_i(), 3);
-        if let &OperationDetail::ManageOffer(ref account_details) = operation.detail() {
-            assert_eq!(account_details.offer_id(), 8);
-            assert_eq!(account_details.selling().code(), "YEN");
-            assert_eq!(account_details.buying().code(), "CHP");
-            assert_eq!(account_details.amount(), Amount::new(1_000_000_000));
-            assert_eq!(account_details.price_ratio().numerator(), 2);
-            assert_eq!(account_details.price(), Amount::new(20_000_000));
-        }
-    }
-}

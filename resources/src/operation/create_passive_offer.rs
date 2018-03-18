@@ -64,29 +64,3 @@ impl CreatePassiveOffer {
         self.price
     }
 }
-
-#[cfg(test)]
-mod create_passive_offer_tests {
-    use serde_json;
-    use operation::{Operation, OperationDetail};
-    use super::*;
-
-    fn create_passive_offer_json() -> &'static str {
-        include_str!("../../fixtures/operations/create_passive_offer.json")
-    }
-
-    #[test]
-    fn it_parses_a_create_passive_offer_from_json() {
-        let operation: Operation = serde_json::from_str(&create_passive_offer_json()).unwrap();
-        assert!(operation.is_create_passive_offer());
-        assert_eq!(operation.type_i(), 4);
-        if let &OperationDetail::CreatePassiveOffer(ref account_details) = operation.detail() {
-            assert_eq!(account_details.offer_id(), 9);
-            assert_eq!(account_details.selling().code(), "XLM");
-            assert_eq!(account_details.buying().code(), "USD");
-            assert_eq!(account_details.amount(), Amount::new(112_782_700));
-            assert_eq!(account_details.price_ratio().numerator(), 1);
-            assert_eq!(account_details.price(), Amount::new(10_000_000));
-        }
-    }
-}

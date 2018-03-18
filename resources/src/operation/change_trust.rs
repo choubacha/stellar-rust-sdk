@@ -47,33 +47,3 @@ impl ChangeTrust {
         self.limit
     }
 }
-
-#[cfg(test)]
-mod change_trust_tests {
-    use serde_json;
-    use operation::{Operation, OperationDetail};
-    use super::*;
-
-    fn change_trust_json() -> &'static str {
-        include_str!("../../fixtures/operations/change_trust.json")
-    }
-
-    #[test]
-    fn it_parses_change_trust_from_json() {
-        let operation: Operation = serde_json::from_str(&change_trust_json()).unwrap();
-        assert!(operation.is_change_trust());
-        assert_eq!(operation.type_i(), 6);
-        if let &OperationDetail::ChangeTrust(ref account_details) = operation.detail() {
-            assert_eq!(
-                account_details.trustee(),
-                "GAC2ZUXVI5266NMMGDPBMXHH4BTZKJ7MMTGXRZGX2R5YLMFRYLJ7U5EA"
-            );
-            assert_eq!(
-                account_details.trustor(),
-                "GDVXG2FMFFSUMMMBIUEMWPZAIU2FNCH7QNGJMWRXRD6K5FZK5KJS4DDR"
-            );
-            assert_eq!(account_details.asset().code(), "CHP");
-            assert_eq!(account_details.limit(), Amount::new(50_000_000));
-        }
-    }
-}

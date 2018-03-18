@@ -7,12 +7,12 @@ mod allow_trust;
 mod change_trust;
 mod create_account;
 mod create_passive_offer;
-mod inflation;
 mod manage_data;
 mod manage_offer;
 mod payment;
 mod path_payment;
 mod set_options;
+
 pub use self::account_merge::AccountMerge;
 pub use self::allow_trust::AllowTrust;
 pub use self::change_trust::ChangeTrust;
@@ -23,6 +23,9 @@ pub use self::manage_offer::ManageOffer;
 pub use self::payment::Payment;
 pub use self::path_payment::PathPayment;
 pub use self::set_options::SetOptions;
+
+#[cfg(test)]
+mod test;
 
 /// Operations are objects that represent a desired change to the ledger: payments, offers to
 /// exchange currency, changes made to account options, etc. Operations are submitted to the
