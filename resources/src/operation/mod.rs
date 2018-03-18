@@ -203,10 +203,10 @@ impl Operation {
 }
 
 #[derive(Debug, Deserialize, Clone)]
-struct IntermediateOperation {
+struct IntermediateOperation<'a> {
     id: i64,
     paging_token: String,
-    #[serde(rename = "type")] operation_type: String,
+    #[serde(rename = "type")] operation_type: &'a str,
     account: Option<String>,
     funder: Option<String>,
     starting_balance: Option<Amount>,
@@ -255,95 +255,112 @@ impl<'de> Deserialize<'de> for Operation {
     where
         D: Deserializer<'de>,
     {
-        let rep: IntermediateOperation = IntermediateOperation::deserialize(d)?;
+        let rep = IntermediateOperation::deserialize(d)?;
 
-        let operation_detail: Option<OperationDetail> = match rep {
+        let operation_detail = match rep {
             IntermediateOperation {
-                operation_type,
+                operation_type: "create_account",
                 account: Some(account),
                 funder: Some(funder),
                 starting_balance: Some(starting_balance),
                 ..
-            } => {
-                if operation_type == "create_account" {
-                    Some(OperationDetail::CreateAccount(
-                        self::create_account::CreateAccount::new(account, funder, starting_balance),
-                    ))
-                } else {
-                    None
-                }
-            }
+            } => OperationDetail::CreateAccount(CreateAccount::new(
+                account,
+                funder,
+                starting_balance,
+            )),
             IntermediateOperation {
-                operation_type,
+                operation_type: "create_account",
+                ..
+            } => {
+                return Err(de::Error::custom(
+                    "Missing fields for create account operation.",
+                ))
+            }
+
+            IntermediateOperation {
+                operation_type: "path_payment",
                 from: Some(from),
                 to: Some(to),
+                asset_code,
+                asset_issuer,
                 asset_type: Some(asset_type),
                 amount: Some(amount),
+                source_asset_code,
+                source_asset_issuer,
                 source_asset_type: Some(source_asset_type),
                 source_amount: Some(source_amount),
                 source_max: Some(source_max),
                 ..
             } => {
-                if operation_type == "path_payment" {
-                    let destination_asset_identifier = AssetIdentifier::new(
-                        &asset_type,
-                        rep.asset_code,
-                        rep.asset_issuer,
-                    ).map_err(|_| {
-                        de::Error::custom("Code and issuer are required for non-native assets")
-                    })?;
-                    let source_asset_identifier = AssetIdentifier::new(
-                        &source_asset_type,
-                        rep.source_asset_code,
-                        rep.source_asset_issuer,
-                    ).map_err(|_| {
-                        de::Error::custom("Code and issuer are required for non-native assets")
-                    })?;
-                    Some(OperationDetail::PathPayment(
-                        self::path_payment::PathPayment::new(
-                            from,
-                            to,
-                            destination_asset_identifier,
-                            amount,
-                            source_asset_identifier,
-                            source_amount,
-                            source_max,
-                        ),
-                    ))
-                } else {
-                    None
-                }
+                let destination_asset_identifier =
+                    AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
+                        .map_err(|err| de::Error::custom(err))?;
+                let source_asset_identifier = AssetIdentifier::new(
+                    &source_asset_type,
+                    source_asset_code,
+                    source_asset_issuer,
+                ).map_err(|err| de::Error::custom(err))?;
+                OperationDetail::PathPayment(PathPayment::new(
+                    from,
+                    to,
+                    destination_asset_identifier,
+                    amount,
+                    source_asset_identifier,
+                    source_amount,
+                    source_max,
+                ))
             }
             IntermediateOperation {
-                operation_type,
+                operation_type: "path_payment",
+                ..
+            } => {
+                return Err(de::Error::custom(
+                    "Missing fields for path payment operation.",
+                ))
+            }
+
+            IntermediateOperation {
+                operation_type: "payment",
                 from: Some(from),
                 to: Some(to),
+                asset_code,
+                asset_issuer,
                 asset_type: Some(asset_type),
                 amount: Some(amount),
                 ..
             } => {
-                if operation_type == "payment" {
-                    let asset_identifier = AssetIdentifier::new(
-                        &asset_type,
-                        rep.asset_code,
-                        rep.asset_issuer,
-                    ).map_err(|_| {
-                        de::Error::custom("Code and issuer are required for non-native assets")
-                    })?;
-                    Some(OperationDetail::Payment(self::payment::Payment::new(
-                        from,
-                        to,
-                        asset_identifier,
-                        amount,
-                    )))
-                } else {
-                    None
-                }
+                let asset_identifier = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
+                    .map_err(|err| de::Error::custom(err))?;
+                OperationDetail::Payment(Payment::new(from, to, asset_identifier, amount))
             }
             IntermediateOperation {
-                operation_type,
+                operation_type: "payment",
+                ..
+            } => return Err(de::Error::custom("Missing fields for payment operation.")),
+
+            IntermediateOperation {
+                operation_type: operation_type @ "create_passive_offer",
                 offer_id: Some(offer_id),
+                buying_asset_code,
+                buying_asset_issuer,
                 buying_asset_type: Some(buying_asset_type),
+                selling_asset_code,
+                selling_asset_issuer,
+                selling_asset_type: Some(selling_asset_type),
+                amount: Some(amount),
+                price_ratio: Some(price_ratio),
+                price: Some(price),
+                ..
+            }
+            | IntermediateOperation {
+                operation_type: operation_type @ "manage_offer",
+                offer_id: Some(offer_id),
+                buying_asset_code,
+                buying_asset_issuer,
+                buying_asset_type: Some(buying_asset_type),
+                selling_asset_code,
+                selling_asset_issuer,
                 selling_asset_type: Some(selling_asset_type),
                 amount: Some(amount),
                 price_ratio: Some(price_ratio),
@@ -352,46 +369,59 @@ impl<'de> Deserialize<'de> for Operation {
             } => {
                 let buying_asset_identifier = AssetIdentifier::new(
                     &buying_asset_type,
-                    rep.buying_asset_code,
-                    rep.buying_asset_issuer,
-                ).map_err(|_| {
-                    de::Error::custom("Code and issuer are required for non-native assets")
-                })?;
+                    buying_asset_code,
+                    buying_asset_issuer,
+                ).map_err(|err| de::Error::custom(err))?;
+
                 let selling_asset_identifier = AssetIdentifier::new(
                     &selling_asset_type,
-                    rep.selling_asset_code,
-                    rep.selling_asset_issuer,
-                ).map_err(|_| {
-                    de::Error::custom("Code and issuer are required for non-native assets")
-                })?;
-                if operation_type == "create_passive_offer" {
-                    Some(OperationDetail::CreatePassiveOffer(
-                        self::create_passive_offer::CreatePassiveOffer::new(
+                    selling_asset_code,
+                    selling_asset_issuer,
+                ).map_err(|err| de::Error::custom(err))?;
+
+                match operation_type {
+                    "create_passive_offer" => {
+                        OperationDetail::CreatePassiveOffer(CreatePassiveOffer::new(
                             offer_id,
                             selling_asset_identifier,
                             buying_asset_identifier,
                             amount,
                             price_ratio,
                             price,
-                        ),
-                    ))
-                } else if operation_type == "manage_offer" {
-                    Some(OperationDetail::ManageOffer(
-                        self::manage_offer::ManageOffer::new(
-                            offer_id,
-                            selling_asset_identifier,
-                            buying_asset_identifier,
-                            amount,
-                            price_ratio,
-                            price,
-                        ),
-                    ))
-                } else {
-                    None
+                        ))
+                    }
+                    "manage_offer" => OperationDetail::ManageOffer(ManageOffer::new(
+                        offer_id,
+                        selling_asset_identifier,
+                        buying_asset_identifier,
+                        amount,
+                        price_ratio,
+                        price,
+                    )),
+                    _ => unreachable!(),
                 }
             }
             IntermediateOperation {
-                operation_type,
+                operation_type: "create_passive_offer",
+                ..
+            } => {
+                return Err(de::Error::custom(
+                    "Missing fields for create passive offer operation.",
+                ))
+            }
+            IntermediateOperation {
+                operation_type: "manage_offer",
+                ..
+            } => {
+                return Err(de::Error::custom(
+                    "Missing fields for manage offer operation.",
+                ))
+            }
+
+            IntermediateOperation {
+                operation_type: "set_options",
+                set_flags_s,
+                clear_flags_s,
                 signer_key: Some(signer_key),
                 signer_weight: Some(signer_weight),
                 master_key_weight: Some(master_key_weight),
@@ -401,132 +431,141 @@ impl<'de> Deserialize<'de> for Operation {
                 home_domain: Some(home_domain),
                 ..
             } => {
-                if operation_type == "set_options" {
-                    let set_flags: Option<Flag> = match rep.set_flags_s {
-                        Some(vec_strings) => {
-                            let auth_required = vec_strings
-                                .iter()
-                                .any(|e| e == &"auth_required_flag".to_string());
-                            let auth_revocable = vec_strings
-                                .iter()
-                                .any(|e| e == &"auth_revocable_flag".to_string());
-                            Some(Flag::new(auth_required, auth_revocable))
-                        }
-                        None => None,
-                    };
-                    let clear_flags: Option<Flag> = match rep.clear_flags_s {
-                        Some(vec_strings) => {
-                            let auth_required = vec_strings
-                                .iter()
-                                .any(|e| e == &"auth_required_flag".to_string());
-                            let auth_revocable = vec_strings
-                                .iter()
-                                .any(|e| e == &"auth_revocable_flag".to_string());
-                            Some(Flag::new(auth_required, auth_revocable))
-                        }
-                        None => None,
-                    };
-                    Some(OperationDetail::SetOptions(
-                        self::set_options::SetOptions::new(
-                            signer_key,
-                            signer_weight,
-                            master_key_weight,
-                            low_threshold,
-                            med_threshold,
-                            high_threshold,
-                            home_domain,
-                            set_flags,
-                            clear_flags,
-                        ),
-                    ))
-                } else {
-                    None
-                }
+                let set_flags: Option<Flag> = match set_flags_s {
+                    Some(vec_strings) => {
+                        let auth_required = vec_strings
+                            .iter()
+                            .any(|e| e == &"auth_required_flag".to_string());
+                        let auth_revocable = vec_strings
+                            .iter()
+                            .any(|e| e == &"auth_revocable_flag".to_string());
+                        Some(Flag::new(auth_required, auth_revocable))
+                    }
+                    None => None,
+                };
+                let clear_flags: Option<Flag> = match clear_flags_s {
+                    Some(vec_strings) => {
+                        let auth_required = vec_strings
+                            .iter()
+                            .any(|e| e == &"auth_required_flag".to_string());
+                        let auth_revocable = vec_strings
+                            .iter()
+                            .any(|e| e == &"auth_revocable_flag".to_string());
+                        Some(Flag::new(auth_required, auth_revocable))
+                    }
+                    None => None,
+                };
+                OperationDetail::SetOptions(SetOptions::new(
+                    signer_key,
+                    signer_weight,
+                    master_key_weight,
+                    low_threshold,
+                    med_threshold,
+                    high_threshold,
+                    home_domain,
+                    set_flags,
+                    clear_flags,
+                ))
             }
             IntermediateOperation {
-                operation_type,
+                operation_type: "set_options",
+                ..
+            } => {
+                return Err(de::Error::custom(
+                    "Missing fields for set options operation.",
+                ))
+            }
+
+            IntermediateOperation {
+                operation_type: "change_trust",
                 limit: Some(limit),
+                asset_code,
+                asset_issuer,
                 asset_type: Some(asset_type),
                 trustor: Some(trustor),
                 trustee: Some(trustee),
                 ..
             } => {
-                if operation_type == "change_trust" {
-                    let asset = AssetIdentifier::new(&asset_type, rep.asset_code, rep.asset_issuer)
-                        .map_err(|_| {
-                            de::Error::custom("Code and issuer are required for non-native assets")
-                        })?;
-                    Some(OperationDetail::ChangeTrust(
-                        self::change_trust::ChangeTrust::new(trustee, trustor, asset, limit),
-                    ))
-                } else {
-                    None
-                }
+                let asset = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
+                    .map_err(|err| de::Error::custom(err))?;
+                OperationDetail::ChangeTrust(ChangeTrust::new(trustee, trustor, asset, limit))
             }
             IntermediateOperation {
-                operation_type,
+                operation_type: "change_trust",
+                ..
+            } => {
+                return Err(de::Error::custom(
+                    "Missing fields for change trust operation.",
+                ))
+            }
+
+            IntermediateOperation {
+                operation_type: "allow_trust",
                 authorize: Some(authorize),
+                asset_code,
+                asset_issuer,
                 asset_type: Some(asset_type),
                 trustor: Some(trustor),
                 trustee: Some(trustee),
                 ..
             } => {
-                if operation_type == "allow_trust" {
-                    let asset = AssetIdentifier::new(&asset_type, rep.asset_code, rep.asset_issuer)
-                        .map_err(|_| {
-                            de::Error::custom("Code and issuer are required for non-native assets")
-                        })?;
-                    Some(OperationDetail::AllowTrust(
-                        self::allow_trust::AllowTrust::new(trustee, trustor, asset, authorize),
-                    ))
-                } else {
-                    None
-                }
+                let asset = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
+                    .map_err(|err| de::Error::custom(err))?;
+                OperationDetail::AllowTrust(AllowTrust::new(trustee, trustor, asset, authorize))
             }
             IntermediateOperation {
-                operation_type,
+                operation_type: "allow_trust",
+                ..
+            } => {
+                return Err(de::Error::custom(
+                    "Missing fields for allow trust operation.",
+                ))
+            }
+
+            IntermediateOperation {
+                operation_type: "account_merge",
                 account: Some(account),
                 into: Some(into),
                 ..
-            } => {
-                if operation_type == "account_merge" {
-                    Some(OperationDetail::AccountMerge(
-                        self::account_merge::AccountMerge::new(account, into),
-                    ))
-                } else {
-                    None
-                }
-            }
+            } => OperationDetail::AccountMerge(AccountMerge::new(account, into)),
+
             IntermediateOperation {
-                operation_type,
+                operation_type: "account_merge",
+                ..
+            } => {
+                return Err(de::Error::custom(
+                    "Missing fields for account merge operation.",
+                ))
+            }
+
+            IntermediateOperation {
+                operation_type: "manage_data",
                 name: Some(name),
                 value: Some(value),
                 ..
+            } => OperationDetail::ManageData(ManageData::new(name, value)),
+
+            IntermediateOperation {
+                operation_type: "manage_data",
+                ..
             } => {
-                if operation_type == "manage_data" {
-                    Some(OperationDetail::ManageData(
-                        self::manage_data::ManageData::new(name, value),
-                    ))
-                } else {
-                    None
-                }
+                return Err(de::Error::custom(
+                    "Missing fields for manage data operation.",
+                ))
             }
-            _ => {
-                if &rep.operation_type[..] == "inflation" {
-                    Some(OperationDetail::Inflation)
-                } else {
-                    None
-                }
-            }
+
+            IntermediateOperation {
+                operation_type: "inflation",
+                ..
+            } => OperationDetail::Inflation,
+
+            _ => return Err(de::Error::custom("Unknown operation type.")),
         };
 
-        match operation_detail {
-            Some(operation_detail) => Ok(Operation {
-                id: rep.id,
-                paging_token: rep.paging_token,
-                detail: operation_detail,
-            }),
-            None => Err(de::Error::custom("Invalid operation type."))?,
-        }
+        Ok(Operation {
+            id: rep.id,
+            paging_token: rep.paging_token,
+            detail: operation_detail,
+        })
     }
 }
