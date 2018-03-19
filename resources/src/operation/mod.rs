@@ -270,14 +270,6 @@ impl<'de> Deserialize<'de> for Operation {
                 starting_balance: Some(starting_balance),
                 ..
             } => Kind::CreateAccount(CreateAccount::new(account, funder, starting_balance)),
-            Intermediate {
-                kind: "create_account",
-                ..
-            } => {
-                return Err(de::Error::custom(
-                    "Missing fields for create account operation.",
-                ))
-            }
 
             Intermediate {
                 kind: "path_payment",
@@ -312,14 +304,6 @@ impl<'de> Deserialize<'de> for Operation {
                     source_max,
                 ))
             }
-            Intermediate {
-                kind: "path_payment",
-                ..
-            } => {
-                return Err(de::Error::custom(
-                    "Missing fields for path payment operation.",
-                ))
-            }
 
             Intermediate {
                 kind: "payment",
@@ -335,9 +319,6 @@ impl<'de> Deserialize<'de> for Operation {
                     .map_err(|err| de::Error::custom(err))?;
                 Kind::Payment(Payment::new(from, to, asset_identifier, amount))
             }
-            Intermediate {
-                kind: "payment", ..
-            } => return Err(de::Error::custom("Missing fields for payment operation.")),
 
             Intermediate {
                 kind: kind @ "create_passive_offer",
@@ -399,22 +380,6 @@ impl<'de> Deserialize<'de> for Operation {
                     _ => unreachable!(),
                 }
             }
-            Intermediate {
-                kind: "create_passive_offer",
-                ..
-            } => {
-                return Err(de::Error::custom(
-                    "Missing fields for create passive offer operation.",
-                ))
-            }
-            Intermediate {
-                kind: "manage_offer",
-                ..
-            } => {
-                return Err(de::Error::custom(
-                    "Missing fields for manage offer operation.",
-                ))
-            }
 
             Intermediate {
                 kind: "set_options",
@@ -431,24 +396,16 @@ impl<'de> Deserialize<'de> for Operation {
             } => {
                 let set_flags: Option<Flag> = match set_flags_s {
                     Some(vec_strings) => {
-                        let auth_required = vec_strings
-                            .iter()
-                            .any(|e| e == &"auth_required_flag".to_string());
-                        let auth_revocable = vec_strings
-                            .iter()
-                            .any(|e| e == &"auth_revocable_flag".to_string());
+                        let auth_required = vec_strings.iter().any(|e| e == "auth_required_flag");
+                        let auth_revocable = vec_strings.iter().any(|e| e == "auth_revocable_flag");
                         Some(Flag::new(auth_required, auth_revocable))
                     }
                     None => None,
                 };
                 let clear_flags: Option<Flag> = match clear_flags_s {
                     Some(vec_strings) => {
-                        let auth_required = vec_strings
-                            .iter()
-                            .any(|e| e == &"auth_required_flag".to_string());
-                        let auth_revocable = vec_strings
-                            .iter()
-                            .any(|e| e == &"auth_revocable_flag".to_string());
+                        let auth_required = vec_strings.iter().any(|e| e == "auth_required_flag");
+                        let auth_revocable = vec_strings.iter().any(|e| e == "auth_revocable_flag");
                         Some(Flag::new(auth_required, auth_revocable))
                     }
                     None => None,
@@ -463,14 +420,6 @@ impl<'de> Deserialize<'de> for Operation {
                     home_domain,
                     set_flags,
                     clear_flags,
-                ))
-            }
-            Intermediate {
-                kind: "set_options",
-                ..
-            } => {
-                return Err(de::Error::custom(
-                    "Missing fields for set options operation.",
                 ))
             }
 
@@ -488,14 +437,6 @@ impl<'de> Deserialize<'de> for Operation {
                     .map_err(|err| de::Error::custom(err))?;
                 Kind::ChangeTrust(ChangeTrust::new(trustee, trustor, asset, limit))
             }
-            Intermediate {
-                kind: "change_trust",
-                ..
-            } => {
-                return Err(de::Error::custom(
-                    "Missing fields for change trust operation.",
-                ))
-            }
 
             Intermediate {
                 kind: "allow_trust",
@@ -511,14 +452,6 @@ impl<'de> Deserialize<'de> for Operation {
                     .map_err(|err| de::Error::custom(err))?;
                 Kind::AllowTrust(AllowTrust::new(trustee, trustor, asset, authorize))
             }
-            Intermediate {
-                kind: "allow_trust",
-                ..
-            } => {
-                return Err(de::Error::custom(
-                    "Missing fields for allow trust operation.",
-                ))
-            }
 
             Intermediate {
                 kind: "account_merge",
@@ -528,15 +461,6 @@ impl<'de> Deserialize<'de> for Operation {
             } => Kind::AccountMerge(AccountMerge::new(account, into)),
 
             Intermediate {
-                kind: "account_merge",
-                ..
-            } => {
-                return Err(de::Error::custom(
-                    "Missing fields for account merge operation.",
-                ))
-            }
-
-            Intermediate {
                 kind: "manage_data",
                 name: Some(name),
                 value: Some(value),
@@ -544,19 +468,26 @@ impl<'de> Deserialize<'de> for Operation {
             } => Kind::ManageData(ManageData::new(name, value)),
 
             Intermediate {
-                kind: "manage_data",
-                ..
-            } => {
-                return Err(de::Error::custom(
-                    "Missing fields for manage data operation.",
-                ))
-            }
-
-            Intermediate {
                 kind: "inflation", ..
             } => Kind::Inflation,
 
-            _ => return Err(de::Error::custom("Unknown operation type.")),
+            Intermediate { kind, .. } => {
+                return Err(match kind {
+                    "account_merge"
+                    | "allow_trust"
+                    | "change_trust"
+                    | "create_account"
+                    | "create_passive_offer"
+                    | "manage_data"
+                    | "manage_offer"
+                    | "path_payment"
+                    | "payment"
+                    | "set_options" => {
+                        de::Error::custom(format!("Missing fields for {} operation.", kind))
+                    }
+                    _ => de::Error::custom("Unknown operation type."),
+                });
+            }
         };
 
         Ok(Operation {
