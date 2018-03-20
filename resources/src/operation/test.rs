@@ -7,6 +7,42 @@ fn account_merge_json() -> &'static str {
     include_str!("../../fixtures/operations/account_merge.json")
 }
 
+mod errors_on_missing_fields_for_type {
+    use super::*;
+
+    macro_rules! assert_err_on_missing_fields {
+        ($type_to_check:ident, $type_i:expr) => {
+            #[test]
+            fn $type_to_check() {
+                let json = format!(
+                    r#"{{"id":1,"paging_token":"7","type_i":{},"type":"{}"}}"#,
+                    $type_i,
+                    stringify!($type_to_check),
+                );
+                let result = serde_json::from_str::<Operation>(&json);
+
+                assert!(result.is_err());
+                assert_eq!(
+                    format!("{}", result.unwrap_err()),
+                    format!("Missing fields for {} operation.", stringify!($type_to_check))
+                );
+            }
+        }
+    }
+
+    assert_err_on_missing_fields!(create_account, 0);
+    assert_err_on_missing_fields!(payment, 1);
+    assert_err_on_missing_fields!(path_payment, 2);
+    assert_err_on_missing_fields!(manage_offer, 3);
+    assert_err_on_missing_fields!(create_passive_offer, 4);
+    assert_err_on_missing_fields!(set_options, 5);
+    assert_err_on_missing_fields!(change_trust, 6);
+    assert_err_on_missing_fields!(allow_trust, 7);
+    assert_err_on_missing_fields!(account_merge, 8);
+    // Inflation (id 9) is infallible as it has no fields.
+    assert_err_on_missing_fields!(manage_data, 10);
+}
+
 #[test]
 fn it_parses_account_merge_from_json() {
     let operation: Operation = serde_json::from_str(&account_merge_json()).unwrap();
