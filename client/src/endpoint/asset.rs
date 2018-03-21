@@ -1,7 +1,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::Asset;
-use super::{EndPoint, Order, Records};
+use super::{Body, EndPoint, Order, Records};
 use http::{Request, Uri};
 
 /// Represents the all assets end point for the stellar horizon server. The endpoint
@@ -147,9 +147,8 @@ impl AllAssets {
 
 impl EndPoint for AllAssets {
     type Response = Records<Asset>;
-    type RequestBody = ();
 
-    fn into_request(self, host: &str) -> Result<Request<()>> {
+    fn into_request(self, host: &str) -> Result<Request<Body>> {
         let mut uri = format!("{}/assets", host);
 
         if self.has_query() {
@@ -176,7 +175,7 @@ impl EndPoint for AllAssets {
         }
 
         let uri = Uri::from_str(&uri)?;
-        let request = Request::get(uri).body(())?;
+        let request = Request::get(uri).body(Body::None)?;
         Ok(request)
     }
 }

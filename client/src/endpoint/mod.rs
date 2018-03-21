@@ -11,15 +11,21 @@ pub use self::records::Records;
 pub use self::account::AccountDetails;
 pub use self::asset::AllAssets;
 
+/// Represents the body of a request to an EndPoint.
+#[derive(Debug)]
+pub enum Body {
+    /// Declares that the endpoint does not have a body.
+    None,
+}
+
 /// Declares the definition of a stellar endpoint and the return type.
 pub trait EndPoint {
     /// The deserializable type that is expected to come back from the stellar server.
     type Response: DeserializeOwned;
     /// The request body to be sent to stellar. Generally this is just a `()` unit.
-    type RequestBody;
 
     /// Converts the implementing struct into an http request.
-    fn into_request(self, host: &str) -> Result<http::Request<Self::RequestBody>>;
+    fn into_request(self, host: &str) -> Result<http::Request<Body>>;
 }
 
 /// The order to return results in.

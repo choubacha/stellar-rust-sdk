@@ -1,7 +1,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::Account;
-use super::EndPoint;
+use super::{Body, EndPoint};
 use http::{Request, Uri};
 
 /// An endpoint that accesses a single accounts details.
@@ -20,11 +20,10 @@ impl AccountDetails {
 
 impl EndPoint for AccountDetails {
     type Response = Account;
-    type RequestBody = ();
 
-    fn into_request(self, host: &str) -> Result<Request<()>> {
+    fn into_request(self, host: &str) -> Result<Request<Body>> {
         let uri = Uri::from_str(&format!("{}/accounts/{}", host, self.id))?;
-        let request = Request::get(uri).body(())?;
+        let request = Request::get(uri).body(Body::None)?;
         Ok(request)
     }
 }
