@@ -2,7 +2,33 @@
 
 The following is an ever growing set of guidelines for contributing to the stellar sdk.
 
-### Testing
+## Finding work
+
+The progress of the sdk is divided up into several components. We use milestones to track
+release targets. We use projects to group related work. And we use issues to track individual
+units of work.
+
+#### Issues
+
+Issues are the basic unit of our work and of future PRs. You don't need to work on an issue
+to contribute but they are a great way to discover ways to contribute. They will have labels on
+them to help you. But feel free to leave comments on any that you either would like to work on
+or have questions about.
+
+#### Projects
+
+Projects are used to group and coordinate the completion of issues. They can help provide
+additional context around a set of issues and provide some basic ordering to when they should
+be completed. They also allow us to think about when a project will be considered _finished_ and
+and not just constantly in flight.
+
+#### Milestones
+
+We also like to track when we are going to ship key versions. Patch versions can go out when/as
+needed but minor and major versions should be shipped when there are features that require them.
+Milestones allow us to track this.
+
+## Testing
 
 We take testing very seriously. Anything that has any logic or complexity should be tested. In
 addition, we prefer that examples are documented in doctests so that people that wish to use
@@ -26,7 +52,7 @@ it can be done simply and without flakiness
 These should be added but will likely rely on docker and some sort of internal test server to be 
 stood up.
 
-### Documentation
+## Documentation
 
 Since this is a library, all public apis must be documented in order to commit. This helps provide
 the expected level of detail to users that wish to install and use our sdk. A build flag should be
@@ -39,16 +65,17 @@ set at the header of every crate:
 This will cause builds to fail unless all documentation and warnings have been corrected. We also
 want debug implementations to be run so that our types can be used in any downstream testing.
 
-### Style
+## Style
 
-We adhere to rustfmt style. You can find up-to-date installation instructions in the rust-lang
+We adhere to rustfmt style. We are using the stable preview version and will continue to do so as
+the code we run is on stable. You can find up-to-date installation instructions in the rust-lang
 nursery: https://github.com/rust-lang-nursery/rustfmt
 
-Naming and conventions to improve the public interface should be followed and considered. we want
+Naming and conventions to improve the public interface should be followed and considered. We want
 sdk to be as easy to use as possible.
 
 
-### Proposing changes
+## Proposing changes
 
 Changes are encouraged and welcome. However, since this is financial software, we must be detailed
 in explaining what and why we are making changes.
