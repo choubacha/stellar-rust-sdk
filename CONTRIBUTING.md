@@ -54,6 +54,28 @@ stood up.
 
 ## Documentation
 
+Spend time on your documentation and try to document how someone unfamilar with the library
+might approach understanding it. Some ways to make that easier:
+
+* Provide concrete examples on the usage through doc-tests
+* Spell check your documentation and use good punctuation
+* Empathize with your target audience
+  * Think about who you were when you were first starting
+  * Think about who you might be in 6 months
+  * Think about who you are right now and how you can help yourself understand
+
+The documentation of a library separates good from bad in the rust eco-system. It might feel
+like that one last box to tick, but for every new contributor or client, it's the difference
+between success and abandon.
+
+#### Reference to horizon
+
+We also emphasize linking back to the horizon documents whenever possible. It's also useful
+to copy much of that content over so that it doesn't require external linking but a URL can
+go a long way to making it easier to understand the stellar api and eco-sytem itself.
+
+#### Requirements
+
 Since this is a library, all public apis must be documented in order to commit. This helps provide
 the expected level of detail to users that wish to install and use our sdk. A build flag should be
 set at the header of every crate:
