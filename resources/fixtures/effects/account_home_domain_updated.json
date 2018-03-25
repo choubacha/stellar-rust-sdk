@@ -1,0 +1,22 @@
+{
+  "_links": {
+    "operation": {
+      "href": "/operations/141733924865"
+    },
+    "succeeds": {
+      "href": "/effects?cursor=141733924865-1u0026order=asc"
+    },
+    "precedes": {
+      "href": "/effects?cursor=141733924865-1u0026order=desc"
+    }
+  },
+  "id": "0000013563506724865-0000000001",
+  "paging_token": "13563506724865-1",
+  "account": "GA6U5X6WOPNKKDKQULBR7IDHDBAQKOWPHYEC7WSXHZBFEYFD3XVZAKO5",
+  "low_threshold": 2,
+  "med_threshold": 3,
+  "high_threshold": 4,
+  "type": "account_home_domain_updated",
+  "home_domain": "stellar.org",
+  "type_i": 5
+}

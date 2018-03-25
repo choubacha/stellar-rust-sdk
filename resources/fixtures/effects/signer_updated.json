@@ -1,0 +1,21 @@
+{
+  "_links": {
+    "operation": {
+      "href": "http://horizon-testnet.stellar.org/operations/65571265859585"
+    },
+    "succeeds": {
+      "href": "http://horizon-testnet.stellar.org/effects?order=descu0026cursor=65571265859585-3"
+    },
+    "precedes": {
+      "href": "http://horizon-testnet.stellar.org/effects?order=ascu0026cursor=65571265859585-3"
+    }
+  },
+  "id": "0000065571265859585-0000000003",
+  "paging_token": "65571265859585-3",
+  "account": "GA6U5X6WOPNKKDKQULBR7IDHDBAQKOWPHYEC7WSXHZBFEYFD3XVZAKOO",
+  "type": "signer_updated",
+  "type_i": 12,
+  "weight": 2,
+  "public_key": "GA6U5X6WOPNKKDKQULBR7IDHDBAQKOWPHYEC7WSXHZBFEYFD3XVZAKOO"
+}
+
