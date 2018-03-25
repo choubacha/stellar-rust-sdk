@@ -1,0 +1,18 @@
+{
+  "_links": {
+    "operation": {
+      "href": "/operations/141733924865"
+    },
+    "succeeds": {
+      "href": "/effects?cursor=141733924865-1\u0026order=asc"
+    },
+    "precedes": {
+      "href": "/effects?cursor=141733924865-1\u0026order=desc"
+    }
+  },
+  "id": "0000065571265847297-0000000001",
+  "paging_token": "65571265847297-1",
+  "account": "GCBQ6JRBPF3SXQBQ6SO5MRBE7WVV4UCHYOSHQGXSZNPZLFRYVYOWBZRQ",
+  "type": "account_removed",
+  "type_i": 1
+}
