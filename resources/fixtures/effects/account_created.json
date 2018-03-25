@@ -1,0 +1,21 @@
+{
+  "_links": {
+    "operation": {
+      "href": "/operations/141733924865"
+    },
+    "precedes": {
+      "href": "/effects?cursor=141733924865-1\u0026order=asc"
+    },
+    "succeeds": {
+      "href": "/effects?cursor=141733924865-1\u0026order=desc"
+    }
+  },
+  "account": "GBS43BF24ENNS3KPACUZVKK2VYPOZVBQO2CISGZ777RYGOPYC2FT6S3K",
+  "id": "0000010157597659139-0000000002",
+  "paging_token": "141733924865-1",
+  "starting_balance": "10000000.0",
+  "type_i": 0,
+  "type": "account_created"
+}
+
+

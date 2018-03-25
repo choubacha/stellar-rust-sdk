@@ -12,6 +12,8 @@ mod account;
 mod amount;
 mod asset;
 mod deserialize;
+/// An effect represents specific changes that occur in the ledger resulting from operations.
+pub mod effect;
 mod ledger;
 mod offer;
 /// An ooperation is an individual command that mutates the ledger.
@@ -29,6 +31,7 @@ mod transaction;
 pub use account::Account;
 pub use amount::Amount;
 pub use asset::{Asset, AssetIdentifier};
+pub use effect::Effect;
 pub use ledger::Ledger;
 pub use offer::Offer;
 pub use payment_path::PaymentPath;
