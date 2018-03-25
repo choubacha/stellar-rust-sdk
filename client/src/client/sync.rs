@@ -104,10 +104,10 @@ impl Client {
     ///
     /// ```
     /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::AccountDetails;
+    /// use stellar_client::endpoint::account;
     /// let client = Client::horizon_test().unwrap();
     /// let endpoint =
-    ///     AccountDetails::new("GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ");
+    ///     account::Details::new("GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ");
     /// let account = client.request(endpoint).unwrap();
     /// assert_eq!(account.id(), "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ");
     /// ```
@@ -176,10 +176,9 @@ mod tests {
 
     #[test]
     fn it_can_make_a_request() {
-        use endpoint::AccountDetails;
+        use endpoint::account::Details;
         let client = Client::horizon_test().unwrap();
-        let endpoint =
-            AccountDetails::new("GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ");
+        let endpoint = Details::new("GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ");
         let account = client.request(endpoint).unwrap();
         assert_eq!(
             account.id(),
