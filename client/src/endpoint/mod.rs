@@ -4,12 +4,10 @@ use error::Result;
 use serde::de::DeserializeOwned;
 use http;
 
-mod account;
-mod asset;
+pub mod account;
+pub mod asset;
 mod records;
 pub use self::records::Records;
-pub use self::account::AccountDetails;
-pub use self::asset::AllAssets;
 
 /// Represents the body of a request to an EndPoint.
 #[derive(Debug)]

@@ -1,3 +1,4 @@
+//! Contains endpoints for accessing accounts and related information.
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::Account;
@@ -6,11 +7,11 @@ use http::{Request, Uri};
 
 /// An endpoint that accesses a single accounts details.
 #[derive(Debug)]
-pub struct AccountDetails {
+pub struct Details {
     id: String,
 }
 
-impl AccountDetails {
+impl Details {
     /// Returns a new end point for account details. Hand this to the client in order to request
     /// details about an account.
     pub fn new(id: &str) -> Self {
@@ -18,7 +19,7 @@ impl AccountDetails {
     }
 }
 
-impl EndPoint for AccountDetails {
+impl EndPoint for Details {
     type Response = Account;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {
@@ -34,7 +35,7 @@ mod tests {
 
     #[test]
     fn it_can_make_an_account_uri() {
-        let details = AccountDetails::new("abc123");
+        let details = Details::new("abc123");
         let request = details
             .into_request("https://horizon-testnet.stellar.org")
             .unwrap();
