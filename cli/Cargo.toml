@@ -1,0 +1,13 @@
+[package]
+name = "stellar-cli"
+version = "0.1.0"
+authors = ["Kevin Bacha <chewbacha@gmail.com>"]
+
+[[bin]]
+name = "stellar"
+path = "src/main.rs"
+
+[dependencies]
+clap = "2.31"
+stellar-resources = { path = "../resources" }
+stellar-client = { path = "../client" }
