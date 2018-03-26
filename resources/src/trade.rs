@@ -6,7 +6,7 @@ use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 
 /// A trade represents an offer that was fulfilled between two assets and accounts.
 ///
-/// https://www.stellar.org/developers/horizon/reference/resources/trade.html
+/// <https://www.stellar.org/developers/horizon/reference/resources/trade.html>
 #[derive(Debug)]
 pub struct Trade {
     id: String,

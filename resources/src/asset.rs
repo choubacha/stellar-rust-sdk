@@ -4,7 +4,8 @@ use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
 /// Assets are the units that are traded on the Stellar Network.
 /// An asset consists of an type, code, and issuer.
 /// Any asset can be traded for any other asset.
-/// https://www.stellar.org/developers/horizon/reference/resources/asset.html
+///
+/// <https://www.stellar.org/developers/horizon/reference/resources/asset.html>
 
 /// An identifer is the type, code, and issuer.
 #[derive(Debug, PartialEq, Eq, Clone)]
@@ -220,7 +221,8 @@ impl Flag {
 /// Assets are the units that are traded on the Stellar Network.
 /// An asset consists of an type, code, and issuer.
 /// Any asset can be traded for any other asset.
-/// https://www.stellar.org/developers/horizon/reference/resources/asset.html
+///
+/// <https://www.stellar.org/developers/horizon/reference/resources/asset.html>
 #[derive(Debug)]
 pub struct Asset {
     asset_identifier: AssetIdentifier,
@@ -305,9 +307,9 @@ impl Asset {
 
     /// The number of units of credit issued for this asset.
     /// This number is scaled by 10 million to display the number if the format a
-    /// user would expect it in
-    /// https://www.stellar.org/developers/guides/concepts/assets.html
-    /// Returns a signed 64-bit integer.
+    /// user would expect it in.
+    ///
+    /// <https://www.stellar.org/developers/guides/concepts/assets.html#amount-precision-and-representation>
     pub fn amount(&self) -> Amount {
         self.amount
     }

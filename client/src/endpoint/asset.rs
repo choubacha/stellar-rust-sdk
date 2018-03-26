@@ -8,7 +8,7 @@ use http::{Request, Uri};
 /// Represents the all assets end point for the stellar horizon server. The endpoint
 /// will return all assets filtered by a myriad of different query params.
 ///
-/// https://www.stellar.org/developers/horizon/reference/endpoints/assets-all.html
+/// <https://www.stellar.org/developers/horizon/reference/endpoints/assets-all.html>
 ///
 /// ## Example
 ///
