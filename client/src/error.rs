@@ -20,11 +20,11 @@ pub enum Error {
     /// this type does not map down well and currently is just wrapped
     /// generically. See the inner description for details.
     ///
-    /// https://github.com/hyperium/http/issues/188
+    /// <https://github.com/hyperium/http/issues/188>
     Http(http::Error),
     /// An error occurred while parsing the json
     ///
-    /// https://docs.serde.rs/serde_json/error/struct.Error.html
+    /// <https://docs.serde.rs/serde_json/error/struct.Error.html>
     ParseError(serde_json::error::Error),
     /// Catch-all for reqwest error handling
     Reqwest(reqwest::Error),

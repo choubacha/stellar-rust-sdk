@@ -3,10 +3,8 @@ use serde::{Deserialize, Deserializer};
 use std::fmt;
 
 /// A resource for the stellar horizon API specific error codes.
-/// These errors adhere to the Problem Details Standard
-/// https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-00
-/// and a list of possible erros can be found here
-/// https://www.stellar.org/developers/horizon/reference/errors.html
+/// These errors adhere to the [Problem Details Standard](https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-00)
+/// and a list of possible erros can be found [on the Stellar website](https://www.stellar.org/developers/horizon/reference/errors.html)
 #[derive(Debug, Deserialize)]
 pub struct StellarError {
     // type is a protected word

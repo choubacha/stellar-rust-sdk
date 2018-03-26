@@ -2,7 +2,8 @@ use deserialize;
 
 /// In the Stellar network, users interact using accounts which can be controlled by a
 /// corresponding keypair that can authorize transactions.
-/// https://www.stellar.org/developers/horizon/reference/resources/account.html
+///
+/// <https://www.stellar.org/developers/horizon/reference/resources/account.html>
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Account {
     id: String,
