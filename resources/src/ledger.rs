@@ -8,7 +8,6 @@ pub struct Ledger {
     id: String,
     paging_token: String,
     hash: String,
-    prev_hash: String,
     sequence: u32,
     transaction_count: i64,
     operation_count: i64,
@@ -35,11 +34,6 @@ impl Ledger {
     /// A hex-encoded SHA-256 hash of the ledger’s XDR-encoded form.
     pub fn hash(&self) -> &String {
         &self.hash
-    }
-
-    /// The hash of the ledger that chronologically came before this one.
-    pub fn prev_hash(&self) -> &String {
-        &self.prev_hash
     }
 
     /// Sequence number of this ledger, suitable for use as the as the :id parameter for url templates that require a ledger number.
@@ -123,10 +117,6 @@ mod ledger_tests {
         assert_eq!(
             ledger.hash(),
             "eee9e6e02899365ecae4c37e52db7d99e2d130baf4ec1856d311bb546df1d0ad"
-        );
-        assert_eq!(
-            ledger.prev_hash(),
-            "3d4de1c6b97d69e86e341c6963f5c669c5c7aac4dc84ddd4c3fe70a5b2bc988f"
         );
         assert_eq!(ledger.sequence(), 69859);
         assert_eq!(ledger.transaction_count(), 0);

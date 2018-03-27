@@ -6,7 +6,9 @@ use http;
 
 pub mod account;
 pub mod asset;
+pub mod ledger;
 mod records;
+
 pub use self::records::Records;
 
 /// Represents the body of a request to an EndPoint.
