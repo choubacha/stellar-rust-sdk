@@ -1,14 +1,14 @@
 /// This effect is the result of a create merge operation and represents
 /// the fact that an account was removed in the merge
 #[derive(Debug, Deserialize)]
-pub struct AccountRemoved {
+pub struct Removed {
     account: String,
 }
 
-impl AccountRemoved {
-    /// Creates a new AccountRemoved
-    pub fn new(account: String) -> AccountRemoved {
-        AccountRemoved { account: account }
+impl Removed {
+    /// Creates a new account Removed effect
+    pub fn new(account: String) -> Removed {
+        Removed { account: account }
     }
     /// The public address of the account that was removed
     pub fn account(&self) -> &String {

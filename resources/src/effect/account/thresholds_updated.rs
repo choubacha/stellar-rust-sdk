@@ -1,17 +1,17 @@
 /// This effect can be the result of a set options operation and represents
 /// the fact that an account's weight thresholds have changed.
 #[derive(Debug, Deserialize)]
-pub struct AccountThresholdsUpdated {
+pub struct ThresholdsUpdated {
     account: String,
     low: u32,
     med: u32,
     high: u32,
 }
 
-impl AccountThresholdsUpdated {
-    /// Creates a new AccountThresholdsUpdated
-    pub fn new(account: String, low: u32, med: u32, high: u32) -> AccountThresholdsUpdated {
-        AccountThresholdsUpdated {
+impl ThresholdsUpdated {
+    /// Creates a new ThresholdsUpdated effect
+    pub fn new(account: String, low: u32, med: u32, high: u32) -> ThresholdsUpdated {
+        ThresholdsUpdated {
             account: account,
             low: low,
             med: med,

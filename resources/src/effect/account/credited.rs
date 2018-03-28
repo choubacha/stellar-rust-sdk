@@ -2,18 +2,18 @@ use amount::Amount;
 use asset::AssetIdentifier;
 /// This effect can be the result of a create_account, payment, path_payment
 /// or merge_account operation.  It represents the fact that assets were
-/// removed to an account
+/// added to an account
 #[derive(Debug, Deserialize)]
-pub struct AccountDebited {
+pub struct Credited {
     account: String,
     amount: Amount,
     asset: AssetIdentifier,
 }
 
-impl AccountDebited {
-    /// Creates a new AccountDebited
-    pub fn new(account: String, amount: Amount, asset: AssetIdentifier) -> AccountDebited {
-        AccountDebited {
+impl Credited {
+    /// Creates a new Credited effect
+    pub fn new(account: String, amount: Amount, asset: AssetIdentifier) -> Credited {
+        Credited {
             account: account,
             amount: amount,
             asset: asset,
