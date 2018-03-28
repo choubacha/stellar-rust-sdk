@@ -1,25 +1,25 @@
 use amount::Amount;
 use asset::AssetIdentifier;
 /// This effect can be the result of a change trust operation and represents
-/// the fact that a new trustline has been created between an asset and account
+/// the fact that a trustline has been updated between an asset and account
 #[derive(Debug, Deserialize)]
-pub struct TrustlineCreated {
+pub struct Updated {
     account: String,
     limit: Amount,
     asset: AssetIdentifier,
 }
 
-impl TrustlineCreated {
-    /// Creates a new TrustlineCreated
-    pub fn new(account: String, limit: Amount, asset: AssetIdentifier) -> TrustlineCreated {
-        TrustlineCreated {
+impl Updated {
+    /// Creates a new Trustline Updated effect
+    pub fn new(account: String, limit: Amount, asset: AssetIdentifier) -> Updated {
+        Updated {
             account: account,
             limit: limit,
             asset: asset,
         }
     }
 
-    /// The public address of the account that is creating a new trustline
+    /// The public address of the account that updated its trustline
     pub fn account(&self) -> &String {
         &self.account
     }

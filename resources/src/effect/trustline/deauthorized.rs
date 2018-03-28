@@ -2,15 +2,15 @@ use asset::AssetIdentifier;
 /// This effect can be the result of a allow trust operation and represents
 /// the fact that an asset issuer will no longer allow an account to hold its assets.
 #[derive(Debug, Deserialize)]
-pub struct TrustlineDeauthorized {
+pub struct Deauthorized {
     account: String,
     asset: AssetIdentifier,
 }
 
-impl TrustlineDeauthorized {
-    /// Creates a new TrustlineDeauthorized
-    pub fn new(account: String, asset: AssetIdentifier) -> TrustlineDeauthorized {
-        TrustlineDeauthorized {
+impl Deauthorized {
+    /// Creates a new Trustline Deauthorized effect
+    pub fn new(account: String, asset: AssetIdentifier) -> Deauthorized {
+        Deauthorized {
             account: account,
             asset: asset,
         }

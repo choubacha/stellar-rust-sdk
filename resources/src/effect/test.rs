@@ -1,6 +1,10 @@
 use amount::Amount;
-use asset::Flag;
+use effect::account::Kind as AccountKind;
+use effect::signer::Kind as SignerKind;
+use effect::trustline::Kind as TrustlineKind;
+use effect::trade::Kind as TradeKind;
 use effect::{Effect, EffectKind};
+use asset::Flag;
 use serde_json;
 
 fn account_created_json() -> &'static str {
@@ -12,7 +16,7 @@ fn it_parses_account_created_from_json() {
     let effect: Effect = serde_json::from_str(&account_created_json()).unwrap();
     assert!(effect.is_account_created());
     assert_eq!(effect.type_i(), 0);
-    if let &EffectKind::AccountCreated(ref effect_details) = effect.kind() {
+    if let &EffectKind::Account(AccountKind::Created(ref effect_details)) = effect.kind() {
         assert_eq!(
             effect_details.account(),
             "GBS43BF24ENNS3KPACUZVKK2VYPOZVBQO2CISGZ777RYGOPYC2FT6S3K"
@@ -34,7 +38,7 @@ fn it_parses_account_removed_from_json() {
     let effect: Effect = serde_json::from_str(&account_removed_json()).unwrap();
     assert!(effect.is_account_removed());
     assert_eq!(effect.type_i(), 1);
-    if let &EffectKind::AccountRemoved(ref effect_details) = effect.kind() {
+    if let &EffectKind::Account(AccountKind::Removed(ref effect_details)) = effect.kind() {
         assert_eq!(
             effect_details.account(),
             "GCBQ6JRBPF3SXQBQ6SO5MRBE7WVV4UCHYOSHQGXSZNPZLFRYVYOWBZRQ"
@@ -52,7 +56,7 @@ fn it_parses_account_credited_from_json() {
     let effect: Effect = serde_json::from_str(&account_credited_json()).unwrap();
     assert!(effect.is_account_credited());
     assert_eq!(effect.type_i(), 2);
-    if let &EffectKind::AccountCredited(ref effect_details) = effect.kind() {
+    if let &EffectKind::Account(AccountKind::Credited(ref effect_details)) = effect.kind() {
         assert_eq!(
             effect_details.account(),
             "GDLGTRIBFH24364GPWPUS45GUFC2GU4ARPGWTXVCPLGTUHX3IOS3ON47"
@@ -72,7 +76,7 @@ fn it_parses_account_debited_from_json() {
     let effect: Effect = serde_json::from_str(&account_debited_json()).unwrap();
     assert!(effect.is_account_debited());
     assert_eq!(effect.type_i(), 3);
-    if let &EffectKind::AccountDebited(ref effect_details) = effect.kind() {
+    if let &EffectKind::Account(AccountKind::Debited(ref effect_details)) = effect.kind() {
         assert_eq!(
             effect_details.account(),
             "GBRPYHIL2CI3FNQ4BXLFMNDLFJUNPU2HY3ZMFSHONUCEOASW7QC7OX2H"
@@ -92,7 +96,8 @@ fn it_parses_account_thresholds_updated_from_json() {
     let effect: Effect = serde_json::from_str(&account_threshold_updated_json()).unwrap();
     assert!(effect.is_account_thresholds_updated());
     assert_eq!(effect.type_i(), 4);
-    if let &EffectKind::AccountThresholdsUpdated(ref effect_details) = effect.kind() {
+    if let &EffectKind::Account(AccountKind::ThresholdsUpdated(ref effect_details)) = effect.kind()
+    {
         assert_eq!(
             effect_details.account(),
             "GA6U5X6WOPNKKDKQULBR7IDHDBAQKOWPHYEC7WSXHZBFEYFD3XVZAKOO"
@@ -113,7 +118,8 @@ fn it_parses_account_home_domain_updated_from_json() {
     let effect: Effect = serde_json::from_str(&account_home_domain_updated_json()).unwrap();
     assert!(effect.is_account_home_domain_updated());
     assert_eq!(effect.type_i(), 5);
-    if let &EffectKind::AccountHomeDomainUpdated(ref effect_details) = effect.kind() {
+    if let &EffectKind::Account(AccountKind::HomeDomainUpdated(ref effect_details)) = effect.kind()
+    {
         assert_eq!(
             effect_details.account(),
             "GA6U5X6WOPNKKDKQULBR7IDHDBAQKOWPHYEC7WSXHZBFEYFD3XVZAKO5"
@@ -132,7 +138,7 @@ fn it_parses_account_flags_updated_from_json() {
     let effect: Effect = serde_json::from_str(&account_flags_updated_json()).unwrap();
     assert!(effect.is_account_flags_updated());
     assert_eq!(effect.type_i(), 6);
-    if let &EffectKind::AccountFlagsUpdated(ref effect_details) = effect.kind() {
+    if let &EffectKind::Account(AccountKind::FlagsUpdated(ref effect_details)) = effect.kind() {
         assert_eq!(
             effect_details.account(),
             "GA6U5X6WOPNKKDKQULBR7IDHDBAQKOWPHYEC7WSXHZBFEYFD3XVZAKOO"
@@ -151,7 +157,7 @@ fn it_parses_signer_created_from_json() {
     let effect: Effect = serde_json::from_str(&signer_created_json()).unwrap();
     assert!(effect.is_signer_created());
     assert_eq!(effect.type_i(), 10);
-    if let &EffectKind::SignerCreated(ref effect_details) = effect.kind() {
+    if let &EffectKind::Signer(SignerKind::Created(ref effect_details)) = effect.kind() {
         assert_eq!(
             effect_details.account(),
             "GB24LPGAHYTWRYOXIDKXLI55SBRWW42T3TZKDAAW3BOJX4ADVIATFTLU"
@@ -174,7 +180,7 @@ fn it_parses_signer_removed_from_json() {
     let effect: Effect = serde_json::from_str(&signer_removed_json()).unwrap();
     assert!(effect.is_signer_removed());
     assert_eq!(effect.type_i(), 11);
-    if let &EffectKind::SignerRemoved(ref effect_details) = effect.kind() {
+    if let &EffectKind::Signer(SignerKind::Removed(ref effect_details)) = effect.kind() {
         assert_eq!(
             effect_details.account(),
             "GCFKT6BN2FEASCEVDNHEC4LLFT2KLUUPEMKM4OJPEJ65H2AEZ7IH4RV6"
@@ -197,7 +203,7 @@ fn it_parses_signer_updated_from_json() {
     let effect: Effect = serde_json::from_str(&signer_updated_json()).unwrap();
     assert!(effect.is_signer_updated());
     assert_eq!(effect.type_i(), 12);
-    if let &EffectKind::SignerUpdated(ref effect_details) = effect.kind() {
+    if let &EffectKind::Signer(SignerKind::Updated(ref effect_details)) = effect.kind() {
         assert_eq!(
             effect_details.account(),
             "GA6U5X6WOPNKKDKQULBR7IDHDBAQKOWPHYEC7WSXHZBFEYFD3XVZAKOO"
@@ -220,7 +226,7 @@ fn it_parses_trustline_created_from_json() {
     let effect: Effect = serde_json::from_str(&trustline_created_json()).unwrap();
     assert!(effect.is_trustline_created());
     assert_eq!(effect.type_i(), 20);
-    if let &EffectKind::TrustlineCreated(ref effect_details) = effect.kind() {
+    if let &EffectKind::Trustline(TrustlineKind::Created(ref effect_details)) = effect.kind() {
         assert_eq!(
             effect_details.account(),
             "GA6U5X6WOPNKKDKQULBR7IDHDBAQKOWPHYEC7WSXHZBFEYFD3XVZAKOO"
@@ -240,7 +246,7 @@ fn it_parses_trustline_removed_from_json() {
     let effect: Effect = serde_json::from_str(&trustline_removed_json()).unwrap();
     assert!(effect.is_trustline_removed());
     assert_eq!(effect.type_i(), 21);
-    if let &EffectKind::TrustlineRemoved(ref effect_details) = effect.kind() {
+    if let &EffectKind::Trustline(TrustlineKind::Removed(ref effect_details)) = effect.kind() {
         assert_eq!(
             effect_details.account(),
             "QA6U5X6WOPNKKDKQULBR7IDHDBAQKOWPHYEC7WSXHZBFEYFD3XVZAKOO"
@@ -260,7 +266,7 @@ fn it_parses_trustline_updated_from_json() {
     let effect: Effect = serde_json::from_str(&trustline_updated_json()).unwrap();
     assert!(effect.is_trustline_updated());
     assert_eq!(effect.type_i(), 22);
-    if let &EffectKind::TrustlineUpdated(ref effect_details) = effect.kind() {
+    if let &EffectKind::Trustline(TrustlineKind::Updated(ref effect_details)) = effect.kind() {
         assert_eq!(
             effect_details.account(),
             "GA6U5X6WOPNKKDKQULBR7IDHDBAQKOWPHYEC7WSXHZBFEYFD3XVZAKOO"
@@ -280,7 +286,7 @@ fn it_parses_trustline_authorized_from_json() {
     let effect: Effect = serde_json::from_str(&trustline_authorized_json()).unwrap();
     assert!(effect.is_trustline_authorized());
     assert_eq!(effect.type_i(), 23);
-    if let &EffectKind::TrustlineAuthorized(ref effect_details) = effect.kind() {
+    if let &EffectKind::Trustline(TrustlineKind::Authorized(ref effect_details)) = effect.kind() {
         assert_eq!(
             effect_details.account(),
             "GA6U5X6WOPNKKDKQULBR7IDHDBAQKOWPHYEC7WSXHZBFEYFD3XVZAKOO"
@@ -299,7 +305,7 @@ fn it_parses_trustline_deauthorized_from_json() {
     let effect: Effect = serde_json::from_str(&trustline_deauthorized_json()).unwrap();
     assert!(effect.is_trustline_deauthorized());
     assert_eq!(effect.type_i(), 24);
-    if let &EffectKind::TrustlineDeauthorized(ref effect_details) = effect.kind() {
+    if let &EffectKind::Trustline(TrustlineKind::Deauthorized(ref effect_details)) = effect.kind() {
         assert_eq!(
             effect_details.account(),
             "GA6U5X6WOPNKKDKQULBR7IDHDBAQKOWPHYEC7WSXHZBFEYFD3XVZAKOO"
@@ -318,7 +324,7 @@ fn it_parses_trade_from_json() {
     let effect: Effect = serde_json::from_str(&trade_json()).unwrap();
     assert!(effect.is_trade());
     assert_eq!(effect.type_i(), 33);
-    if let &EffectKind::Trade(ref effect_details) = effect.kind() {
+    if let &EffectKind::Trade(TradeKind::Trade(ref effect_details)) = effect.kind() {
         assert_eq!(
             effect_details.account(),
             "GA6U5X6WOPNKKDKQULBR7IDHDBAQKOWPHYEC7WSXHZBFEYFD3XVZAKOO"

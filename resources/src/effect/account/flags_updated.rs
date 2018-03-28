@@ -2,15 +2,15 @@ use asset::Flag;
 /// This effect can be the result of a set options operation and represents
 /// the fact that an account's flags have been updated
 #[derive(Debug, Deserialize)]
-pub struct AccountFlagsUpdated {
+pub struct FlagsUpdated {
     account: String,
     flags: Flag,
 }
 
-impl AccountFlagsUpdated {
-    /// Creates a new AccountFlagsUpdated
-    pub fn new(account: String, flags: Flag) -> AccountFlagsUpdated {
-        AccountFlagsUpdated {
+impl FlagsUpdated {
+    /// Creates a new FlagsUpdated effect
+    pub fn new(account: String, flags: Flag) -> FlagsUpdated {
+        FlagsUpdated {
             account: account,
             flags: flags,
         }

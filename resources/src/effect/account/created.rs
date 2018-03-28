@@ -2,15 +2,15 @@ use amount::Amount;
 /// This effect is the result of a create account operation and represents
 /// the fact that an account was created
 #[derive(Debug, Deserialize)]
-pub struct AccountCreated {
+pub struct Created {
     account: String,
     starting_balance: Amount,
 }
 
-impl AccountCreated {
-    /// Creates a new CreateAccount
-    pub fn new(account: String, starting_balance: Amount) -> AccountCreated {
-        AccountCreated {
+impl Created {
+    /// Creates a new Account
+    pub fn new(account: String, starting_balance: Amount) -> Created {
+        Created {
             account: account,
             starting_balance: starting_balance,
         }

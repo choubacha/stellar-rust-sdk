@@ -1,15 +1,15 @@
 /// This effect can be the result of a set options operation and represents
 /// the fact that an account's home domain has changed
 #[derive(Debug, Deserialize)]
-pub struct AccountHomeDomainUpdated {
+pub struct HomeDomainUpdated {
     account: String,
     home_domain: String,
 }
 
-impl AccountHomeDomainUpdated {
-    /// Creates a new AccountAccountHomeDomainUpdated
-    pub fn new(account: String, home_domain: String) -> AccountHomeDomainUpdated {
-        AccountHomeDomainUpdated {
+impl HomeDomainUpdated {
+    /// Creates a HomeDomainUpdated effect
+    pub fn new(account: String, home_domain: String) -> HomeDomainUpdated {
+        HomeDomainUpdated {
             account: account,
             home_domain: home_domain,
         }
