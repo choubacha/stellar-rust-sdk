@@ -4,8 +4,10 @@ use asset::AssetIdentifier;
 /// The ratio between the asking and selling price
 #[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Copy, Clone)]
 pub struct PriceRatio {
-    #[serde(rename = "n")] numerator: u64,
-    #[serde(rename = "d")] denominator: u64,
+    #[serde(rename = "n")]
+    numerator: u64,
+    #[serde(rename = "d")]
+    denominator: u64,
 }
 
 impl PriceRatio {
@@ -32,7 +34,8 @@ impl PriceRatio {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct OfferSummary {
     amount: Amount,
-    #[serde(rename = "price_r")] price_ratio: PriceRatio,
+    #[serde(rename = "price_r")]
+    price_ratio: PriceRatio,
     price: Amount,
 }
 
@@ -80,7 +83,8 @@ pub struct Offer {
     selling: AssetIdentifier,
     buying: AssetIdentifier,
     amount: Amount,
-    #[serde(rename = "price_r")] price_ratio: PriceRatio,
+    #[serde(rename = "price_r")]
+    price_ratio: PriceRatio,
     price: Amount,
 }
 

@@ -11,7 +11,8 @@ pub struct CreatePassiveOffer {
     selling: AssetIdentifier,
     buying: AssetIdentifier,
     amount: Amount,
-    #[serde(rename = "price_r")] price_ratio: PriceRatio,
+    #[serde(rename = "price_r")]
+    price_ratio: PriceRatio,
     price: Amount,
 }
 

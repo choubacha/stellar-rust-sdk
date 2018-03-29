@@ -168,13 +168,17 @@ struct TradeRepresentation {
     base_account: String,
     base_amount: Amount,
     base_asset_type: String,
-    #[serde(skip_serializing_if = "Option::is_none")] base_asset_code: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")] base_asset_issuer: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    base_asset_code: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    base_asset_issuer: Option<String>,
     counter_account: String,
     counter_amount: Amount,
     counter_asset_type: String,
-    #[serde(skip_serializing_if = "Option::is_none")] counter_asset_code: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")] counter_asset_issuer: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    counter_asset_code: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    counter_asset_issuer: Option<String>,
     base_is_seller: bool,
     price: Price,
 }

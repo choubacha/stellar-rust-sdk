@@ -14,7 +14,8 @@ pub struct Transaction {
     ledger: u32,
     created_at: DateTime<Utc>,
     source_account: String,
-    #[serde(deserialize_with = "deserialize::from_str")] source_account_sequence: u64,
+    #[serde(deserialize_with = "deserialize::from_str")]
+    source_account_sequence: u64,
     fee_paid: i64,
     operation_count: u32,
     envelope_xdr: String,

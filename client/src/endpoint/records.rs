@@ -60,8 +60,10 @@ where
 /// https://www.stellar.org/developers/horizon/reference/responses.html
 #[derive(Deserialize)]
 struct Embedded<T> {
-    #[serde(rename = "_embedded")] embedded: T,
-    #[serde(rename = "_links")] links: Links,
+    #[serde(rename = "_embedded")]
+    embedded: T,
+    #[serde(rename = "_links")]
+    links: Links,
 }
 
 /// If the embedded resource is a set of records, this can provide that data back in

@@ -8,7 +8,8 @@ use std::fmt;
 #[derive(Debug, Deserialize)]
 pub struct StellarError {
     // type is a protected word
-    #[serde(rename = "type")] error_type: ErrorType,
+    #[serde(rename = "type")]
+    error_type: ErrorType,
     title: String,
     status: u16,
     detail: String,
