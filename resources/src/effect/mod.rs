@@ -217,7 +217,8 @@ impl Effect {
 struct Intermediate<'a> {
     id: String,
     paging_token: String,
-    #[serde(rename = "type")] kind: &'a str,
+    #[serde(rename = "type")]
+    kind: &'a str,
     account: Option<String>,
     starting_balance: Option<Amount>,
     amount: Option<Amount>,

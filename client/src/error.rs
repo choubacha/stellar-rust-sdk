@@ -28,7 +28,8 @@ pub enum Error {
     ParseError(serde_json::error::Error),
     /// Catch-all for reqwest error handling
     Reqwest(reqwest::Error),
-    #[doc(hidden)] __Nonexhaustive,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 /// A result including client specific errors.

@@ -211,7 +211,8 @@ impl Operation {
 struct Intermediate<'a> {
     id: i64,
     paging_token: String,
-    #[serde(rename = "type")] kind: &'a str,
+    #[serde(rename = "type")]
+    kind: &'a str,
     account: Option<String>,
     funder: Option<String>,
     starting_balance: Option<Amount>,
@@ -233,7 +234,8 @@ struct Intermediate<'a> {
     selling_asset_code: Option<String>,
     selling_asset_issuer: Option<String>,
     offer_id: Option<i64>,
-    #[serde(rename = "price_r")] price_ratio: Option<PriceRatio>,
+    #[serde(rename = "price_r")]
+    price_ratio: Option<PriceRatio>,
     price: Option<Amount>,
     signer_key: Option<String>,
     signer_weight: Option<u8>,

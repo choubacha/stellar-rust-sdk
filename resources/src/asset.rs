@@ -29,8 +29,10 @@ pub struct AssetId {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct IntermediateAssetIdentifier {
     asset_type: String,
-    #[serde(skip_serializing_if = "Option::is_none")] asset_code: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")] asset_issuer: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    asset_code: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    asset_issuer: Option<String>,
 }
 
 impl<'de> Deserialize<'de> for AssetIdentifier {
@@ -234,8 +236,10 @@ pub struct Asset {
 #[derive(Serialize, Deserialize, Debug)]
 pub struct IntermediateAsset {
     asset_type: String,
-    #[serde(skip_serializing_if = "Option::is_none")] asset_code: Option<String>,
-    #[serde(skip_serializing_if = "Option::is_none")] asset_issuer: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    asset_code: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    asset_issuer: Option<String>,
     amount: Amount,
     num_accounts: u32,
     flags: Flag,
