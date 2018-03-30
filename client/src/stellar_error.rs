@@ -1,6 +1,6 @@
 use std::error::Error;
-use serde::{Deserialize, Deserializer};
-use std::fmt;
+use serde::{de, Deserialize, Deserializer};
+use std::{fmt, str::FromStr};
 
 /// A resource for the stellar horizon API specific error codes.
 /// These errors adhere to the [Problem Details Standard](https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-00)
@@ -9,15 +9,15 @@ use std::fmt;
 pub struct StellarError {
     // type is a protected word
     #[serde(rename = "type")]
-    error_type: ErrorType,
+    kind: Kind,
     title: String,
     status: u16,
     detail: String,
-    instance: String,
+    instance: Option<String>,
 }
 
-#[derive(Debug, Eq, PartialEq)]
-pub enum ErrorType {
+#[derive(Debug, Eq, PartialEq, Clone, Copy)]
+pub enum Kind {
     BadRequest,
     BeforeHistory,
     Forbidden,
@@ -32,53 +32,43 @@ pub enum ErrorType {
     UnknownError,
 }
 
-impl<'de> Deserialize<'de> for ErrorType {
+impl<'de> Deserialize<'de> for Kind {
     fn deserialize<D>(d: D) -> Result<Self, D::Error>
     where
         D: Deserializer<'de>,
     {
-        let type_enum: ErrorType = StellarError::error_type_from_str(&String::deserialize(d)?[..]);
-        Ok(type_enum)
+        let kind = String::deserialize(d)?;
+        Kind::from_str(&kind).map_err(|_| de::Error::custom("Error decoding kind"))
+    }
+}
+
+impl FromStr for Kind {
+    type Err = super::Error;
+
+    fn from_str(s: &str) -> Result<Self, super::Error> {
+        Ok(match s {
+            "https://stellar.org/horizon-errors/bad_request" => Kind::BadRequest,
+            "https://stellar.org/horizon-errors/before_history" => Kind::BeforeHistory,
+            "https://stellar.org/horizon-errors/forbidden" => Kind::Forbidden,
+            "https://stellar.org/horizon-errors/not_acceptable" => Kind::NotAcceptable,
+            "https://stellar.org/horizon-errors/not_found" => Kind::NotFound,
+            "https://stellar.org/horizon-errors/not_implemented" => Kind::NotImplemented,
+            "https://stellar.org/horizon-errors/rate_limit_exceeded" => Kind::RateLimitExceeded,
+            "https://stellar.org/horizon-errors/internal_server_error" => Kind::InternalServerError,
+            "https://stellar.org/horizon-errors/stale_history" => Kind::StaleHistory,
+            "https://stellar.org/horizon-errors/transaction_failed" => Kind::TransactionFailed,
+            "https://stellar.org/horizon-errors/transaction_malformed" => {
+                Kind::TransactionMalformed
+            }
+            _ => Kind::UnknownError,
+        })
     }
 }
 
 impl StellarError {
-    /// Creates a new stellar error.  If the error type is not recognized an error is returned.
-    pub fn new(
-        error_type: &str,
-        title: String,
-        status: u16,
-        detail: String,
-        instance: String,
-    ) -> Result<StellarError, String> {
-        let type_enum: ErrorType = StellarError::error_type_from_str(error_type);
-        Ok(StellarError {
-            error_type: type_enum,
-            title: title,
-            status: status,
-            detail: detail,
-            instance: instance,
-        })
-    }
-
-    /// Converts a str representation of a stellar error type into an
-    /// enum error type.  If a new error is created in the stellar API that is
-    /// not represented in this library an unknown error is returned
-    pub fn error_type_from_str(string: &str) -> ErrorType {
-        match string {
-            "bad_request" => ErrorType::BadRequest,
-            "before_history" => ErrorType::BeforeHistory,
-            "forbidden" => ErrorType::Forbidden,
-            "not_acceptable" => ErrorType::NotAcceptable,
-            "not_found" => ErrorType::NotFound,
-            "not_implemented" => ErrorType::NotImplemented,
-            "rate_limit_exceeded" => ErrorType::RateLimitExceeded,
-            "internal_server_error" => ErrorType::InternalServerError,
-            "stale_history" => ErrorType::StaleHistory,
-            "transaction_failed" => ErrorType::TransactionFailed,
-            "transaction_malformed" => ErrorType::TransactionMalformed,
-            _ => ErrorType::UnknownError,
-        }
+    /// Returns the kind of error that was returned from stellar.
+    pub fn kind(&self) -> Kind {
+        self.kind
     }
 
     /// If Horizon cannot understand a request due to invalid parameters, it will return a
@@ -87,7 +77,7 @@ impl StellarError {
     /// If you are encountering this error, check the invalid_field attribute on the extras object
     /// to see what field is triggering the error.
     pub fn is_bad_request(&self) -> bool {
-        self.error_type == ErrorType::BadRequest
+        self.kind == Kind::BadRequest
     }
 
     /// A horizon server may be configured to only keep a portion of the stellar network’s history
@@ -95,7 +85,7 @@ impl StellarError {
     /// information (such as a page of transactions or a single operation) that the server can
     /// positively identify as falling outside the range of recorded history.
     pub fn is_before_history(&self) -> bool {
-        self.error_type == ErrorType::BeforeHistory
+        self.kind == Kind::BeforeHistory
     }
 
     /// If you request data from Horizon you are not authorized to see, Horizon will return a
@@ -104,7 +94,7 @@ impl StellarError {
     /// If you are encountering this error, please check your request and make sure you have
     /// permission to receive that data.
     pub fn is_forbidden(&self) -> bool {
-        self.error_type == ErrorType::Forbidden
+        self.kind == Kind::Forbidden
     }
 
     /// When your client only accepts certain formats of data from Horizon and Horizon cannot
@@ -114,7 +104,7 @@ impl StellarError {
     /// If you are encountering this error, please check to make sure the criteria for content
     /// you’ll accept is correct.
     pub fn is_not_acceptable(&self) -> bool {
-        self.error_type == ErrorType::NotAcceptable
+        self.kind == Kind::NotAcceptable
     }
 
     /// When Horizon can’t find whatever you are requesting, it will return a not_found error. This
@@ -123,7 +113,7 @@ impl StellarError {
     /// Incorrect URL path parameters or missing data are the common reasons for this error. If you
     /// navigate using a link from a valid response, you should never receive this error message.
     pub fn is_not_found(&self) -> bool {
-        self.error_type == ErrorType::NotFound
+        self.kind == Kind::NotFound
     }
 
     /// If your request method is not supported by Horizon, Horizon will return a not_implemented
@@ -132,7 +122,7 @@ impl StellarError {
     /// If you are encountering this error, Horizon does not have the functionality you are
     /// requesting yet.
     pub fn is_not_implemented(&self) -> bool {
-        self.error_type == ErrorType::NotImplemented
+        self.kind == Kind::NotImplemented
     }
 
     /// When a single user makes too many requests to Horizon in a one hour time frame, Horizon
@@ -140,7 +130,7 @@ impl StellarError {
     /// average of one request per second.
     /// See the Rate Limiting Guide for more info.
     pub fn is_rate_limit_exceeded(&self) -> bool {
-        self.error_type == ErrorType::RateLimitExceeded
+        self.kind == Kind::RateLimitExceeded
     }
 
     /// If there’s an internal error within Horizon, Horizon will return a server_error response.
@@ -150,7 +140,7 @@ impl StellarError {
     /// Horizon does not expose information such as stack traces or raw error messages to a client.
     /// Doing so may reveal sensitive configuration data such as secret keys.
     pub fn is_internal_server_error(&self) -> bool {
-        self.error_type == ErrorType::InternalServerError
+        self.kind == Kind::InternalServerError
     }
 
     /// A horizon server may be configured to reject historical requests when the history is known
@@ -158,7 +148,7 @@ impl StellarError {
     /// returned. To resolve this error (provided you are the horizon instance’s operator) please
     /// ensure that the ingestion system is running correctly and importing new ledgers.
     pub fn is_stale_history(&self) -> bool {
-        self.error_type == ErrorType::StaleHistory
+        self.kind == Kind::StaleHistory
     }
 
     /// This error occurs when a client submits a transaction that was well-formed but was not
@@ -173,7 +163,7 @@ impl StellarError {
     /// tx_bad_seq result code (as expressed in the result_code field of the error) may become
     /// valid in the future if the sequence number it used was too high.
     pub fn is_transaction_failed(&self) -> bool {
-        self.error_type == ErrorType::TransactionFailed
+        self.kind == Kind::TransactionFailed
     }
 
     /// When you submit a malformed transaction to Horizon, Horizon will return a
@@ -185,13 +175,13 @@ impl StellarError {
     /// your XDR structure is invalid
     /// you have leftover bytes in your XDR structure
     pub fn is_transaction_malformed(&self) -> bool {
-        self.error_type == ErrorType::TransactionMalformed
+        self.kind == Kind::TransactionMalformed
     }
 
     /// The Stellar API returns an error type that is currently unknown
     /// to the sdk
     pub fn is_unknown_error(&self) -> bool {
-        self.error_type == ErrorType::UnknownError
+        self.kind == Kind::UnknownError
     }
 }
 
@@ -225,14 +215,8 @@ mod asset_identifier_tests {
     }
 
     #[test]
-    fn it_will_instantiate_unknown_errors() {
-        let stellar_error = StellarError::new(
-            "bad type",
-            "title".to_string(),
-            400,
-            "detail".to_string(),
-            "instance".to_string(),
-        ).unwrap();
-        assert!(stellar_error.is_unknown_error());
+    fn it_will_deserialize_unknown_errors() {
+        let kind: Kind = serde_json::from_str("\"bad type\"").unwrap();
+        assert_eq!(kind, Kind::UnknownError);
     }
 }

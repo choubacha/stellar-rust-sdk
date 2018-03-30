@@ -6,6 +6,7 @@ use reqwest;
 use serde_json;
 use std::error::Error as StdError;
 use std::fmt;
+use super::StellarError;
 
 /// A set of errors for use in the client
 #[derive(Debug)]
@@ -15,7 +16,9 @@ pub enum Error {
     /// Was unable to resolve ssl configuration
     BadSSL,
     /// Placeholder for errors that come back from the client.
-    BadResponse,
+    BadResponse(StellarError),
+    /// Server error detected
+    ServerError,
     /// The response was from the http library and resulted in an error.
     /// this type does not map down well and currently is just wrapped
     /// generically. See the inner description for details.
@@ -43,7 +46,8 @@ impl StdError for Error {
             Error::Http(ref inner) => inner.description(),
             Error::Reqwest(ref inner) => inner.description(),
             Error::ParseError(ref inner) => inner.description(),
-            Error::BadResponse => "A non-successful response came back from the stellar server",
+            Error::BadResponse(ref inner) => inner.description(),
+            Error::ServerError => "An unknown error on the server has occurred",
             Error::__Nonexhaustive => unreachable!(),
         }
     }
