@@ -5,11 +5,21 @@ use std::{fmt, str::FromStr};
 /// A resource for the stellar horizon API specific error codes.
 /// These errors adhere to the [Problem Details Standard](https://tools.ietf.org/html/draft-ietf-appsawg-http-problem-00)
 /// and a list of possible erros can be found [on the Stellar website](https://www.stellar.org/developers/horizon/reference/errors.html)
-#[derive(Debug, Deserialize)]
+#[derive(Debug)]
 pub struct StellarError {
-    // type is a protected word
-    #[serde(rename = "type")]
     kind: Kind,
+    url: String,
+    title: String,
+    status: u16,
+    detail: String,
+    instance: Option<String>,
+}
+
+#[derive(Deserialize)]
+struct Intermediate {
+    // type is a protected word and it's a URL anyhow
+    #[serde(rename = "type")]
+    url: String,
     title: String,
     status: u16,
     detail: String,
@@ -42,6 +52,26 @@ impl<'de> Deserialize<'de> for Kind {
     }
 }
 
+impl<'de> Deserialize<'de> for StellarError {
+    fn deserialize<D>(d: D) -> Result<Self, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        let int = Intermediate::deserialize(d)?;
+        let kind: Kind = int.url
+            .parse()
+            .map_err(|_| de::Error::custom("Error decoding kind"))?;
+        Ok(StellarError {
+            kind,
+            url: int.url,
+            title: int.title,
+            status: int.status,
+            detail: int.detail,
+            instance: int.instance,
+        })
+    }
+}
+
 impl FromStr for Kind {
     type Err = super::Error;
 
@@ -69,6 +99,11 @@ impl StellarError {
     /// Returns the kind of error that was returned from stellar.
     pub fn kind(&self) -> Kind {
         self.kind
+    }
+
+    /// Returns a URL that can provide additional information about the stellar error.
+    pub fn url<'a>(&'a self) -> &'a str {
+        &self.url
     }
 
     /// If Horizon cannot understand a request due to invalid parameters, it will return a
@@ -193,7 +228,7 @@ impl Error for StellarError {
 
 impl fmt::Display for StellarError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.write_str(self.description())
+        write!(f, "{}\n\nTo learn more: {}", self.detail, self.url)
     }
 }
 
@@ -209,9 +244,19 @@ mod asset_identifier_tests {
     #[test]
     fn it_parses_stellar_errors_from_json() {
         let before_history: StellarError = serde_json::from_str(&before_history_json()).unwrap();
-        assert_eq!(format!("{}", before_history), "This horizon instance is configured to only track a portion of the stellar network's latest history. This request is asking for results prior to the recorded history known to this horizon instance.");
+        assert_eq!(
+            format!("{}", before_history),
+            "This horizon instance is configured to only track a portion of the stellar \
+             network's latest history. This request is asking for results prior to the \
+             recorded history known to this horizon instance.\n\n\
+             To learn more: https://stellar.org/horizon-errors/before_history"
+        );
         assert!(before_history.is_before_history());
         assert_eq!(before_history.is_bad_request(), false);
+        assert_eq!(
+            before_history.url(),
+            "https://stellar.org/horizon-errors/before_history"
+        );
     }
 
     #[test]
