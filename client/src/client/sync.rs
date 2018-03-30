@@ -5,6 +5,7 @@ use http::{self, Uri};
 use error::{Error, Result};
 use endpoint::EndPoint;
 use super::{Host, HORIZON_TEST_URI, HORIZON_URI};
+use StellarError;
 use serde_json;
 
 /// A client that can issue requests to a horizon api in a synchronous
@@ -121,9 +122,11 @@ impl Client {
         if response.status().is_success() {
             let resp: E::Response = serde_json::from_reader(response)?;
             Ok(resp)
+        } else if response.status().is_client_error() {
+            let e: StellarError = serde_json::from_reader(response)?;
+            Err(Error::BadResponse(e))
         } else {
-            // TODO: Implement bad response parsing and capture the error here.
-            Err(Error::BadResponse)
+            Err(Error::ServerError)
         }
     }
 
@@ -143,6 +146,7 @@ impl Client {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use stellar_error;
 
     #[test]
     fn it_constructs_a_test_client() {
@@ -184,5 +188,16 @@ mod tests {
             account.id(),
             "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ"
         );
+    }
+
+    #[test]
+    fn it_can_make_a_failed_request() {
+        use endpoint::account::Details;
+        let client = Client::horizon_test().unwrap();
+        let endpoint = Details::new("LDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ");
+        match client.request(endpoint).unwrap_err() {
+            Error::BadResponse(error) => assert_eq!(error.kind(), stellar_error::Kind::NotFound),
+            error => panic!("Client did not return a bad response {:?}", error),
+        }
     }
 }
