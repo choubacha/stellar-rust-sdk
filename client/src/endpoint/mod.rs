@@ -7,6 +7,7 @@ use http;
 pub mod account;
 pub mod asset;
 pub mod ledger;
+pub mod transaction;
 mod records;
 
 pub use self::records::Records;
