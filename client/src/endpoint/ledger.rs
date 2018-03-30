@@ -8,7 +8,7 @@ use http::{Request, Uri};
 /// Represents the all ledgers end point for the stellar horizon server. The endpoint
 /// will return all ledgers filtered by a myriad of different query params.
 ///
-/// https://www.stellar.org/developers/horizon/reference/endpoints/ledgers-all.html
+/// <https://www.stellar.org/developers/horizon/reference/endpoints/ledgers-all.html>
 ///
 /// ## Example
 /// ```
@@ -129,7 +129,7 @@ impl EndPoint for All {
 /// Represents the ledger details endpoint for the stellar horizon server. The endpoint
 /// will return a single ledger's details.
 ///
-/// https://www.stellar.org/developers/horizon/reference/endpoints/ledgers-single.html
+/// <https://www.stellar.org/developers/horizon/reference/endpoints/ledgers-single.html>
 ///
 /// ## Example
 /// ```

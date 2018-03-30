@@ -4,6 +4,7 @@ use std::str::FromStr;
 use stellar_resources::Transaction;
 use super::{Body, EndPoint, Order, Records};
 use http::{Request, Uri};
+pub use super::account::Transactions as ForAccount;
 
 /// Represents the all transactions end point for the stellar horizon server. The endpoint
 /// will return all transactions filtered by cursor, order and limit
