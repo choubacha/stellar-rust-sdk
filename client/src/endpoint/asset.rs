@@ -105,7 +105,7 @@ impl All {
     /// let client      = Client::horizon_test().unwrap();
     /// #
     /// # // grab first page and extract cursor
-    /// # let endpoint      = asset::All::default().limit(1);
+    /// # let endpoint      = asset::All::default();
     /// # let first_page    = client.request(endpoint).unwrap();
     /// # let cursor        = first_page.next_cursor();
     /// #

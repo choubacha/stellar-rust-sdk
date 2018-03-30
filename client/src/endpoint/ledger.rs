@@ -59,7 +59,7 @@ impl All {
     /// let client      = Client::horizon_test().unwrap();
     /// #
     /// # // grab first page and extract cursor
-    /// # let endpoint      = ledger::All::default().limit(1);
+    /// # let endpoint      = ledger::All::default();
     /// # let first_page    = client.request(endpoint).unwrap();
     /// # let cursor        = first_page.next_cursor();
     /// #
