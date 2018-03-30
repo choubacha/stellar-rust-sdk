@@ -1,5 +1,6 @@
 use amount::Amount;
 use asset::{AssetIdentifier, Flag};
+use deserialize;
 use serde::{de, Deserialize, Deserializer};
 use offer::PriceRatio;
 mod account_merge;
@@ -208,11 +209,12 @@ impl Operation {
 /// Represents the actual structure of the json api. This allows us to parse
 /// directly from the captured json into our own types.
 #[derive(Debug, Deserialize, Clone)]
-struct Intermediate<'a> {
+struct Intermediate {
+    #[serde(deserialize_with = "deserialize::from_str")]
     id: i64,
     paging_token: String,
     #[serde(rename = "type")]
-    kind: &'a str,
+    kind: String,
     account: Option<String>,
     funder: Option<String>,
     starting_balance: Option<Amount>,
@@ -264,234 +266,274 @@ impl<'de> Deserialize<'de> for Operation {
     {
         let rep = Intermediate::deserialize(d)?;
 
-        let kind = match rep {
-            Intermediate {
-                kind: "create_account",
-                account: Some(account),
-                funder: Some(funder),
-                starting_balance: Some(starting_balance),
-                ..
-            } => Kind::CreateAccount(CreateAccount::new(account, funder, starting_balance)),
-
-            Intermediate {
-                kind: "path_payment",
-                from: Some(from),
-                to: Some(to),
-                asset_code,
-                asset_issuer,
-                asset_type: Some(asset_type),
-                amount: Some(amount),
-                source_asset_code,
-                source_asset_issuer,
-                source_asset_type: Some(source_asset_type),
-                source_amount: Some(source_amount),
-                source_max: Some(source_max),
-                ..
-            } => {
-                let destination_asset_identifier =
-                    AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                        .map_err(|err| de::Error::custom(err))?;
-                let source_asset_identifier = AssetIdentifier::new(
-                    &source_asset_type,
+        let kind: Kind = match rep.kind.as_str() {
+            "create_account" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    funder: Some(funder),
+                    starting_balance: Some(starting_balance),
+                    ..
+                } => Kind::CreateAccount(CreateAccount::new(account, funder, starting_balance)),
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for create_account operation.",
+                    ))
+                }
+            },
+            "path_payment" => match rep {
+                Intermediate {
+                    from: Some(from),
+                    to: Some(to),
+                    asset_code,
+                    asset_issuer,
+                    asset_type: Some(asset_type),
+                    amount: Some(amount),
                     source_asset_code,
                     source_asset_issuer,
-                ).map_err(|err| de::Error::custom(err))?;
-                Kind::PathPayment(PathPayment::new(
-                    from,
-                    to,
-                    destination_asset_identifier,
-                    amount,
-                    source_asset_identifier,
-                    source_amount,
-                    source_max,
-                ))
-            }
-
-            Intermediate {
-                kind: "payment",
-                from: Some(from),
-                to: Some(to),
-                asset_code,
-                asset_issuer,
-                asset_type: Some(asset_type),
-                amount: Some(amount),
-                ..
-            } => {
-                let asset_identifier = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                    .map_err(|err| de::Error::custom(err))?;
-                Kind::Payment(Payment::new(from, to, asset_identifier, amount))
-            }
-
-            Intermediate {
-                kind: kind @ "create_passive_offer",
-                offer_id: Some(offer_id),
-                buying_asset_code,
-                buying_asset_issuer,
-                buying_asset_type: Some(buying_asset_type),
-                selling_asset_code,
-                selling_asset_issuer,
-                selling_asset_type: Some(selling_asset_type),
-                amount: Some(amount),
-                price_ratio: Some(price_ratio),
-                price: Some(price),
-                ..
-            }
-            | Intermediate {
-                kind: kind @ "manage_offer",
-                offer_id: Some(offer_id),
-                buying_asset_code,
-                buying_asset_issuer,
-                buying_asset_type: Some(buying_asset_type),
-                selling_asset_code,
-                selling_asset_issuer,
-                selling_asset_type: Some(selling_asset_type),
-                amount: Some(amount),
-                price_ratio: Some(price_ratio),
-                price: Some(price),
-                ..
-            } => {
-                let buying_asset_identifier = AssetIdentifier::new(
-                    &buying_asset_type,
+                    source_asset_type: Some(source_asset_type),
+                    source_amount: Some(source_amount),
+                    source_max: Some(source_max),
+                    ..
+                } => {
+                    let destination_asset_identifier =
+                        AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
+                            .map_err(|err| de::Error::custom(err))?;
+                    let source_asset_identifier = AssetIdentifier::new(
+                        &source_asset_type,
+                        source_asset_code,
+                        source_asset_issuer,
+                    ).map_err(|err| de::Error::custom(err))?;
+                    Kind::PathPayment(PathPayment::new(
+                        from,
+                        to,
+                        destination_asset_identifier,
+                        amount,
+                        source_asset_identifier,
+                        source_amount,
+                        source_max,
+                    ))
+                }
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for path_payment operation.",
+                    ))
+                }
+            },
+            "payment" => match rep {
+                Intermediate {
+                    from: Some(from),
+                    to: Some(to),
+                    asset_code,
+                    asset_issuer,
+                    asset_type: Some(asset_type),
+                    amount: Some(amount),
+                    ..
+                } => {
+                    let asset_identifier =
+                        AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
+                            .map_err(|err| de::Error::custom(err))?;
+                    Kind::Payment(Payment::new(from, to, asset_identifier, amount))
+                }
+                _ => return Err(de::Error::custom("Missing fields for payment operation.")),
+            },
+            "create_passive_offer" => match rep {
+                Intermediate {
+                    offer_id: Some(offer_id),
                     buying_asset_code,
                     buying_asset_issuer,
-                ).map_err(|err| de::Error::custom(err))?;
-
-                let selling_asset_identifier = AssetIdentifier::new(
-                    &selling_asset_type,
+                    buying_asset_type: Some(buying_asset_type),
                     selling_asset_code,
                     selling_asset_issuer,
-                ).map_err(|err| de::Error::custom(err))?;
+                    selling_asset_type: Some(selling_asset_type),
+                    amount: Some(amount),
+                    price_ratio: Some(price_ratio),
+                    price: Some(price),
+                    ..
+                } => {
+                    let buying_asset_identifier = AssetIdentifier::new(
+                        &buying_asset_type,
+                        buying_asset_code,
+                        buying_asset_issuer,
+                    ).map_err(|err| de::Error::custom(err))?;
 
-                match kind {
-                    "create_passive_offer" => Kind::CreatePassiveOffer(CreatePassiveOffer::new(
+                    let selling_asset_identifier = AssetIdentifier::new(
+                        &selling_asset_type,
+                        selling_asset_code,
+                        selling_asset_issuer,
+                    ).map_err(|err| de::Error::custom(err))?;
+                    Kind::CreatePassiveOffer(CreatePassiveOffer::new(
                         offer_id,
                         selling_asset_identifier,
                         buying_asset_identifier,
                         amount,
                         price_ratio,
                         price,
-                    )),
-                    "manage_offer" => Kind::ManageOffer(ManageOffer::new(
-                        offer_id,
-                        selling_asset_identifier,
-                        buying_asset_identifier,
-                        amount,
-                        price_ratio,
-                        price,
-                    )),
-                    _ => unreachable!(),
+                    ))
                 }
-            }
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for create_passive_offer operation.",
+                    ))
+                }
+            },
+            "manage_offer" => match rep {
+                Intermediate {
+                    offer_id: Some(offer_id),
+                    buying_asset_code,
+                    buying_asset_issuer,
+                    buying_asset_type: Some(buying_asset_type),
+                    selling_asset_code,
+                    selling_asset_issuer,
+                    selling_asset_type: Some(selling_asset_type),
+                    amount: Some(amount),
+                    price_ratio: Some(price_ratio),
+                    price: Some(price),
+                    ..
+                } => {
+                    let buying_asset_identifier = AssetIdentifier::new(
+                        &buying_asset_type,
+                        buying_asset_code,
+                        buying_asset_issuer,
+                    ).map_err(|err| de::Error::custom(err))?;
 
-            Intermediate {
-                kind: "set_options",
-                set_flags_s,
-                clear_flags_s,
-                signer_key: Some(signer_key),
-                signer_weight: Some(signer_weight),
-                master_key_weight: Some(master_key_weight),
-                low_threshold: Some(low_threshold),
-                med_threshold: Some(med_threshold),
-                high_threshold: Some(high_threshold),
-                home_domain: Some(home_domain),
-                ..
-            } => {
-                let set_flags: Option<Flag> = match set_flags_s {
-                    Some(vec_strings) => {
-                        let auth_required = vec_strings.iter().any(|e| e == "auth_required_flag");
-                        let auth_revocable = vec_strings.iter().any(|e| e == "auth_revocable_flag");
-                        Some(Flag::new(auth_required, auth_revocable))
-                    }
-                    None => None,
-                };
-                let clear_flags: Option<Flag> = match clear_flags_s {
-                    Some(vec_strings) => {
-                        let auth_required = vec_strings.iter().any(|e| e == "auth_required_flag");
-                        let auth_revocable = vec_strings.iter().any(|e| e == "auth_revocable_flag");
-                        Some(Flag::new(auth_required, auth_revocable))
-                    }
-                    None => None,
-                };
-                Kind::SetOptions(SetOptions::new(
-                    signer_key,
-                    signer_weight,
-                    master_key_weight,
-                    low_threshold,
-                    med_threshold,
-                    high_threshold,
-                    home_domain,
-                    set_flags,
-                    clear_flags,
-                ))
-            }
-
-            Intermediate {
-                kind: "change_trust",
-                limit: Some(limit),
-                asset_code,
-                asset_issuer,
-                asset_type: Some(asset_type),
-                trustor: Some(trustor),
-                trustee: Some(trustee),
-                ..
-            } => {
-                let asset = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                    .map_err(|err| de::Error::custom(err))?;
-                Kind::ChangeTrust(ChangeTrust::new(trustee, trustor, asset, limit))
-            }
-
-            Intermediate {
-                kind: "allow_trust",
-                authorize: Some(authorize),
-                asset_code,
-                asset_issuer,
-                asset_type: Some(asset_type),
-                trustor: Some(trustor),
-                trustee: Some(trustee),
-                ..
-            } => {
-                let asset = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                    .map_err(|err| de::Error::custom(err))?;
-                Kind::AllowTrust(AllowTrust::new(trustee, trustor, asset, authorize))
-            }
-
-            Intermediate {
-                kind: "account_merge",
-                account: Some(account),
-                into: Some(into),
-                ..
-            } => Kind::AccountMerge(AccountMerge::new(account, into)),
-
-            Intermediate {
-                kind: "manage_data",
-                name: Some(name),
-                value: Some(value),
-                ..
-            } => Kind::ManageData(ManageData::new(name, value)),
-
-            Intermediate {
-                kind: "inflation", ..
-            } => Kind::Inflation,
-
-            Intermediate { kind, .. } => {
-                return Err(match kind {
-                    "account_merge"
-                    | "allow_trust"
-                    | "change_trust"
-                    | "create_account"
-                    | "create_passive_offer"
-                    | "manage_data"
-                    | "manage_offer"
-                    | "path_payment"
-                    | "payment"
-                    | "set_options" => {
-                        de::Error::custom(format!("Missing fields for {} operation.", kind))
-                    }
-                    _ => de::Error::custom("Unknown operation type."),
-                });
-            }
+                    let selling_asset_identifier = AssetIdentifier::new(
+                        &selling_asset_type,
+                        selling_asset_code,
+                        selling_asset_issuer,
+                    ).map_err(|err| de::Error::custom(err))?;
+                    Kind::ManageOffer(ManageOffer::new(
+                        offer_id,
+                        selling_asset_identifier,
+                        buying_asset_identifier,
+                        amount,
+                        price_ratio,
+                        price,
+                    ))
+                }
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for manage_offer operation.",
+                    ))
+                }
+            },
+            "set_options" => match rep {
+                Intermediate {
+                    set_flags_s,
+                    clear_flags_s,
+                    signer_key: Some(signer_key),
+                    signer_weight: Some(signer_weight),
+                    master_key_weight: Some(master_key_weight),
+                    low_threshold: Some(low_threshold),
+                    med_threshold: Some(med_threshold),
+                    high_threshold: Some(high_threshold),
+                    home_domain: Some(home_domain),
+                    ..
+                } => {
+                    let set_flags: Option<Flag> = match set_flags_s {
+                        Some(vec_strings) => {
+                            let auth_required =
+                                vec_strings.iter().any(|e| e == "auth_required_flag");
+                            let auth_revocable =
+                                vec_strings.iter().any(|e| e == "auth_revocable_flag");
+                            Some(Flag::new(auth_required, auth_revocable))
+                        }
+                        None => None,
+                    };
+                    let clear_flags: Option<Flag> = match clear_flags_s {
+                        Some(vec_strings) => {
+                            let auth_required =
+                                vec_strings.iter().any(|e| e == "auth_required_flag");
+                            let auth_revocable =
+                                vec_strings.iter().any(|e| e == "auth_revocable_flag");
+                            Some(Flag::new(auth_required, auth_revocable))
+                        }
+                        None => None,
+                    };
+                    Kind::SetOptions(SetOptions::new(
+                        signer_key,
+                        signer_weight,
+                        master_key_weight,
+                        low_threshold,
+                        med_threshold,
+                        high_threshold,
+                        home_domain,
+                        set_flags,
+                        clear_flags,
+                    ))
+                }
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for set_options operation.",
+                    ))
+                }
+            },
+            "change_trust" => match rep {
+                Intermediate {
+                    limit: Some(limit),
+                    asset_code,
+                    asset_issuer,
+                    asset_type: Some(asset_type),
+                    trustor: Some(trustor),
+                    trustee: Some(trustee),
+                    ..
+                } => {
+                    let asset = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
+                        .map_err(|err| de::Error::custom(err))?;
+                    Kind::ChangeTrust(ChangeTrust::new(trustee, trustor, asset, limit))
+                }
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for change_trust operation.",
+                    ))
+                }
+            },
+            "allow_trust" => match rep {
+                Intermediate {
+                    authorize: Some(authorize),
+                    asset_code,
+                    asset_issuer,
+                    asset_type: Some(asset_type),
+                    trustor: Some(trustor),
+                    trustee: Some(trustee),
+                    ..
+                } => {
+                    let asset = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
+                        .map_err(|err| de::Error::custom(err))?;
+                    Kind::AllowTrust(AllowTrust::new(trustee, trustor, asset, authorize))
+                }
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for allow_trust operation.",
+                    ))
+                }
+            },
+            "account_merge" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    into: Some(into),
+                    ..
+                } => Kind::AccountMerge(AccountMerge::new(account, into)),
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for account_merge operation.",
+                    ))
+                }
+            },
+            "manage_data" => match rep {
+                Intermediate {
+                    name: Some(name),
+                    value: Some(value),
+                    ..
+                } => Kind::ManageData(ManageData::new(name, value)),
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for manage_data operation.",
+                    ))
+                }
+            },
+            "inflation" => Kind::Inflation,
+            _ => return Err(de::Error::custom("Unknown operation type.")),
         };
-
         Ok(Operation {
             id: rep.id,
             paging_token: rep.paging_token,

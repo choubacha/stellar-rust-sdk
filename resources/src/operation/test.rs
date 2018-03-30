@@ -15,7 +15,7 @@ mod errors_on_missing_fields_for_type {
             #[test]
             fn $type_to_check() {
                 let json = format!(
-                    r#"{{"id":1,"paging_token":"7","type_i":{},"type":"{}"}}"#,
+                    r#"{{"id":"1","paging_token":"7","type_i":{},"type":"{}"}}"#,
                     $type_i,
                     stringify!($type_to_check),
                 );

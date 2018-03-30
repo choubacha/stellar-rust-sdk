@@ -74,7 +74,7 @@ impl All {
         self
     }
 
-    /// Sets the number of records to return at most.
+    /// Sets the maximum number of records to return.
     ///
     /// ## Example
     ///

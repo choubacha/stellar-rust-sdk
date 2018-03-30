@@ -1,90 +1,44 @@
-//! Contains endpoints for assets and related information to specific assets.
+//! Contains the endpoint for all payment operations.
 use error::Result;
 use std::str::FromStr;
-use stellar_resources::Asset;
+use stellar_resources::Operation;
 use super::{Body, EndPoint, Order, Records};
 use http::{Request, Uri};
 
-/// Represents the all assets end point for the stellar horizon server. The endpoint
-/// will return all assets filtered by a myriad of different query params.
+/// This endpoint represents all payment operations that are part of validated transactions.
+/// The endpoint will return all payments and accepts query params for a cursor, order, and limit.
 ///
-/// <https://www.stellar.org/developers/horizon/reference/endpoints/assets-all.html>
+/// https://www.stellar.org/developers/horizon/reference/endpoints/payments-all.html
 ///
 /// ## Example
-///
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::asset;
+/// use stellar_client::endpoint::payment;
 ///
 /// let client      = Client::horizon_test().unwrap();
-/// let endpoint    = asset::All::default();
+/// let endpoint    = payment::All::default();
 /// let records     = client.request(endpoint).unwrap();
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
 #[derive(Debug, Default)]
 pub struct All {
-    code: Option<String>,
-    issuer: Option<String>,
     cursor: Option<String>,
     order: Option<Order>,
     limit: Option<u32>,
 }
 
 impl All {
-    /// Fetches all records for a given asset code.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::asset;
-    ///
-    /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = asset::All::default().asset_code("USD");
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert!(records.records().len() > 0);
-    /// # assert_eq!(records.records()[0].code(), "USD");
-    /// ```
-    pub fn asset_code(mut self, code: &str) -> Self {
-        self.code = Some(code.to_string());
-        self
-    }
-
-    /// Fetches all records for a given asset issuer.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::asset;
-    ///
-    /// let client = Client::horizon_test().unwrap();
-    /// # let endpoint = asset::All::default().asset_code("USD");
-    /// # let records = client.request(endpoint).unwrap();
-    /// # let issuer = records.records()[0].issuer();
-    /// let endpoint = asset::All::default().asset_issuer(issuer);
-    /// let records = client.request(endpoint).unwrap();
-    /// #
-    /// # assert!(records.records().len() > 0);
-    /// # assert_eq!(records.records()[0].issuer(), issuer);
-    /// ```
-    pub fn asset_issuer(mut self, issuer: &str) -> Self {
-        self.issuer = Some(issuer.to_string());
-        self
-    }
-
     /// Fetches all records in a set order, either ascending or descending.
     ///
     /// ## Example
     ///
     /// ```
-    /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::{asset, Order};
-    ///
+    /// # use stellar_client::sync::Client;
+    /// # use stellar_client::endpoint::{payment, Order};
+    /// #
     /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = asset::All::default().order(Order::Asc);
+    /// let endpoint    = payment::All::default().order(Order::Asc);
     /// let records     = client.request(endpoint).unwrap();
     /// #
     /// # assert!(records.records().len() > 0);
@@ -99,17 +53,17 @@ impl All {
     /// ## Example
     ///
     /// ```
-    /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::asset;
-    ///
+    /// # use stellar_client::sync::Client;
+    /// # use stellar_client::endpoint::payment;
+    /// #
     /// let client      = Client::horizon_test().unwrap();
     /// #
     /// # // grab first page and extract cursor
-    /// # let endpoint      = asset::All::default().limit(1);
+    /// # let endpoint      = payment::All::default().limit(1);
     /// # let first_page    = client.request(endpoint).unwrap();
     /// # let cursor        = first_page.next_cursor();
     /// #
-    /// let endpoint    = asset::All::default().cursor(cursor);
+    /// let endpoint    = payment::All::default().cursor(cursor);
     /// let records     = client.request(endpoint).unwrap();
     /// #
     /// # assert!(records.records().len() > 0);
@@ -125,11 +79,11 @@ impl All {
     /// ## Example
     ///
     /// ```
-    /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::asset;
-    ///
+    /// # use stellar_client::sync::Client;
+    /// # use stellar_client::endpoint::payment;
+    /// #
     /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = asset::All::default().limit(3);
+    /// let endpoint    = payment::All::default().limit(3);
     /// let records     = client.request(endpoint).unwrap();
     /// #
     /// # assert_eq!(records.records().len(), 3);
@@ -140,26 +94,18 @@ impl All {
     }
 
     fn has_query(&self) -> bool {
-        self.code.is_some() || self.issuer.is_some() || self.order.is_some()
-            || self.cursor.is_some() || self.limit.is_some()
+        self.order.is_some() || self.cursor.is_some() || self.limit.is_some()
     }
 }
 
 impl EndPoint for All {
-    type Response = Records<Asset>;
+    type Response = Records<Operation>;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {
-        let mut uri = format!("{}/assets", host);
+        let mut uri = format!("{}/payments", host);
 
         if self.has_query() {
             uri.push_str("?");
-            if let Some(code) = self.code {
-                uri.push_str(&format!("asset_code={}&", code));
-            }
-
-            if let Some(issuer) = self.issuer {
-                uri.push_str(&format!("asset_issuer={}&", issuer));
-            }
 
             if let Some(order) = self.order {
                 uri.push_str(&format!("order={}&", order.to_param()));
@@ -181,30 +127,28 @@ impl EndPoint for All {
 }
 
 #[cfg(test)]
-mod all_assets_tests {
+mod all_payments_tests {
     use super::*;
 
     #[test]
     fn it_leaves_off_the_params_if_not_specified() {
         let ep = All::default();
         let req = ep.into_request("https://www.google.com").unwrap();
-        assert_eq!(req.uri().path(), "/assets");
+        assert_eq!(req.uri().path(), "/payments");
         assert_eq!(req.uri().query(), None);
     }
 
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = All::default()
-            .asset_code("CODE")
-            .asset_issuer("ISSUER")
             .cursor("CURSOR")
             .limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
-        assert_eq!(req.uri().path(), "/assets");
+        assert_eq!(req.uri().path(), "/payments");
         assert_eq!(
             req.uri().query(),
-            Some("asset_code=CODE&asset_issuer=ISSUER&order=desc&cursor=CURSOR&limit=123")
+            Some("order=desc&cursor=CURSOR&limit=123")
         );
     }
 }
