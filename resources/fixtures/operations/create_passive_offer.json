@@ -21,7 +21,7 @@
   "buying_asset_code": "USD",
   "buying_asset_issuer": "GDS5JW5E6DRSSN5XK4LW7E6VUMFKKE2HU5WCOVFTO7P2RP7OXVCBLJ3Y",
   "buying_asset_type": "credit_alphanum4",
-  "id": 1127729562914817,
+  "id": "1127729562914817",
   "offer_id": 9,
   "paging_token": "1127729562914817",
   "price": "1.0",
