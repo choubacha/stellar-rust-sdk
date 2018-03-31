@@ -225,7 +225,7 @@ impl Flag {
 /// Any asset can be traded for any other asset.
 ///
 /// <https://www.stellar.org/developers/horizon/reference/resources/asset.html>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Asset {
     asset_identifier: AssetIdentifier,
     amount: Amount,
