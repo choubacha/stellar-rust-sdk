@@ -1,9 +1,8 @@
 //! Contains endpoints for accessing accounts and related information.
 use error::Result;
 use std::str::FromStr;
-use stellar_resources::Account;
-use stellar_resources::Transaction;
-use super::{Body, EndPoint, Order, Records};
+use stellar_resources::{Account, Transaction};
+use super::{Body, Cursor, EndPoint, Order, Records};
 use http::{Request, Uri};
 
 /// An endpoint that accesses a single accounts details.
@@ -45,7 +44,7 @@ mod details_tests {
     }
 }
 /// An endpoint that accesses the transactions for a specific account
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Transactions {
     id: String,
     cursor: Option<String>,
@@ -145,6 +144,12 @@ impl Transactions {
 
     fn has_query(&self) -> bool {
         self.order.is_some() || self.cursor.is_some() || self.limit.is_some()
+    }
+}
+
+impl Cursor<Transaction> for Transactions {
+    fn cursor(self, cursor: &str) -> Self {
+        self.cursor(cursor)
     }
 }
 

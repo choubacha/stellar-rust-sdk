@@ -8,6 +8,10 @@ use super::{Host, HORIZON_TEST_URI, HORIZON_URI};
 use StellarError;
 use serde_json;
 
+mod iter;
+
+pub use self::iter::Iter;
+
 /// A client that can issue requests to a horizon api in a synchronous
 /// fashion, meaning that the functions will block until the response
 /// has been formed. The overall performance of this is slightly slower

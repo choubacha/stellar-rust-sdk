@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::Transaction;
-use super::{Body, EndPoint, Order, Records};
+use super::{Body, Cursor, EndPoint, Order, Records};
 use http::{Request, Uri};
 pub use super::account::Transactions as ForAccount;
 
@@ -125,6 +125,12 @@ impl EndPoint for All {
         let uri = Uri::from_str(&uri)?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
+    }
+}
+
+impl Cursor<Transaction> for All {
+    fn cursor(self, cursor: &str) -> Self {
+        self.cursor(cursor)
     }
 }
 

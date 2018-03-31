@@ -12,7 +12,7 @@ pub mod payment;
 pub mod transaction;
 mod records;
 
-pub use self::records::Records;
+pub use self::records::{Cursor, Records};
 
 /// Represents the body of a request to an EndPoint.
 #[derive(Debug)]
@@ -32,7 +32,7 @@ pub trait EndPoint {
 }
 
 /// The order to return results in.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum Order {
     /// Order the results ascending
     Asc,

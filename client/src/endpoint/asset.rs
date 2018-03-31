@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::Asset;
-use super::{Body, EndPoint, Order, Records};
+use super::{Body, Cursor, EndPoint, Order, Records};
 use http::{Request, Uri};
 
 /// Represents the all assets end point for the stellar horizon server. The endpoint
@@ -22,7 +22,7 @@ use http::{Request, Uri};
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct All {
     code: Option<String>,
     issuer: Option<String>,
@@ -94,6 +94,25 @@ impl All {
         self
     }
 
+    /// Sets the maximum number of records to return.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// use stellar_client::sync::Client;
+    /// use stellar_client::endpoint::asset;
+    ///
+    /// let client      = Client::horizon_test().unwrap();
+    /// let endpoint    = asset::All::default().limit(3);
+    /// let records     = client.request(endpoint).unwrap();
+    /// #
+    /// # assert_eq!(records.records().len(), 3);
+    /// ```
+    pub fn limit(mut self, limit: u32) -> Self {
+        self.limit = Some(limit);
+        self
+    }
+
     /// Starts the page of results at a given cursor
     ///
     /// ## Example
@@ -120,28 +139,15 @@ impl All {
         self
     }
 
-    /// Sets the maximum number of records to return.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::asset;
-    ///
-    /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = asset::All::default().limit(3);
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert_eq!(records.records().len(), 3);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
-        self
-    }
-
     fn has_query(&self) -> bool {
         self.code.is_some() || self.issuer.is_some() || self.order.is_some()
             || self.cursor.is_some() || self.limit.is_some()
+    }
+}
+
+impl Cursor<Asset> for All {
+    fn cursor(self, cursor: &str) -> Self {
+        self.cursor(cursor)
     }
 }
 
