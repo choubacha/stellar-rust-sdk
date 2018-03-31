@@ -154,3 +154,63 @@ mod all_transactions_test {
         );
     }
 }
+
+/// Represents the details for a single transaction.
+///
+/// <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-single.html>
+///
+/// ## Example
+///
+/// ```
+/// use stellar_client::sync::Client;
+/// use stellar_client::endpoint::transaction;
+///
+/// let client   = Client::horizon_test().unwrap();
+/// # let transaction_ep   = transaction::All::default().limit(1);
+/// # let txns             = client.request(transaction_ep).unwrap();
+/// # let txn              = &txns.records()[0];
+/// # let hash             = txn.hash();
+/// let endpoint = transaction::Details::new(hash);
+/// let txn      = client.request(endpoint).unwrap();
+/// #
+/// # assert_eq!(txn.hash(), hash);
+/// ```
+#[derive(Debug)]
+pub struct Details {
+    hash: String,
+}
+
+impl Details {
+    /// Returns a new end point for transaction details. Hand this to the client in order to request
+    /// the details for a specific transaction
+    pub fn new(hash: &str) -> Self {
+        Self {
+            hash: hash.to_string(),
+        }
+    }
+}
+
+impl EndPoint for Details {
+    type Response = Transaction;
+
+    fn into_request(self, host: &str) -> Result<Request<Body>> {
+        let uri = Uri::from_str(&format!("{}/transactions/{}", host, self.hash))?;
+        let request = Request::get(uri).body(Body::None)?;
+        Ok(request)
+    }
+}
+
+#[cfg(test)]
+mod transaction_details_tests {
+    use super::*;
+
+    #[test]
+    fn it_can_make_an_transaction_uri() {
+        let details = Details::new("123");
+        let request = details
+            .into_request("https://horizon-testnet.stellar.org")
+            .unwrap();
+        assert_eq!(request.uri().host().unwrap(), "horizon-testnet.stellar.org");
+        assert_eq!(request.uri().path(), "/transactions/123");
+    }
+}
