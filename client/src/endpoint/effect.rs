@@ -1,22 +1,22 @@
-//! Contains the endpoint for all payment operations.
+//! Contains the endpoint for all effects.
 use error::Result;
 use std::str::FromStr;
-use stellar_resources::Operation;
+use stellar_resources::Effect;
 use super::{Body, EndPoint, Order, Records};
 use http::{Request, Uri};
 
-/// This endpoint represents all payment operations that are part of validated transactions.
-/// The endpoint will return all payments and accepts query params for a cursor, order, and limit.
+/// This endpoint represents all effects that have resulted from successful opreations in Stellar.
+/// The endpoint will return all effects and accepts query params for a cursor, order, and limit.
 ///
-/// <https://www.stellar.org/developers/horizon/reference/endpoints/payments-all.html>
+/// <https://www.stellar.org/developers/horizon/reference/endpoints/effects-all.html>
 ///
 /// ## Example
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::payment;
+/// use stellar_client::endpoint::effect;
 ///
 /// let client      = Client::horizon_test().unwrap();
-/// let endpoint    = payment::All::default();
+/// let endpoint    = effect::All::default();
 /// let records     = client.request(endpoint).unwrap();
 /// #
 /// # assert!(records.records().len() > 0);
@@ -35,10 +35,10 @@ impl All {
     ///
     /// ```
     /// # use stellar_client::sync::Client;
-    /// # use stellar_client::endpoint::{payment, Order};
+    /// # use stellar_client::endpoint::{effect, Order};
     /// #
     /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = payment::All::default().order(Order::Asc);
+    /// let endpoint    = effect::All::default().order(Order::Asc);
     /// let records     = client.request(endpoint).unwrap();
     /// #
     /// # assert!(records.records().len() > 0);
@@ -54,16 +54,16 @@ impl All {
     ///
     /// ```
     /// # use stellar_client::sync::Client;
-    /// # use stellar_client::endpoint::payment;
+    /// # use stellar_client::endpoint::effect;
     /// #
     /// let client      = Client::horizon_test().unwrap();
     /// #
     /// # // grab first page and extract cursor
-    /// # let endpoint      = payment::All::default().limit(1);
+    /// # let endpoint      = effect::All::default().limit(1);
     /// # let first_page    = client.request(endpoint).unwrap();
     /// # let cursor        = first_page.next_cursor();
     /// #
-    /// let endpoint    = payment::All::default().cursor(cursor);
+    /// let endpoint    = effect::All::default().cursor(cursor).limit(1);
     /// let records     = client.request(endpoint).unwrap();
     /// #
     /// # assert!(records.records().len() > 0);
@@ -80,10 +80,10 @@ impl All {
     ///
     /// ```
     /// # use stellar_client::sync::Client;
-    /// # use stellar_client::endpoint::payment;
+    /// # use stellar_client::endpoint::effect;
     /// #
     /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = payment::All::default().limit(3);
+    /// let endpoint    = effect::All::default().limit(3);
     /// let records     = client.request(endpoint).unwrap();
     /// #
     /// # assert_eq!(records.records().len(), 3);
@@ -99,10 +99,10 @@ impl All {
 }
 
 impl EndPoint for All {
-    type Response = Records<Operation>;
+    type Response = Records<Effect>;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {
-        let mut uri = format!("{}/payments", host);
+        let mut uri = format!("{}/effects", host);
 
         if self.has_query() {
             uri.push_str("?");
@@ -127,14 +127,14 @@ impl EndPoint for All {
 }
 
 #[cfg(test)]
-mod all_payments_tests {
+mod all_effects_tests {
     use super::*;
 
     #[test]
     fn it_leaves_off_the_params_if_not_specified() {
         let ep = All::default();
         let req = ep.into_request("https://www.google.com").unwrap();
-        assert_eq!(req.uri().path(), "/payments");
+        assert_eq!(req.uri().path(), "/effects");
         assert_eq!(req.uri().query(), None);
     }
 
@@ -145,7 +145,7 @@ mod all_payments_tests {
             .limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
-        assert_eq!(req.uri().path(), "/payments");
+        assert_eq!(req.uri().path(), "/effects");
         assert_eq!(
             req.uri().query(),
             Some("order=desc&cursor=CURSOR&limit=123")

@@ -370,7 +370,7 @@ mod errors_on_missing_fields_for_effect_types {
     assert_err_on_missing_fields!(account_removed, 1);
     assert_err_on_missing_fields!(account_credited, 2);
     assert_err_on_missing_fields!(account_debited, 3);
-    assert_err_on_missing_fields!(account_threshold_updated, 4);
+    assert_err_on_missing_fields!(account_thresholds_updated, 4);
     assert_err_on_missing_fields!(account_home_domain_updated, 5);
     assert_err_on_missing_fields!(account_flags_updated, 6);
     assert_err_on_missing_fields!(signer_created, 10);
