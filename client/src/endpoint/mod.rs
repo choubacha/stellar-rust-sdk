@@ -6,6 +6,7 @@ use http;
 
 pub mod account;
 pub mod asset;
+pub mod effect;
 pub mod ledger;
 pub mod payment;
 pub mod transaction;

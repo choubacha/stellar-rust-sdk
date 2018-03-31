@@ -214,11 +214,11 @@ impl Effect {
 /// Represents the actual structure of the json api. This allows us to parse
 /// directly from the captured json into our own types.
 #[derive(Debug, Deserialize, Clone)]
-struct Intermediate<'a> {
+struct Intermediate {
     id: String,
     paging_token: String,
     #[serde(rename = "type")]
-    kind: &'a str,
+    kind: String,
     account: Option<String>,
     starting_balance: Option<Amount>,
     amount: Option<Amount>,
@@ -254,304 +254,335 @@ impl<'de> Deserialize<'de> for Effect {
     {
         let rep = Intermediate::deserialize(d)?;
 
-        let kind = match rep {
-            Intermediate {
-                kind: "account_created",
-                account: Some(account),
-                starting_balance: Some(starting_balance),
-                ..
-            } => Kind::Account(account::Kind::Created(account::Created::new(
-                account,
-                starting_balance,
-            ))),
-
-            Intermediate {
-                kind: "account_removed",
-                account: Some(account),
-                ..
-            } => Kind::Account(account::Kind::Removed(account::Removed::new(account))),
-
-            Intermediate {
-                kind: "account_credited",
-                account: Some(account),
-                amount: Some(amount),
-                asset_type: Some(asset_type),
-                asset_code,
-                asset_issuer,
-                ..
-            } => {
-                let asset_identifier = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                    .map_err(|err| de::Error::custom(err))?;
-                Kind::Account(account::Kind::Credited(account::Credited::new(
+        let kind: Kind = match rep.kind.as_str() {
+            "account_created" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    starting_balance: Some(starting_balance),
+                    ..
+                } => Kind::Account(account::Kind::Created(account::Created::new(
                     account,
-                    amount,
-                    asset_identifier,
-                )))
-            }
-
-            Intermediate {
-                kind: "account_debited",
-                account: Some(account),
-                amount: Some(amount),
-                asset_type: Some(asset_type),
-                asset_code,
-                asset_issuer,
-                ..
-            } => {
-                let asset_identifier = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                    .map_err(|err| de::Error::custom(err))?;
-                Kind::Account(account::Kind::Debited(account::Debited::new(
+                    starting_balance,
+                ))),
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for account_created effect.",
+                    ))
+                }
+            },
+            "account_removed" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    ..
+                } => Kind::Account(account::Kind::Removed(account::Removed::new(account))),
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for account_removed effect.",
+                    ))
+                }
+            },
+            "account_credited" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    amount: Some(amount),
+                    asset_type: Some(asset_type),
+                    asset_code,
+                    asset_issuer,
+                    ..
+                } => {
+                    let asset_identifier =
+                        AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
+                            .map_err(|err| de::Error::custom(err))?;
+                    Kind::Account(account::Kind::Credited(account::Credited::new(
+                        account,
+                        amount,
+                        asset_identifier,
+                    )))
+                }
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for account_credited effect.",
+                    ))
+                }
+            },
+            "account_debited" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    amount: Some(amount),
+                    asset_type: Some(asset_type),
+                    asset_code,
+                    asset_issuer,
+                    ..
+                } => {
+                    let asset_identifier =
+                        AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
+                            .map_err(|err| de::Error::custom(err))?;
+                    Kind::Account(account::Kind::Debited(account::Debited::new(
+                        account,
+                        amount,
+                        asset_identifier,
+                    )))
+                }
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for account_debited effect.",
+                    ))
+                }
+            },
+            "account_thresholds_updated" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    low_threshold: Some(low_threshold),
+                    med_threshold: Some(med_threshold),
+                    high_threshold: Some(high_threshold),
+                    ..
+                } => Kind::Account(account::Kind::ThresholdsUpdated(
+                    account::ThresholdsUpdated::new(
+                        account,
+                        low_threshold,
+                        med_threshold,
+                        high_threshold,
+                    ),
+                )),
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for account_thresholds_updated effect.",
+                    ))
+                }
+            },
+            "account_home_domain_updated" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    home_domain: Some(home_domain),
+                    ..
+                } => Kind::Account(account::Kind::HomeDomainUpdated(
+                    account::HomeDomainUpdated::new(account, home_domain),
+                )),
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for account_home_domain_updated effect.",
+                    ))
+                }
+            },
+            "account_flags_updated" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    auth_required_flag: Some(auth_required_flag),
+                    auth_revokable_flag: Some(auth_revokable_flag),
+                    ..
+                } => {
+                    let flags = Flag::new(auth_required_flag, auth_revokable_flag);
+                    Kind::Account(account::Kind::FlagsUpdated(account::FlagsUpdated::new(
+                        account,
+                        flags,
+                    )))
+                }
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for account_flags_updated effect.",
+                    ))
+                }
+            },
+            "signer_created" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    public_key: Some(public_key),
+                    weight: Some(weight),
+                    ..
+                } => Kind::Signer(signer::Kind::Created(signer::Created::new(
                     account,
-                    amount,
-                    asset_identifier,
-                )))
-            }
-
-            Intermediate {
-                kind: "account_thresholds_updated",
-                account: Some(account),
-                low_threshold: Some(low_threshold),
-                med_threshold: Some(med_threshold),
-                high_threshold: Some(high_threshold),
-                ..
-            } => Kind::Account(account::Kind::ThresholdsUpdated(
-                account::ThresholdsUpdated::new(
+                    public_key,
+                    weight,
+                ))),
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for signer_created effect.",
+                    ))
+                }
+            },
+            "signer_removed" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    public_key: Some(public_key),
+                    weight: Some(weight),
+                    ..
+                } => Kind::Signer(signer::Kind::Removed(signer::Removed::new(
                     account,
-                    low_threshold,
-                    med_threshold,
-                    high_threshold,
-                ),
-            )),
-
-            Intermediate {
-                kind: "account_home_domain_updated",
-                account: Some(account),
-                home_domain: Some(home_domain),
-                ..
-            } => Kind::Account(account::Kind::HomeDomainUpdated(
-                account::HomeDomainUpdated::new(account, home_domain),
-            )),
-
-            Intermediate {
-                kind: "account_flags_updated",
-                account: Some(account),
-                auth_required_flag: Some(auth_required_flag),
-                auth_revokable_flag: Some(auth_revokable_flag),
-                ..
-            } => {
-                let flags = Flag::new(auth_required_flag, auth_revokable_flag);
-                Kind::Account(account::Kind::FlagsUpdated(account::FlagsUpdated::new(
+                    public_key,
+                    weight,
+                ))),
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for signer_removed effect.",
+                    ))
+                }
+            },
+            "signer_updated" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    public_key: Some(public_key),
+                    weight: Some(weight),
+                    ..
+                } => Kind::Signer(signer::Kind::Updated(signer::Updated::new(
                     account,
-                    flags,
-                )))
-            }
-
-            Intermediate {
-                kind: "signer_created",
-                account: Some(account),
-                public_key: Some(public_key),
-                weight: Some(weight),
-                ..
-            } => Kind::Signer(signer::Kind::Created(signer::Created::new(
-                account,
-                public_key,
-                weight,
-            ))),
-
-            Intermediate {
-                kind: "signer_removed",
-                account: Some(account),
-                public_key: Some(public_key),
-                weight: Some(weight),
-                ..
-            } => Kind::Signer(signer::Kind::Removed(signer::Removed::new(
-                account,
-                public_key,
-                weight,
-            ))),
-
-            Intermediate {
-                kind: "signer_updated",
-                account: Some(account),
-                public_key: Some(public_key),
-                weight: Some(weight),
-                ..
-            } => Kind::Signer(signer::Kind::Updated(signer::Updated::new(
-                account,
-                public_key,
-                weight,
-            ))),
-
-            Intermediate {
-                kind: "trustline_created",
-                account: Some(account),
-                limit: Some(limit),
-                asset_type: Some(asset_type),
-                asset_code,
-                asset_issuer,
-                ..
-            } => {
-                let asset_identifier = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                    .map_err(|err| de::Error::custom(err))?;
-                Kind::Trustline(trustline::Kind::Created(trustline::Created::new(
-                    account,
-                    limit,
-                    asset_identifier,
-                )))
-            }
-
-            Intermediate {
-                kind: "trustline_removed",
-                account: Some(account),
-                limit: Some(limit),
-                asset_type: Some(asset_type),
-                asset_code,
-                asset_issuer,
-                ..
-            } => {
-                let asset_identifier = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                    .map_err(|err| de::Error::custom(err))?;
-                Kind::Trustline(trustline::Kind::Removed(trustline::Removed::new(
-                    account,
-                    limit,
-                    asset_identifier,
-                )))
-            }
-
-            Intermediate {
-                kind: "trustline_updated",
-                account: Some(account),
-                limit: Some(limit),
-                asset_type: Some(asset_type),
-                asset_code,
-                asset_issuer,
-                ..
-            } => {
-                let asset_identifier = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                    .map_err(|err| de::Error::custom(err))?;
-                Kind::Trustline(trustline::Kind::Updated(trustline::Updated::new(
-                    account,
-                    limit,
-                    asset_identifier,
-                )))
-            }
-
-            Intermediate {
-                kind: "trustline_authorized",
-                account: Some(account),
-                asset_type: Some(asset_type),
-                asset_code,
-                trustor,
-                ..
-            } => {
-                let asset_identifier = AssetIdentifier::new(&asset_type, asset_code, trustor)
-                    .map_err(|err| de::Error::custom(err))?;
-                Kind::Trustline(trustline::Kind::Authorized(trustline::Authorized::new(
-                    account,
-                    asset_identifier,
-                )))
-            }
-
-            Intermediate {
-                kind: "trustline_deauthorized",
-                account: Some(account),
-                asset_type: Some(asset_type),
-                asset_code,
-                trustor,
-                ..
-            } => {
-                let asset_identifier = AssetIdentifier::new(&asset_type, asset_code, trustor)
-                    .map_err(|err| de::Error::custom(err))?;
-                Kind::Trustline(trustline::Kind::Deauthorized(
-                    trustline::Deauthorized::new(account, asset_identifier),
-                ))
-            }
-
-            Intermediate {
-                kind: "trade",
-                account: Some(account),
-                offer_id: Some(offer_id),
-                seller: Some(seller),
-                sold_amount: Some(sold_amount),
-                sold_asset_type: Some(sold_asset_type),
-                sold_asset_code,
-                sold_asset_issuer,
-                bought_amount: Some(bought_amount),
-                bought_asset_type: Some(bought_asset_type),
-                bought_asset_code,
-                bought_asset_issuer,
-                ..
-            } => {
-                let sold_asset =
-                    AssetIdentifier::new(&sold_asset_type, sold_asset_code, sold_asset_issuer)
+                    public_key,
+                    weight,
+                ))),
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for signer_updated effect.",
+                    ))
+                }
+            },
+            "trustline_created" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    limit: Some(limit),
+                    asset_type: Some(asset_type),
+                    asset_code,
+                    asset_issuer,
+                    ..
+                } => {
+                    let asset_identifier =
+                        AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
+                            .map_err(|err| de::Error::custom(err))?;
+                    Kind::Trustline(trustline::Kind::Created(trustline::Created::new(
+                        account,
+                        limit,
+                        asset_identifier,
+                    )))
+                }
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for trustline_created effect.",
+                    ))
+                }
+            },
+            "trustline_removed" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    limit: Some(limit),
+                    asset_type: Some(asset_type),
+                    asset_code,
+                    asset_issuer,
+                    ..
+                } => {
+                    let asset_identifier =
+                        AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
+                            .map_err(|err| de::Error::custom(err))?;
+                    Kind::Trustline(trustline::Kind::Removed(trustline::Removed::new(
+                        account,
+                        limit,
+                        asset_identifier,
+                    )))
+                }
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for trustline_removed effect.",
+                    ))
+                }
+            },
+            "trustline_updated" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    limit: Some(limit),
+                    asset_type: Some(asset_type),
+                    asset_code,
+                    asset_issuer,
+                    ..
+                } => {
+                    let asset_identifier =
+                        AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
+                            .map_err(|err| de::Error::custom(err))?;
+                    Kind::Trustline(trustline::Kind::Updated(trustline::Updated::new(
+                        account,
+                        limit,
+                        asset_identifier,
+                    )))
+                }
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for trustline_updated effect.",
+                    ))
+                }
+            },
+            "trustline_authorized" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    asset_type: Some(asset_type),
+                    asset_code,
+                    trustor,
+                    ..
+                } => {
+                    let asset_identifier = AssetIdentifier::new(&asset_type, asset_code, trustor)
                         .map_err(|err| de::Error::custom(err))?;
-                let bought_asset = AssetIdentifier::new(
-                    &bought_asset_type,
+                    Kind::Trustline(trustline::Kind::Authorized(trustline::Authorized::new(
+                        account,
+                        asset_identifier,
+                    )))
+                }
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for trustline_authorized effect.",
+                    ))
+                }
+            },
+            "trustline_deauthorized" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    asset_type: Some(asset_type),
+                    asset_code,
+                    trustor,
+                    ..
+                } => {
+                    let asset_identifier = AssetIdentifier::new(&asset_type, asset_code, trustor)
+                        .map_err(|err| de::Error::custom(err))?;
+                    Kind::Trustline(trustline::Kind::Deauthorized(
+                        trustline::Deauthorized::new(account, asset_identifier),
+                    ))
+                }
+                _ => {
+                    return Err(de::Error::custom(
+                        "Missing fields for trustline_deauthorized effect.",
+                    ))
+                }
+            },
+            "trade" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    offer_id: Some(offer_id),
+                    seller: Some(seller),
+                    sold_amount: Some(sold_amount),
+                    sold_asset_type: Some(sold_asset_type),
+                    sold_asset_code,
+                    sold_asset_issuer,
+                    bought_amount: Some(bought_amount),
+                    bought_asset_type: Some(bought_asset_type),
                     bought_asset_code,
                     bought_asset_issuer,
-                ).map_err(|err| de::Error::custom(err))?;
-                Kind::Trade(trade::Kind::Trade(trade::Trade::new(
-                    account,
-                    offer_id,
-                    seller,
-                    sold_amount,
-                    sold_asset,
-                    bought_amount,
-                    bought_asset,
-                )))
-            }
-
-            Intermediate { kind, .. } => {
-                return Err(match kind {
-                    "account_created" => {
-                        de::Error::custom(format!("Missing fields for {} effect.", kind))
-                    }
-                    "account_removed" => {
-                        de::Error::custom(format!("Missing fields for {} effect.", kind))
-                    }
-                    "account_credited" => {
-                        de::Error::custom(format!("Missing fields for {} effect.", kind))
-                    }
-                    "account_debited" => {
-                        de::Error::custom(format!("Missing fields for {} effect.", kind))
-                    }
-                    "account_threshold_updated" => {
-                        de::Error::custom(format!("Missing fields for {} effect.", kind))
-                    }
-                    "account_home_domain_updated" => {
-                        de::Error::custom(format!("Missing fields for {} effect.", kind))
-                    }
-                    "account_flags_updated" => {
-                        de::Error::custom(format!("Missing fields for {} effect.", kind))
-                    }
-                    "signer_created" => {
-                        de::Error::custom(format!("Missing fields for {} effect.", kind))
-                    }
-                    "signer_removed" => {
-                        de::Error::custom(format!("Missing fields for {} effect.", kind))
-                    }
-                    "signer_updated" => {
-                        de::Error::custom(format!("Missing fields for {} effect.", kind))
-                    }
-                    "trustline_created" => {
-                        de::Error::custom(format!("Missing fields for {} effect.", kind))
-                    }
-                    "trustline_removed" => {
-                        de::Error::custom(format!("Missing fields for {} effect.", kind))
-                    }
-                    "trustline_updated" => {
-                        de::Error::custom(format!("Missing fields for {} effect.", kind))
-                    }
-                    "trustline_authorized" => {
-                        de::Error::custom(format!("Missing fields for {} effect.", kind))
-                    }
-                    "trustline_deauthorized" => {
-                        de::Error::custom(format!("Missing fields for {} effect.", kind))
-                    }
-                    "trade" => de::Error::custom(format!("Missing fields for {} effect.", kind)),
-                    _ => de::Error::custom("Unknown effect type."),
-                });
-            }
+                    ..
+                } => {
+                    let sold_asset =
+                        AssetIdentifier::new(&sold_asset_type, sold_asset_code, sold_asset_issuer)
+                            .map_err(|err| de::Error::custom(err))?;
+                    let bought_asset = AssetIdentifier::new(
+                        &bought_asset_type,
+                        bought_asset_code,
+                        bought_asset_issuer,
+                    ).map_err(|err| de::Error::custom(err))?;
+                    Kind::Trade(trade::Kind::Trade(trade::Trade::new(
+                        account,
+                        offer_id,
+                        seller,
+                        sold_amount,
+                        sold_asset,
+                        bought_amount,
+                        bought_asset,
+                    )))
+                }
+                _ => return Err(de::Error::custom("Missing fields for trade effect.")),
+            },
+            _ => return Err(de::Error::custom("Unknown effect type.")),
         };
 
         Ok(Effect {
