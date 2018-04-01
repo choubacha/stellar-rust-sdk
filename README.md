@@ -19,7 +19,7 @@ are fully documented and can be deserialized from the client.
 ## Client
 
 The client provides two interfaces. One is the synchronous client and the other is
-the asynchronous client. Both consume an EndPoint trait and will return the appropriate
+the asynchronous client. Both consume an IntoRequest trait and will return the appropriate
 response associated with the endpoint implementation. You should see the documentation
 associated with the code itself but below is a brief example
 

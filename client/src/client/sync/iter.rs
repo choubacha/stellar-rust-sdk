@@ -1,4 +1,4 @@
-use endpoint::{Cursor, EndPoint, Records};
+use endpoint::{Cursor, IntoRequest, Records};
 use serde::de::DeserializeOwned;
 use super::Client;
 use error::Result;
@@ -21,7 +21,7 @@ use error::Result;
 #[derive(Debug)]
 pub struct Iter<'a, T, E>
 where
-    E: EndPoint<Response = Records<T>> + Clone + Cursor<T>,
+    E: IntoRequest<Response = Records<T>> + Clone + Cursor<T>,
     T: DeserializeOwned + Clone,
 {
     client: &'a Client,
@@ -33,7 +33,7 @@ where
 
 impl<'a, T, E> Iter<'a, T, E>
 where
-    E: EndPoint<Response = Records<T>> + Clone + Cursor<T>,
+    E: IntoRequest<Response = Records<T>> + Clone + Cursor<T>,
     T: DeserializeOwned + Clone,
 {
     /// Creates a new iterator for the client and endpoint.
@@ -72,7 +72,7 @@ where
 
 impl<'a, T, E> Iterator for Iter<'a, T, E>
 where
-    E: EndPoint<Response = Records<T>> + Clone + Cursor<T>,
+    E: IntoRequest<Response = Records<T>> + Clone + Cursor<T>,
     T: DeserializeOwned + Clone,
 {
     type Item = Result<T>;

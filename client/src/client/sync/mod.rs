@@ -3,7 +3,7 @@
 use reqwest;
 use http::{self, Uri};
 use error::{Error, Result};
-use endpoint::EndPoint;
+use endpoint::IntoRequest;
 use super::{Host, HORIZON_TEST_URI, HORIZON_URI};
 use StellarError;
 use serde_json;
@@ -118,7 +118,7 @@ impl Client {
     /// ```
     pub fn request<E>(&self, endpoint: E) -> Result<E::Response>
     where
-        E: EndPoint,
+        E: IntoRequest,
     {
         let request = endpoint.into_request(&self.uri())?;
         let request = Self::http_to_reqwest(request);
