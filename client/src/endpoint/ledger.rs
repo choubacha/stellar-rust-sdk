@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::Ledger;
-use super::{Body, EndPoint, Order, Records};
+use super::{Body, IntoRequest, Order, Records};
 use http::{Request, Uri};
 
 /// Represents the all ledgers end point for the stellar horizon server. The endpoint
@@ -98,7 +98,7 @@ impl All {
     }
 }
 
-impl EndPoint for All {
+impl IntoRequest for All {
     type Response = Records<Ledger>;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {
@@ -159,7 +159,7 @@ impl Details {
     }
 }
 
-impl EndPoint for Details {
+impl IntoRequest for Details {
     type Response = Ledger;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {

@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::Effect;
-use super::{Body, EndPoint, Order, Records};
+use super::{Body, IntoRequest, Order, Records};
 use http::{Request, Uri};
 
 /// This endpoint represents all effects that have resulted from successful opreations in Stellar.
@@ -98,7 +98,7 @@ impl All {
     }
 }
 
-impl EndPoint for All {
+impl IntoRequest for All {
     type Response = Records<Effect>;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {

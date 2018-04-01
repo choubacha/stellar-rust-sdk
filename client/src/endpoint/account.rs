@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::{Account, Datum, Transaction};
-use super::{Body, Cursor, EndPoint, Order, Records};
+use super::{Body, Cursor, IntoRequest, Order, Records};
 use http::{Request, Uri};
 
 /// An endpoint that accesses a single accounts details.
@@ -19,7 +19,7 @@ impl Details {
     }
 }
 
-impl EndPoint for Details {
+impl IntoRequest for Details {
     type Response = Account;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {
@@ -61,7 +61,7 @@ impl Data {
     }
 }
 
-impl EndPoint for Data {
+impl IntoRequest for Data {
     type Response = Datum;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {
@@ -204,7 +204,7 @@ impl Cursor<Transaction> for Transactions {
     }
 }
 
-impl EndPoint for Transactions {
+impl IntoRequest for Transactions {
     type Response = Records<Transaction>;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {

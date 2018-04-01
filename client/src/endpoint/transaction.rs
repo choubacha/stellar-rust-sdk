@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::Transaction;
-use super::{Body, Cursor, EndPoint, Order, Records};
+use super::{Body, Cursor, IntoRequest, Order, Records};
 use http::{Request, Uri};
 pub use super::account::Transactions as ForAccount;
 
@@ -101,7 +101,7 @@ impl All {
     }
 }
 
-impl EndPoint for All {
+impl IntoRequest for All {
     type Response = Records<Transaction>;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {
@@ -196,7 +196,7 @@ impl Details {
     }
 }
 
-impl EndPoint for Details {
+impl IntoRequest for Details {
     type Response = Transaction;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {

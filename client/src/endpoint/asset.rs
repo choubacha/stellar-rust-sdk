@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::Asset;
-use super::{Body, Cursor, EndPoint, Order, Records};
+use super::{Body, Cursor, IntoRequest, Order, Records};
 use http::{Request, Uri};
 
 /// Represents the all assets end point for the stellar horizon server. The endpoint
@@ -151,7 +151,7 @@ impl Cursor<Asset> for All {
     }
 }
 
-impl EndPoint for All {
+impl IntoRequest for All {
     type Response = Records<Asset>;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {
