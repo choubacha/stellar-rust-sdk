@@ -2,6 +2,7 @@
 //! Defines the basic resources of stellar's horizon end points and
 //! implements their serialization.
 
+extern crate base64;
 extern crate chrono;
 extern crate serde;
 #[macro_use]
@@ -11,12 +12,14 @@ extern crate serde_json;
 mod account;
 mod amount;
 mod asset;
+mod base64string;
+mod datum;
 mod deserialize;
 /// An effect represents specific changes that occur in the ledger resulting from operations.
 pub mod effect;
 mod ledger;
 mod offer;
-/// An ooperation is an individual command that mutates the ledger.
+/// An operation is an individual command that mutates the ledger.
 pub mod operation;
 mod orderbook;
 mod payment_path;
@@ -31,6 +34,7 @@ mod transaction;
 pub use account::Account;
 pub use amount::Amount;
 pub use asset::{Asset, AssetIdentifier};
+pub use datum::Datum;
 pub use effect::Effect;
 pub use ledger::Ledger;
 pub use offer::Offer;

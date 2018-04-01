@@ -1,7 +1,7 @@
 //! Contains endpoints for accessing accounts and related information.
 use error::Result;
 use std::str::FromStr;
-use stellar_resources::{Account, Transaction};
+use stellar_resources::{Account, Datum, Transaction};
 use super::{Body, Cursor, EndPoint, Order, Records};
 use http::{Request, Uri};
 
@@ -29,6 +29,48 @@ impl EndPoint for Details {
     }
 }
 
+/// An endpoint that returns a single value for a key/vaule pair associated with an account.
+///
+/// https://www.stellar.org/developers/horizon/reference/endpoints/data-for-account.html
+///
+/// ## Example
+/// ```
+/// use stellar_client::sync::Client;
+/// use stellar_client::endpoint::account;
+///
+/// let client      = Client::horizon_test().unwrap();
+/// let endpoint    = account::Data::new("GATLAI2D7SSH6PE3HXTDPTRM4RE5VRK6HGA63K5EWP75PSANCZRFDNB5", "Food");
+/// let record      = client.request(endpoint).unwrap();
+/// #
+/// # assert_eq!(record.value(), "Pizza"); //
+/// ```
+#[derive(Debug)]
+pub struct Data {
+    id: String,
+    key: String,
+}
+
+impl Data {
+    /// Returns a new end point for account details. Hand this to the client in order to request
+    /// a single value for a key/value pair for an account.
+    pub fn new(id: &str, key: &str) -> Self {
+        Self {
+            id: id.to_string(),
+            key: key.to_string(),
+        }
+    }
+}
+
+impl EndPoint for Data {
+    type Response = Datum;
+
+    fn into_request(self, host: &str) -> Result<Request<Body>> {
+        let uri = Uri::from_str(&format!("{}/accounts/{}/data/{}", host, self.id, self.key))?;
+        let request = Request::get(uri).body(Body::None)?;
+        Ok(request)
+    }
+}
+
 #[cfg(test)]
 mod details_tests {
     use super::*;
@@ -41,6 +83,15 @@ mod details_tests {
             .unwrap();
         assert_eq!(request.uri().host().unwrap(), "horizon-testnet.stellar.org");
         assert_eq!(request.uri().path(), "/accounts/abc123");
+    }
+
+    #[test]
+    fn it_can_make_an_account_data_uri() {
+        let data = Data::new("abc123", "key");
+        let request = data.into_request("https://horizon-testnet.stellar.org")
+            .unwrap();
+        assert_eq!(request.uri().host().unwrap(), "horizon-testnet.stellar.org");
+        assert_eq!(request.uri().path(), "/accounts/abc123/data/key");
     }
 }
 /// An endpoint that accesses the transactions for a specific account

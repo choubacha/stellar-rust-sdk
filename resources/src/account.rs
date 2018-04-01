@@ -1,4 +1,6 @@
 use deserialize;
+use std::collections::HashMap;
+use base64string::Base64String;
 
 /// In the Stellar network, users interact using accounts which can be controlled by a
 /// corresponding keypair that can authorize transactions.
@@ -11,6 +13,7 @@ pub struct Account {
     #[serde(deserialize_with = "deserialize::from_str")]
     sequence: u64,
     subentry_count: u64,
+    data: HashMap<String, Base64String>,
 }
 
 impl Account {
@@ -48,5 +51,10 @@ impl Account {
     /// 0.5 to determine the minimum required balance.
     pub fn subentry_count(&self) -> u64 {
         self.subentry_count
+    }
+
+    /// A key/value store of data attached to this account.
+    pub fn data(&self) -> &HashMap<String, Base64String> {
+        &self.data
     }
 }
