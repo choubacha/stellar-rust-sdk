@@ -3,13 +3,33 @@ extern crate stellar_client;
 extern crate stellar_resources;
 
 use clap::{App, AppSettings, Arg, SubCommand};
-use stellar_client::sync::Client;
+use stellar_client::{error::Error, sync::Client};
 
 fn build_app<'a, 'b>() -> App<'a, 'b> {
     App::new("Stellar CLI")
         .version("0.1")
         .about("Access the stellar horizon API via the command line.")
         .setting(AppSettings::SubcommandRequired)
+        .arg(
+            Arg::with_name("host")
+                .takes_value(true)
+                .short("h")
+                .long("host")
+                .conflicts_with_all(&["test-net", "pub-net"])
+                .help("The host url to attempt to connect to. If not specified will default to test-net."),
+        )
+        .arg(
+            Arg::with_name("test-net")
+                .long("test-net")
+                .conflicts_with_all(&["host", "pub-net"])
+                .help("Connects to the test net. This is the default"),
+        )
+        .arg(
+            Arg::with_name("pub-net")
+                .long("pub-net")
+                .conflicts_with_all(&["host", "test-net"])
+                .help("Connects to the public net."),
+        )
         .subcommand(
             SubCommand::with_name("account")
                 .about("Access information about accounts or related to them")
@@ -39,6 +59,71 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                 .setting(AppSettings::SubcommandRequired)
                 .subcommand(SubCommand::with_name("all").about("Fetch all transactions")),
         )
+        .subcommand(
+            SubCommand::with_name("assets")
+                .about("Access lists of assets")
+                .setting(AppSettings::SubcommandRequired)
+                .subcommand(
+                    SubCommand::with_name("all")
+                        .about("Fetch all assets")
+                        .arg(
+                            Arg::with_name("code")
+                                .short("c")
+                                .long("code")
+                                .takes_value(true)
+                                .help("Filters the set by a particular asset code"),
+                        )
+                        .arg(
+                            Arg::with_name("issuer")
+                                .short("i")
+                                .long("issuer")
+                                .takes_value(true)
+                                .help("Filters the set by a particular asset issuer"),
+                        ),
+                ),
+        )
+}
+
+fn main() {
+    let matches = build_app().get_matches();
+
+    let client = if let Some(host) = matches.value_of("host") {
+        Client::new(&host).expect("Failed to initialize client")
+    } else if matches.is_present("pub-net") {
+        Client::horizon().unwrap()
+    } else {
+        Client::horizon_test().unwrap()
+    };
+
+    // Master match block. All subcommands need to be captured here.
+    let result = match matches.subcommand() {
+        ("account", Some(sub_m)) => match sub_m.subcommand() {
+            ("details", Some(sub_m)) => account::details(client, sub_m),
+            ("transactions", Some(sub_m)) => account::transactions(client, sub_m),
+            _ => return print_help_and_exit(),
+        },
+        ("transactions", Some(sub_m)) => match sub_m.subcommand() {
+            ("all", Some(_)) => transactions::all(client),
+            _ => return print_help_and_exit(),
+        },
+        ("assets", Some(sub_m)) => match sub_m.subcommand() {
+            ("all", Some(m)) => assets::all(client, m),
+            _ => return print_help_and_exit(),
+        },
+        _ => return print_help_and_exit(),
+    };
+
+    match result {
+        Ok(_) => {}
+        Err(Error::BadResponse(err)) => {
+            eprintln!("{}", err);
+            ::std::process::exit(1);
+        }
+        err => {
+            eprintln!("An unknown error occurred: {:?}", err);
+            ::std::process::exit(1);
+        }
+    }
 }
 
 fn print_help_and_exit() {
@@ -47,120 +132,18 @@ fn print_help_and_exit() {
     ::std::process::exit(1);
 }
 
-fn next_page() -> bool {
-    println!("-- press q to quit --");
-    let mut input = String::new();
-    match ::std::io::stdin().read_line(&mut input) {
-        Ok(_) => !input.starts_with("q"),
-        _ => false,
-    }
-}
-
-mod account {
-    use clap::ArgMatches;
-    use stellar_client::{endpoint::{account, Order}, error::Error, sync::Client};
-    use super::next_page;
-
-    pub fn details<'a>(client: Client, matches: &'a ArgMatches) {
-        let id = matches.value_of("ID").expect("ID is required");
-        let endpoint = account::Details::new(id);
-        match client.request(endpoint) {
-            Ok(account) => {
-                println!("ID:       {}", account.id());
-                println!("Sequence: {}", account.sequence());
-            }
-            Err(Error::BadResponse(err)) => {
-                eprintln!("{}", err);
-                ::std::process::exit(1);
-            }
-            err => {
-                eprintln!("An unknown error occurred: {:?}", err);
-                ::std::process::exit(1);
-            }
-        }
-    }
-
-    pub fn transactions<'a>(client: Client, matches: &'a ArgMatches, cursor: Option<String>) {
-        let id = matches.value_of("ID").expect("ID is required");
-        let mut endpoint = account::Transactions::new(id).order(Order::Desc);
-
-        if let Some(c) = cursor {
-            endpoint = endpoint.cursor(&c);
-        }
-
-        match client.request(endpoint) {
-            Ok(records) => {
-                for txn in records.records().iter() {
-                    println!("ID:         {}", txn.id());
-                    println!("account id: {}", txn.source_account());
-                    println!("created at: {}", txn.created_at());
-                    println!("");
-                }
-                if records.records().len() > 0 && next_page() {
-                    transactions(client, &matches, Some(records.next_cursor().to_string()))
-                }
-            }
-            Err(Error::BadResponse(err)) => {
-                eprintln!("{}", err);
-                ::std::process::exit(1);
-            }
-            err => {
-                eprintln!("An unknown error occurred: {:?}", err);
-                ::std::process::exit(1);
-            }
+mod utils {
+    /// A tool useful for paginating against the user through stdin
+    pub fn next_page() -> bool {
+        println!("-- press q to quit --");
+        let mut input = String::new();
+        match ::std::io::stdin().read_line(&mut input) {
+            Ok(_) => !input.starts_with("q"),
+            _ => false,
         }
     }
 }
 
-mod transactions {
-    use stellar_client::{endpoint::{transaction, Order}, error::Error, sync::Client};
-    use super::next_page;
-
-    pub fn all<'a>(client: Client, cursor: Option<String>) {
-        let mut endpoint = transaction::All::default().order(Order::Desc);
-
-        if let Some(c) = cursor {
-            endpoint = endpoint.cursor(&c);
-        }
-
-        match client.request(endpoint) {
-            Ok(records) => {
-                for txn in records.records().iter() {
-                    println!("ID:         {}", txn.id());
-                    println!("account id: {}", txn.source_account());
-                    println!("created at: {}", txn.created_at());
-                    println!("");
-                }
-                if records.records().len() > 0 && next_page() {
-                    all(client, Some(records.next_cursor().to_string()))
-                }
-            }
-            Err(Error::BadResponse(err)) => {
-                eprintln!("{}", err);
-                ::std::process::exit(1);
-            }
-            err => {
-                eprintln!("An unknown error occurred: {:?}", err);
-                ::std::process::exit(1);
-            }
-        }
-    }
-}
-
-fn main() {
-    let matches = build_app().get_matches();
-
-    let client = Client::horizon_test().unwrap();
-    match matches.subcommand() {
-        ("account", Some(sub_m)) => match sub_m.subcommand() {
-            ("details", Some(sub_m)) => account::details(client, sub_m),
-            ("transactions", Some(sub_m)) => account::transactions(client, sub_m, None),
-            _ => print_help_and_exit(),
-        },
-        ("transactions", Some(sub_m)) => match sub_m.subcommand() {
-            ("all", Some(_)) => transactions::all(client, None),
-            _ => print_help_and_exit(),
-        },
-        _ => print_help_and_exit(),
-    };
-}
+mod account;
+mod transactions;
+mod assets;

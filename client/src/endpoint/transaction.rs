@@ -23,7 +23,7 @@ pub use super::account::Transactions as ForAccount;
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct All {
     cursor: Option<String>,
     order: Option<Order>,
