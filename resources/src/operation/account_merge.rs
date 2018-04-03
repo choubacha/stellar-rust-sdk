@@ -16,12 +16,12 @@ impl AccountMerge {
     }
 
     /// The account being deleted from the ledger
-    pub fn account<'a>(&'a self) -> &'a str {
+    pub fn account(&self) -> &str {
         &self.account
     }
 
     /// Account ID where funds of deleted account were transferred.
-    pub fn into<'a>(&'a self) -> &'a str {
+    pub fn into(&self) -> &str {
         &self.into
     }
 }

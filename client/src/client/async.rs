@@ -118,8 +118,8 @@ impl Client {
         self.host == Host::HorizonProd
     }
 
-    #[allow(dead_code)] // TODO: Used for joining to end points
-    fn uri<'a>(&'a self) -> &'a str {
+    #[allow(dead_code)]
+    fn uri(&self) -> &str {
         match self.host {
             Host::HorizonTest => HORIZON_TEST_URI,
             Host::HorizonProd => HORIZON_URI,

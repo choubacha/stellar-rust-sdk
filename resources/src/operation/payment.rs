@@ -23,12 +23,12 @@ impl Payment {
     }
 
     /// The public address of the account making a payment.
-    pub fn from<'a>(&'a self) -> &'a str {
+    pub fn from(&self) -> &str {
         &self.from
     }
 
     /// The public address of the account receiving a payment.
-    pub fn to<'a>(&'a self) -> &'a str {
+    pub fn to(&self) -> &str {
         &self.to
     }
 

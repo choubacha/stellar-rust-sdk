@@ -18,12 +18,12 @@ impl CreateAccount {
         }
     }
     /// The public address of a new account that was funded.
-    pub fn account<'a>(&'a self) -> &'a str {
+    pub fn account(&self) -> &str {
         &self.account
     }
 
     /// The public address of the account that funded a new account.
-    pub fn funder<'a>(&'a self) -> &'a str {
+    pub fn funder(&self) -> &str {
         &self.funder
     }
 

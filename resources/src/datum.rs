@@ -12,7 +12,7 @@ pub struct Datum {
 
 impl Datum {
     /// The value of a single key/value pair tied to a single account.
-    pub fn value<'a>(&'a self) -> &'a str {
+    pub fn value(&self) -> &str {
         &self.value.0
     }
 }

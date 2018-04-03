@@ -70,7 +70,7 @@ impl Serialize for AssetIdentifier {
 impl AssetIdentifier {
     /// The type of this asset: “credit_alphanum4”, or “credit_alphanum12”.
     /// Returns a slice that lives as long as the asset does.
-    pub fn asset_type<'a>(&'a self) -> &'a str {
+    pub fn asset_type(&self) -> &str {
         match self {
             &AssetIdentifier::Native => &"native",
             &AssetIdentifier::CreditAlphanum4(_) => &"credit_alphanum4",
@@ -80,7 +80,7 @@ impl AssetIdentifier {
 
     /// The code of this asset.
     /// Returns a slice that lives as long as the asset does.
-    pub fn code<'a>(&'a self) -> &'a str {
+    pub fn code(&self) -> &str {
         match self {
             &AssetIdentifier::Native => &"XLM",
             &AssetIdentifier::CreditAlphanum4(ref asset_id) => &asset_id.code,
@@ -99,7 +99,7 @@ impl AssetIdentifier {
 
     /// The issuer of this asset.  This corresponds to the id of an account.
     /// Returns a slice that lives as long as the asset does.
-    pub fn issuer<'a>(&'a self) -> &'a str {
+    pub fn issuer(&self) -> &str {
         match self {
             &AssetIdentifier::Native => &"Stellar Foundation",
             &AssetIdentifier::CreditAlphanum4(ref asset_id) => &asset_id.issuer,
@@ -293,19 +293,19 @@ impl Serialize for Asset {
 impl Asset {
     /// The type of this asset: “credit_alphanum4”, or “credit_alphanum12”.
     /// Returns a slice that lives as long as the asset does.
-    pub fn asset_type<'a>(&'a self) -> &'a str {
+    pub fn asset_type(&self) -> &str {
         &self.asset_identifier.asset_type()
     }
 
     /// The code of this asset.
     /// Returns a slice that lives as long as the asset does.
-    pub fn code<'a>(&'a self) -> &'a str {
+    pub fn code(&self) -> &str {
         &self.asset_identifier.code()
     }
 
     /// The issuer of this asset.  This corresponds to the id of an account.
     /// Returns a slice that lives as long as the asset does.
-    pub fn issuer<'a>(&'a self) -> &'a str {
+    pub fn issuer(&self) -> &str {
         &self.asset_identifier.issuer()
     }
 

@@ -93,12 +93,12 @@ impl Operation {
     }
 
     /// A paging token suitable for use as a cursor parameter.
-    pub fn paging_token<'a>(&'a self) -> &'a str {
+    pub fn paging_token(&self) -> &str {
         &self.paging_token
     }
 
     /// The has for the transaction that the operation was part of
-    pub fn transaction<'a>(&'a self) -> &'a str {
+    pub fn transaction(&self) -> &str {
         &self.transaction_hash
     }
 

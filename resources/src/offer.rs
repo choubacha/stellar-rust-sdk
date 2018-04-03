@@ -95,22 +95,22 @@ impl Offer {
     }
 
     /// A paging_token suitable for use as a cursor parameter.
-    pub fn paging_token<'a>(&'a self) -> &'a str {
+    pub fn paging_token(&self) -> &str {
         &self.paging_token
     }
 
     /// The account id fo the account making this offer.
-    pub fn seller<'a>(&'a self) -> &'a str {
+    pub fn seller(&self) -> &str {
         &self.seller
     }
 
     /// The asset being sold
-    pub fn selling<'a>(&'a self) -> &'a AssetIdentifier {
+    pub fn selling(&self) -> &AssetIdentifier {
         &self.selling
     }
 
     /// The asset being bought
-    pub fn buying<'a>(&'a self) -> &'a AssetIdentifier {
+    pub fn buying(&self) -> &AssetIdentifier {
         &self.buying
     }
 

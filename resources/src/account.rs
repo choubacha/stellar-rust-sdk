@@ -20,13 +20,13 @@ impl Account {
     /// The canonical id of this account, suitable for use as the :id parameter
     /// for url templates that require an account’s ID. Returns a slice that lives
     /// as long as the account does.
-    pub fn id_ref<'a>(&'a self) -> &'a str {
+    pub fn id_ref(&self) -> &str {
         &self.id
     }
 
     /// The account’s public key encoded into a base32 string representation.
     /// Returns a slice that lives as long as the account does.
-    pub fn account_id_ref<'a>(&'a self) -> &'a str {
+    pub fn account_id_ref(&self) -> &str {
         &self.account_id
     }
 
