@@ -4,6 +4,7 @@ use std::str::FromStr;
 use stellar_resources::Effect;
 use super::{Body, IntoRequest, Order, Records};
 use http::{Request, Uri};
+pub use super::account::Effects as ForAccount;
 
 /// This endpoint represents all effects that have resulted from successful opreations in Stellar.
 /// The endpoint will return all effects and accepts query params for a cursor, order, and limit.
