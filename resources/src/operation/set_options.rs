@@ -50,7 +50,7 @@ impl SetOptions {
     }
 
     /// The public key of the new signer.
-    pub fn signer_key<'a>(&'a self) -> &'a str {
+    pub fn signer_key(&self) -> &str {
         &self.signer_key
     }
 
@@ -80,7 +80,7 @@ impl SetOptions {
     }
 
     /// The home domain used for reverse federation lookup
-    pub fn home_domain<'a>(&'a self) -> &'a str {
+    pub fn home_domain(&self) -> &str {
         &self.home_domain
     }
 

@@ -15,12 +15,12 @@ impl ManageData {
     }
 
     /// The key of the data value to update
-    pub fn name<'a>(&'a self) -> &'a str {
+    pub fn name(&self) -> &str {
         &self.name
     }
 
     /// The new data value associated with the named key
-    pub fn value<'a>(&'a self) -> &'a str {
+    pub fn value(&self) -> &str {
         &self.value
     }
 }

@@ -102,7 +102,7 @@ impl StellarError {
     }
 
     /// Returns a URL that can provide additional information about the stellar error.
-    pub fn url<'a>(&'a self) -> &'a str {
+    pub fn url(&self) -> &str {
         &self.url
     }
 

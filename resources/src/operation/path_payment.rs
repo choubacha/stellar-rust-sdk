@@ -37,12 +37,12 @@ impl PathPayment {
         }
     }
     /// Sender of a payment.
-    pub fn from<'a>(&'a self) -> &'a str {
+    pub fn from(&self) -> &str {
         &self.from
     }
 
     /// Destination of a payment.
-    pub fn to<'a>(&'a self) -> &'a str {
+    pub fn to(&self) -> &str {
         &self.to
     }
 

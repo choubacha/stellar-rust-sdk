@@ -185,12 +185,12 @@ struct TradeRepresentation {
 
 impl Trade {
     /// The id of the trade.
-    pub fn id<'a>(&'a self) -> &'a str {
+    pub fn id(&self) -> &str {
         &self.id
     }
 
     /// A paging_token suitable for use as a cursor parameter.
-    pub fn paging_token<'a>(&'a self) -> &'a str {
+    pub fn paging_token(&self) -> &str {
         &self.paging_token
     }
 
@@ -200,17 +200,17 @@ impl Trade {
     }
 
     /// The id of the offer involved in the trade.
-    pub fn offer_id<'a>(&'a self) -> &'a str {
+    pub fn offer_id(&self) -> &str {
         &self.offer_id
     }
 
     /// The base account of the trade that received the counter asset.
-    pub fn base_account<'a>(&'a self) -> &'a str {
+    pub fn base_account(&self) -> &str {
         &self.base_account
     }
 
     /// The asset offerred from the base party of the trade.
-    pub fn base_asset<'a>(&'a self) -> &'a AssetIdentifier {
+    pub fn base_asset(&self) -> &AssetIdentifier {
         &self.base_asset
     }
 
@@ -220,12 +220,12 @@ impl Trade {
     }
 
     /// The counter account of the trade that received the base asset.
-    pub fn counter_account<'a>(&'a self) -> &'a str {
+    pub fn counter_account(&self) -> &str {
         &self.counter_account
     }
 
     /// The asset offerred from the counter party of the trade.
-    pub fn counter_asset<'a>(&'a self) -> &'a AssetIdentifier {
+    pub fn counter_asset(&self) -> &AssetIdentifier {
         &self.counter_asset
     }
 

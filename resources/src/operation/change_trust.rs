@@ -28,12 +28,12 @@ impl ChangeTrust {
     }
 
     /// Trustee account.
-    pub fn trustee<'a>(&'a self) -> &'a str {
+    pub fn trustee(&self) -> &str {
         &self.trustee
     }
 
     /// Trustor account.
-    pub fn trustor<'a>(&'a self) -> &'a str {
+    pub fn trustor(&self) -> &str {
         &self.trustor
     }
 

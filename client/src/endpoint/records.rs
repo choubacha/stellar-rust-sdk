@@ -32,17 +32,17 @@ where
     T: DeserializeOwned,
 {
     /// Returns a slice of the embedded records.
-    pub fn records<'a>(&'a self) -> &'a Vec<T> {
+    pub fn records(&self) -> &Vec<T> {
         &self.records
     }
 
     /// Returns the pagination cursor for the next page
-    pub fn next_cursor<'a>(&'a self) -> &'a str {
+    pub fn next_cursor(&self) -> &str {
         &self.next
     }
 
     /// Returns the pagination cursor for the previous page
-    pub fn prev_cursor<'a>(&'a self) -> &'a str {
+    pub fn prev_cursor(&self) -> &str {
         &self.prev
     }
 }
