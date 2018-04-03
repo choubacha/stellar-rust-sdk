@@ -1,7 +1,7 @@
 //! Contains the endpoint for all ledgers.
 use error::Result;
 use std::str::FromStr;
-use stellar_resources::{Ledger, Operation};
+use stellar_resources::{Ledger, Operation, Transaction};
 use super::{Body, Cursor, IntoRequest, Order, Records};
 use http::{Request, Uri};
 
@@ -379,6 +379,168 @@ mod ledger_payments_tests {
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/ledgers/123/payments");
+        assert_eq!(
+            req.uri().query(),
+            Some("order=desc&cursor=CURSOR&limit=123")
+        );
+    }
+}
+
+/// Represents the transactions for ledger endpoint on the stellar horizon server.
+/// The endpoint will return all the transactions for a single ledger in the chain.
+///
+/// <https://www.stellar.org/developers/horizon/reference/endpoints/transactions-for-ledger.html>
+///
+/// ## Example
+/// ```
+/// use stellar_client::sync::Client;
+/// use stellar_client::endpoint::{ledger, transaction};
+///
+/// let client   = Client::horizon_test().unwrap();
+///
+/// // Grab transactions and associated ledger to ensure a ledger sequence with transactions
+/// let txns = client.request(transaction::All::default().limit(1)).unwrap();
+/// let txn = &txns.records()[0];
+/// let sequence = txn.ledger();
+///
+/// // Now we issue a request for that ledgers transactions
+/// let endpoint = ledger::Transactions::new(sequence);
+/// let ledger_txns = client.request(endpoint).unwrap();
+///
+/// assert!(ledger_txns.records().len() > 0);
+/// ```
+#[derive(Debug, Clone)]
+pub struct Transactions {
+    sequence: u32,
+    cursor: Option<String>,
+    order: Option<Order>,
+    limit: Option<u32>,
+}
+
+impl Transactions {
+    /// Creates a new ledger::Transactions endpoint struct.
+    ///
+    /// ```
+    /// use stellar_client::endpoint::ledger;
+    ///
+    /// let txns = ledger::Transactions::new(123);
+    /// ```
+    pub fn new(sequence: u32) -> Transactions {
+        Transactions {
+            sequence,
+            cursor: None,
+            order: None,
+            limit: None,
+        }
+    }
+
+    /// Fetches all records in a set order, either ascending or descending.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// use stellar_client::endpoint::{ledger, Order};
+    ///
+    /// # // Not making requests seeing as the main documentation already does this.
+    /// # // This serves to document the usage while conserving hits to horizon.
+    /// let endpoint = ledger::Transactions::new(123).order(Order::Asc);
+    /// ```
+    pub fn order(mut self, order: Order) -> Self {
+        self.order = Some(order);
+        self
+    }
+
+    /// Starts the page of results at a given cursor
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// use stellar_client::endpoint::ledger;
+    ///
+    /// # // Not making requests seeing as the main documentation already does this.
+    /// # // This serves to document the usage while conserving hits to horizon.
+    /// let endpoint = ledger::Transactions::new(123).cursor("cursor");
+    /// ```
+    pub fn cursor(mut self, cursor: &str) -> Self {
+        self.cursor = Some(cursor.to_string());
+        self
+    }
+
+    /// Sets the maximum number of records to return.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// use stellar_client::endpoint::ledger;
+    ///
+    /// # // Not making requests seeing as the main documentation already does this.
+    /// # // This serves to document the usage while conserving hits to horizon.
+    /// let endpoint = ledger::Transactions::new(123).limit(15);
+    /// ```
+    pub fn limit(mut self, limit: u32) -> Self {
+        self.limit = Some(limit);
+        self
+    }
+
+    fn has_query(&self) -> bool {
+        self.order.is_some() || self.cursor.is_some() || self.limit.is_some()
+    }
+}
+
+impl IntoRequest for Transactions {
+    type Response = Records<Transaction>;
+
+    fn into_request(self, host: &str) -> Result<Request<Body>> {
+        let mut uri = format!("{}/ledgers/{}/transactions", host, self.sequence);
+
+        if self.has_query() {
+            uri.push_str("?");
+
+            if let Some(order) = self.order {
+                uri.push_str(&format!("order={}&", order.to_param()));
+            }
+
+            if let Some(cursor) = self.cursor {
+                uri.push_str(&format!("cursor={}&", cursor));
+            }
+
+            if let Some(limit) = self.limit {
+                uri.push_str(&format!("limit={}", limit));
+            }
+        }
+
+        let uri = Uri::from_str(&uri)?;
+        let request = Request::get(uri).body(Body::None)?;
+        Ok(request)
+    }
+}
+
+impl Cursor<Transaction> for Transactions {
+    fn cursor(self, cursor: &str) -> Self {
+        self.cursor(cursor)
+    }
+}
+
+#[cfg(test)]
+mod ledger_transactions_tests {
+    use super::*;
+
+    #[test]
+    fn it_leaves_off_the_params_if_not_specified() {
+        let ep = Transactions::new(123);
+        let req = ep.into_request("https://www.google.com").unwrap();
+        assert_eq!(req.uri().path(), "/ledgers/123/transactions");
+        assert_eq!(req.uri().query(), None);
+    }
+
+    #[test]
+    fn it_puts_the_query_params_on_the_uri() {
+        let ep = Transactions::new(123)
+            .cursor("CURSOR")
+            .limit(123)
+            .order(Order::Desc);
+        let req = ep.into_request("https://www.google.com").unwrap();
+        assert_eq!(req.uri().path(), "/ledgers/123/transactions");
         assert_eq!(
             req.uri().query(),
             Some("order=desc&cursor=CURSOR&limit=123")
