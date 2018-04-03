@@ -14,7 +14,7 @@
       "href": "/operations?cursor=402494270214144&order=desc"
     },
     "transactions": {
-      "href": "/transactions/402494270214144"
+      "href": "/transactions/f0222a5421ccfc4e612f11d9ff95755fbb6300df7c61442d990d498a4cd01c92"
     }
   },
   "account": "GCEZWKCA5VLDNRLN3RPRJMRZOX3Z6G5CHCGSNFHEYVXM3XOJMDS674JZ",
@@ -23,5 +23,6 @@
   "paging_token": "402494270214144",
   "starting_balance": "10000.0",
   "type_i": 0,
-  "type": "create_account"
+  "type": "create_account",
+  "transaction_hash": "f0222a5421ccfc4e612f11d9ff95755fbb6300df7c61442d990d498a4cd01c92"
 }

@@ -10,7 +10,7 @@ use asset::Flag;
 /// Set the account’s inflation destination.
 /// Add new signers to the account.
 /// Set home domain.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct SetOptions {
     signer_key: String,
     signer_weight: u8,
@@ -50,7 +50,7 @@ impl SetOptions {
     }
 
     /// The public key of the new signer.
-    pub fn signer_key(&self) -> &String {
+    pub fn signer_key<'a>(&'a self) -> &'a str {
         &self.signer_key
     }
 
@@ -80,7 +80,7 @@ impl SetOptions {
     }
 
     /// The home domain used for reverse federation lookup
-    pub fn home_domain(&self) -> &String {
+    pub fn home_domain<'a>(&'a self) -> &'a str {
         &self.home_domain
     }
 

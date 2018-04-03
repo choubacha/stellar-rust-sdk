@@ -14,7 +14,7 @@
       "href": "/operations?cursor=1127729562914817\u0026order=desc"
     },
     "transaction": {
-      "href": "/transactions/1127729562914816"
+      "href": "/transactions/f0222a5421ccfc4e612f11d9ff95755fbb6300df7c61442d990d498a4cd01c92"
     }
   },
   "amount": "11.27827",
@@ -31,5 +31,6 @@
   },
   "selling_asset_type": "native",
   "type_i": 4,
-  "type": "create_passive_offer"
+  "type": "create_passive_offer",
+  "transaction_hash": "f0222a5421ccfc4e612f11d9ff95755fbb6300df7c61442d990d498a4cd01c92"
 }

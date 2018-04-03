@@ -31,16 +31,17 @@ mod test;
 /// Operations are objects that represent a desired change to the ledger: payments, offers to
 /// exchange currency, changes made to account options, etc. Operations are submitted to the
 /// Stellar network grouped in a Transaction.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Operation {
     id: i64,
     paging_token: String,
+    transaction_hash: String,
     kind: Kind,
 }
 
 /// Each operation type is representing by a kind and captures data specific to that
 /// type within it's newtype.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone)]
 pub enum OperationKind {
     /// A create account operation represents a new account creation.
     CreateAccount(CreateAccount),
@@ -85,14 +86,20 @@ pub enum OperationKind {
 use self::OperationKind as Kind;
 
 impl Operation {
+    /// The canonical id of this operation, suitable for use as the :id parameter for url templates
     /// that require an operation’s ID.
     pub fn id(&self) -> i64 {
         self.id
     }
 
     /// A paging token suitable for use as a cursor parameter.
-    pub fn paging_token(&self) -> &String {
+    pub fn paging_token<'a>(&'a self) -> &'a str {
         &self.paging_token
+    }
+
+    /// The has for the transaction that the operation was part of
+    pub fn transaction<'a>(&'a self) -> &'a str {
+        &self.transaction_hash
     }
 
     /// Specifies the type of operation, See “Types” section below for reference.
@@ -213,6 +220,7 @@ struct Intermediate {
     #[serde(deserialize_with = "deserialize::from_str")]
     id: i64,
     paging_token: String,
+    transaction_hash: String,
     #[serde(rename = "type")]
     kind: String,
     account: Option<String>,
@@ -537,6 +545,7 @@ impl<'de> Deserialize<'de> for Operation {
         Ok(Operation {
             id: rep.id,
             paging_token: rep.paging_token,
+            transaction_hash: rep.transaction_hash,
             kind,
         })
     }

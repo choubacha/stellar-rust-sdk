@@ -1,5 +1,5 @@
 /// Removes the account and transfers all remaining XLM to the destination account.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct AccountMerge {
     account: String,
     into: String,
@@ -16,12 +16,12 @@ impl AccountMerge {
     }
 
     /// The account being deleted from the ledger
-    pub fn account(&self) -> &String {
+    pub fn account<'a>(&'a self) -> &'a str {
         &self.account
     }
 
     /// Account ID where funds of deleted account were transferred.
-    pub fn into(&self) -> &String {
+    pub fn into<'a>(&'a self) -> &'a str {
         &self.into
     }
 }

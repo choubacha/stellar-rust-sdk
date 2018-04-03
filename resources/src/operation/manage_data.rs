@@ -1,5 +1,5 @@
 /// Set, modify or delete a Data Entry (name/value pair) for an account.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct ManageData {
     name: String,
     value: String,
@@ -15,12 +15,12 @@ impl ManageData {
     }
 
     /// The key of the data value to update
-    pub fn name(&self) -> &String {
+    pub fn name<'a>(&'a self) -> &'a str {
         &self.name
     }
 
     /// The new data value associated with the named key
-    pub fn value(&self) -> &String {
+    pub fn value<'a>(&'a self) -> &'a str {
         &self.value
     }
 }

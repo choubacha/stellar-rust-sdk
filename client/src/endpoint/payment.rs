@@ -6,6 +6,7 @@ use super::{Body, IntoRequest, Order, Records};
 use http::{Request, Uri};
 
 pub use super::transaction::Payments as ForTransaction;
+pub use super::ledger::Payments as ForLedger;
 
 /// This endpoint represents all payment operations that are part of validated transactions.
 /// The endpoint will return all payments and accepts query params for a cursor, order, and limit.

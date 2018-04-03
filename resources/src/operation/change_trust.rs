@@ -3,7 +3,7 @@ use amount::Amount;
 
 /// Use “Change Trust” operation to create/update/delete a trust line from the source account to
 /// another. The issuer being trusted and the asset code are in the given Asset object.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct ChangeTrust {
     trustee: String,
     trustor: String,
@@ -28,12 +28,12 @@ impl ChangeTrust {
     }
 
     /// Trustee account.
-    pub fn trustee(&self) -> &String {
+    pub fn trustee<'a>(&'a self) -> &'a str {
         &self.trustee
     }
 
     /// Trustor account.
-    pub fn trustor(&self) -> &String {
+    pub fn trustor<'a>(&'a self) -> &'a str {
         &self.trustor
     }
 

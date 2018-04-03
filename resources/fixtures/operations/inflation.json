@@ -14,11 +14,12 @@
       "href": "/operations?cursor=12884914177\u0026order=desc"
     },
     "transaction": {
-      "href": "/transactions/12884914176"
+      "href": "/transactions/f0222a5421ccfc4e612f11d9ff95755fbb6300df7c61442d990d498a4cd01c92"
     }
   },
   "id": "12884914177",
   "paging_token": "12884914177",
   "type_i": 9,
-  "type": "inflation"
+  "type": "inflation",
+  "transaction_hash": "f0222a5421ccfc4e612f11d9ff95755fbb6300df7c61442d990d498a4cd01c92"
 }

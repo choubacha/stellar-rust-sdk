@@ -22,5 +22,6 @@
   "type": "manage_data",
   "type_i": 10,
   "name": "lang",
-  "value": "aW5kb25lc2lhbg=="
+  "value": "aW5kb25lc2lhbg==",
+  "transaction_hash": "e0710d3e410fe6b1ba77fcfec9e3789e94ff29b2424f1f4bf51e530dbbdf221c"
 }

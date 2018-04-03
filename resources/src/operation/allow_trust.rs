@@ -5,7 +5,7 @@ use asset::AssetIdentifier;
 ///
 ///Heads up! Unless the issuing account has AUTH_REVOCABLE_FLAG set than the “authorized” flag can
 ///only be set and never cleared.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct AllowTrust {
     trustee: String,
     trustor: String,
@@ -30,12 +30,12 @@ impl AllowTrust {
     }
 
     /// Trustee account.
-    pub fn trustee(&self) -> &String {
+    pub fn trustee<'a>(&'a self) -> &'a str {
         &self.trustee
     }
 
     /// Trustor account.
-    pub fn trustor(&self) -> &String {
+    pub fn trustor<'a>(&'a self) -> &'a str {
         &self.trustor
     }
 

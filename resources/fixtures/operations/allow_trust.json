@@ -14,7 +14,7 @@
       "href": "/operations?cursor=34359742465\u0026order=desc"
     },
     "transaction": {
-      "href": "/transactions/34359742464"
+      "href": "/transactions/f0222a5421ccfc4e612f11d9ff95755fbb6300df7c61442d990d498a4cd01c92"
     }
   },
   "asset_code": "USD",
@@ -26,5 +26,6 @@
   "trustee": "GC23QF2HUE52AMXUFUH3AYJAXXGXXV2VHXYYR6EYXETPKDXZSAW67XO4",
   "trustor": "GBXGQJWVLWOYHFLVTKWV5FGHA3LNYY2JQKM7OAJAUEQFU6LPCSEFVXON",
   "type_i": 7,
-  "type": "allow_trust"
+  "type": "allow_trust",
+  "transaction_hash": "f0222a5421ccfc4e612f11d9ff95755fbb6300df7c61442d990d498a4cd01c92"
 }

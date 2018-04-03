@@ -14,7 +14,7 @@
       "href": "/operations?cursor=25769807873\u0026order=desc"
     },
     "transaction": {
-      "href": "/transactions/25769807872"
+      "href": "/transactions/f0222a5421ccfc4e612f11d9ff95755fbb6300df7c61442d990d498a4cd01c92"
     }
   },
   "amount": "10.0",
@@ -31,5 +31,6 @@
   "source_max": "10.0",
   "to": "GA5WBPYA5Y4WAEHXWR2UKO2UO4BUGHUQ74EUPKON2QHV4WRHOIRNKKH2",
   "type_i": 2,
-  "type": "path_payment"
+  "type": "path_payment",
+  "transaction_hash": "f0222a5421ccfc4e612f11d9ff95755fbb6300df7c61442d990d498a4cd01c92"
 }
