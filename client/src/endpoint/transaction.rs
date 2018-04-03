@@ -5,6 +5,7 @@ use stellar_resources::{Operation, Transaction};
 use super::{Body, Cursor, IntoRequest, Order, Records};
 use http::{Request, Uri};
 pub use super::account::Transactions as ForAccount;
+pub use super::ledger::Transactions as ForLedger;
 
 /// Represents the all transactions end point for the stellar horizon server. The endpoint
 /// will return all transactions filtered by cursor, order and limit
