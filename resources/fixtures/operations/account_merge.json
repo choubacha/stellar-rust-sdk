@@ -14,7 +14,7 @@
       "href": "/operations?cursor=799357838299137\u0026order=desc"
     },
     "transaction": {
-      "href": "/transactions/799357838299136"
+      "href": "/transactions/f0222a5421ccfc4e612f11d9ff95755fbb6300df7c61442d990d498a4cd01c92"
     }
   },
   "account": "GBCR5OVQ54S2EKHLBZMK6VYMTXZHXN3T45Y6PRX4PX4FXDMJJGY4FD42",
@@ -22,5 +22,6 @@
   "into": "GBS43BF24ENNS3KPACUZVKK2VYPOZVBQO2CISGZ777RYGOPYC2FT6S3K",
   "paging_token": "799357838299137",
   "type_i": 8,
-  "type": "account_merge"
+  "type": "account_merge",
+  "transaction_hash": "f0222a5421ccfc4e612f11d9ff95755fbb6300df7c61442d990d498a4cd01c92"
 }

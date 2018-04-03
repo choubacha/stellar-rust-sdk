@@ -14,7 +14,7 @@
       "href": "/operations?cursor=574731048718337\u0026order=desc"
     },
     "transaction": {
-      "href": "/transactions/574731048718336"
+      "href": "/transactions/f0222a5421ccfc4e612f11d9ff95755fbb6300df7c61442d990d498a4cd01c92"
     }
   },
   "asset_code": "CHP",
@@ -26,5 +26,6 @@
   "trustee": "GAC2ZUXVI5266NMMGDPBMXHH4BTZKJ7MMTGXRZGX2R5YLMFRYLJ7U5EA",
   "trustor": "GDVXG2FMFFSUMMMBIUEMWPZAIU2FNCH7QNGJMWRXRD6K5FZK5KJS4DDR",
   "type_i": 6,
-  "type": "change_trust"
+  "type": "change_trust",
+  "transaction_hash": "f0222a5421ccfc4e612f11d9ff95755fbb6300df7c61442d990d498a4cd01c92"
 }

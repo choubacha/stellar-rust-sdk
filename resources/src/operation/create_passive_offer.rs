@@ -5,13 +5,12 @@ use offer::PriceRatio;
 /// “Create Passive Offer” operation creates an offer that won’t consume a counter offer that
 /// exactly matches this offer. This is useful for offers just used as 1:1 exchanges for path
 /// payments. Use Manage Offer to manage this offer after using this operation to create it.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct CreatePassiveOffer {
     offer_id: i64,
     selling: AssetIdentifier,
     buying: AssetIdentifier,
     amount: Amount,
-    #[serde(rename = "price_r")]
     price_ratio: PriceRatio,
     price: Amount,
 }

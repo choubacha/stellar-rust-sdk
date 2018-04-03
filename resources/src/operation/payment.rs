@@ -3,7 +3,7 @@ use asset::AssetIdentifier;
 
 /// A payment operation represents a payment from one account to another. This payment can be
 /// either a simple native asset payment or a fiat asset payment.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct Payment {
     from: String,
     to: String,
@@ -23,12 +23,12 @@ impl Payment {
     }
 
     /// The public address of the account making a payment.
-    pub fn from(&self) -> &String {
+    pub fn from<'a>(&'a self) -> &'a str {
         &self.from
     }
 
     /// The public address of the account receiving a payment.
-    pub fn to(&self) -> &String {
+    pub fn to<'a>(&'a self) -> &'a str {
         &self.to
     }
 

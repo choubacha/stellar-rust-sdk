@@ -4,7 +4,7 @@ use asset::AssetIdentifier;
 /// A path payment operation represents a payment from one account to another through a path. This
 /// type of payment starts as one type of asset and ends as another type of asset. There can be
 /// other assets that are traded into and out of along the path.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct PathPayment {
     from: String,
     to: String,
@@ -37,12 +37,12 @@ impl PathPayment {
         }
     }
     /// Sender of a payment.
-    pub fn from(&self) -> &String {
+    pub fn from<'a>(&'a self) -> &'a str {
         &self.from
     }
 
     /// Destination of a payment.
-    pub fn to(&self) -> &String {
+    pub fn to<'a>(&'a self) -> &'a str {
         &self.to
     }
 

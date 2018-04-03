@@ -1,7 +1,7 @@
 use amount::Amount;
 
 /// A create account operation represents a new account creation.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Clone)]
 pub struct CreateAccount {
     account: String,
     funder: String,
@@ -18,12 +18,12 @@ impl CreateAccount {
         }
     }
     /// The public address of a new account that was funded.
-    pub fn account(&self) -> &String {
+    pub fn account<'a>(&'a self) -> &'a str {
         &self.account
     }
 
     /// The public address of the account that funded a new account.
-    pub fn funder(&self) -> &String {
+    pub fn funder<'a>(&'a self) -> &'a str {
         &self.funder
     }
 
