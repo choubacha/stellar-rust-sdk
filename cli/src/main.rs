@@ -5,6 +5,9 @@ extern crate stellar_resources;
 use clap::{App, AppSettings, Arg, SubCommand};
 use stellar_client::{error::Error, sync::Client};
 
+mod pager;
+use pager::Pager;
+
 fn build_app<'a, 'b>() -> App<'a, 'b> {
     App::new("Stellar CLI")
         .version("0.1")
@@ -44,42 +47,48 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                         ),
                 )
                 .subcommand(
-                    SubCommand::with_name("transactions")
-                        .about("Fetch transactions for an account")
-                        .arg(
-                            Arg::with_name("ID")
-                                .required(true)
-                                .help("The identifier of the account to look up"),
-                        ),
+                    Pager::add(
+                        SubCommand::with_name("transactions")
+                            .about("Fetch transactions for an account")
+                            .arg(
+                                Arg::with_name("ID")
+                                    .required(true)
+                                    .help("The identifier of the account to look up"),
+                            )
+                    ),
+
                 ),
         )
         .subcommand(
             SubCommand::with_name("transactions")
                 .about("Access lists of transactions")
                 .setting(AppSettings::SubcommandRequired)
-                .subcommand(SubCommand::with_name("all").about("Fetch all transactions")),
+                .subcommand(Pager::add(SubCommand::with_name("all").about("Fetch all transactions"))
+            ),
         )
         .subcommand(
             SubCommand::with_name("assets")
                 .about("Access lists of assets")
                 .setting(AppSettings::SubcommandRequired)
                 .subcommand(
-                    SubCommand::with_name("all")
-                        .about("Fetch all assets")
-                        .arg(
-                            Arg::with_name("code")
-                                .short("c")
-                                .long("code")
-                                .takes_value(true)
-                                .help("Filters the set by a particular asset code"),
-                        )
-                        .arg(
-                            Arg::with_name("issuer")
-                                .short("i")
-                                .long("issuer")
-                                .takes_value(true)
-                                .help("Filters the set by a particular asset issuer"),
-                        ),
+                    Pager::add(
+                        SubCommand::with_name("all")
+                            .about("Fetch all assets")
+                            .arg(
+                                Arg::with_name("code")
+                                    .short("c")
+                                    .long("code")
+                                    .takes_value(true)
+                                    .help("Filters the set by a particular asset code"),
+                            )
+                            .arg(
+                                Arg::with_name("issuer")
+                                    .short("i")
+                                    .long("issuer")
+                                    .takes_value(true)
+                                    .help("Filters the set by a particular asset issuer"),
+                            )
+                    ),
                 ),
         )
 }
@@ -103,7 +112,7 @@ fn main() {
             _ => return print_help_and_exit(),
         },
         ("transactions", Some(sub_m)) => match sub_m.subcommand() {
-            ("all", Some(_)) => transactions::all(client),
+            ("all", Some(sub_m)) => transactions::all(client, sub_m),
             _ => return print_help_and_exit(),
         },
         ("assets", Some(sub_m)) => match sub_m.subcommand() {
@@ -130,18 +139,6 @@ fn print_help_and_exit() {
     build_app().print_help().expect("Error printing help");
     println!();
     ::std::process::exit(1);
-}
-
-mod utils {
-    /// A tool useful for paginating against the user through stdin
-    pub fn next_page() -> bool {
-        println!("-- press q to quit --");
-        let mut input = String::new();
-        match ::std::io::stdin().read_line(&mut input) {
-            Ok(_) => !input.starts_with("q"),
-            _ => false,
-        }
-    }
 }
 
 mod account;
