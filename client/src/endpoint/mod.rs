@@ -8,6 +8,7 @@ pub mod account;
 pub mod asset;
 pub mod effect;
 pub mod ledger;
+pub mod operation;
 pub mod payment;
 pub mod transaction;
 mod records;
