@@ -131,7 +131,7 @@ mod serialize_amount_tests {
 
 /// The stellar ammount fields are represented as strings in the horizon api,
 /// however, they look like floats. But, in the actual ledger they are signed
-/// 64-bit integers. This function converst what we get from horizon into a
+/// 64-bit integers. This function converts what we get from horizon into a
 /// signed integer. The precision of the float is assumed to be out to 7
 /// digits (but if fewer are found it's ok).
 

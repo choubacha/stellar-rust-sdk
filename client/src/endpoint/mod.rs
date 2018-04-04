@@ -32,11 +32,13 @@ pub mod transaction;
 mod cursor;
 mod limit;
 mod records;
+mod flat_records;
 mod order;
 
 pub use self::cursor::Cursor;
 pub use self::limit::Limit;
 pub use self::records::Records;
+pub use self::flat_records::FlatRecords;
 pub use self::order::{Direction, Order};
 
 /// Represents the body of a request to an IntoRequest.
