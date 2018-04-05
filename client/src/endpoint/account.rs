@@ -1,7 +1,7 @@
 //! Contains endpoints for accessing accounts and related information.
 use error::Result;
 use std::str::FromStr;
-use stellar_resources::{Account, Datum, Effect, Transaction};
+use stellar_resources::{Account, Datum, Effect, Operation, Transaction};
 use super::{Body, Cursor, IntoRequest, Order, Records};
 use http::{Request, Uri};
 
@@ -450,5 +450,170 @@ mod effects_tests {
             .unwrap();
         assert_eq!(req.uri().path(), "/accounts/abc123/effects");
         assert_eq!(req.uri().query(), Some("cursor=CURSOR&order=asc&limit=123"));
+    }
+}
+
+/// Represents the operations for account endpoint on the stellar horizon server.
+/// The endpoint will return all the operations for a single account on the networkd.
+///
+/// <https://www.stellar.org/developers/horizon/reference/endpoints/operations-for-account.html>
+///
+/// ## Example
+/// ```
+/// use stellar_client::sync::Client;
+/// use stellar_client::endpoint::{account, transaction};
+///
+/// let client   = Client::horizon_test().unwrap();
+///
+/// // Grab transactions and associated source account to ensure we query an account
+/// // that has operations. We seek transactions because operations have no guaranteed
+/// // reference to an account but transactions do. And by definition every transaction
+/// // has at least one operation.
+/// let txns = client.request(transaction::All::default().limit(1)).unwrap();
+/// let txn = &txns.records()[0];
+/// let account_id = txn.source_account();
+///
+/// // Now we issue a request for that accounts operations
+/// let endpoint = account::Operations::new(account_id);
+/// let account_operations = client.request(endpoint).unwrap();
+///
+/// assert!(account_operations.records().len() > 0);
+/// ```
+#[derive(Debug, Clone)]
+pub struct Operations {
+    account_id: String,
+    cursor: Option<String>,
+    order: Option<Order>,
+    limit: Option<u32>,
+}
+
+impl Operations {
+    /// Creates a new account::Operations endpoint struct.
+    ///
+    /// ```
+    /// use stellar_client::endpoint::account;
+    ///
+    /// let txns = account::Operations::new("abc123");
+    /// ```
+    pub fn new(account_id: &str) -> Operations {
+        Operations {
+            account_id: account_id.to_string(),
+            cursor: None,
+            order: None,
+            limit: None,
+        }
+    }
+
+    /// Fetches all records in a set order, either ascending or descending.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// use stellar_client::endpoint::{account, Order};
+    ///
+    /// # // Not making requests seeing as the main documentation already does this.
+    /// # // This serves to document the usage while conserving hits to horizon.
+    /// let endpoint = account::Operations::new("abc123").order(Order::Asc);
+    /// ```
+    pub fn order(mut self, order: Order) -> Self {
+        self.order = Some(order);
+        self
+    }
+
+    /// Starts the page of results at a given cursor
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// use stellar_client::endpoint::account;
+    ///
+    /// # // Not making requests seeing as the main documentation already does this.
+    /// # // This serves to document the usage while conserving hits to horizon.
+    /// let endpoint = account::Operations::new("abc123").cursor("cursor");
+    /// ```
+    pub fn cursor(mut self, cursor: &str) -> Self {
+        self.cursor = Some(cursor.to_string());
+        self
+    }
+
+    /// Sets the maximum number of records to return.
+    ///
+    /// ## Example
+    ///
+    /// ```
+    /// use stellar_client::endpoint::account;
+    ///
+    /// # // Not making requests seeing as the main documentation already does this.
+    /// # // This serves to document the usage while conserving hits to horizon.
+    /// let endpoint = account::Operations::new("abc123").limit(15);
+    /// ```
+    pub fn limit(mut self, limit: u32) -> Self {
+        self.limit = Some(limit);
+        self
+    }
+
+    fn has_query(&self) -> bool {
+        self.order.is_some() || self.cursor.is_some() || self.limit.is_some()
+    }
+}
+
+impl IntoRequest for Operations {
+    type Response = Records<Operation>;
+
+    fn into_request(self, host: &str) -> Result<Request<Body>> {
+        let mut uri = format!("{}/accounts/{}/operations", host, self.account_id);
+
+        if self.has_query() {
+            uri.push_str("?");
+
+            if let Some(order) = self.order {
+                uri.push_str(&format!("order={}&", order.to_param()));
+            }
+
+            if let Some(cursor) = self.cursor {
+                uri.push_str(&format!("cursor={}&", cursor));
+            }
+
+            if let Some(limit) = self.limit {
+                uri.push_str(&format!("limit={}", limit));
+            }
+        }
+
+        let uri = Uri::from_str(&uri)?;
+        let request = Request::get(uri).body(Body::None)?;
+        Ok(request)
+    }
+}
+
+impl Cursor<Operation> for Operations {
+    fn cursor(self, cursor: &str) -> Self {
+        self.cursor(cursor)
+    }
+}
+
+#[cfg(test)]
+mod ledger_operations_tests {
+    use super::*;
+
+    #[test]
+    fn it_leaves_off_the_params_if_not_specified() {
+        let ep = Operations::new("abc123");
+        let req = ep.into_request("https://www.google.com").unwrap();
+        assert_eq!(req.uri().path(), "/accounts/abc123/operations");
+        assert_eq!(req.uri().query(), None);
+    }
+
+    #[test]
+    fn it_puts_the_query_params_on_the_uri() {
+        let ep = Operations::new("abc123")
+            .cursor("CURSOR")
+            .limit(123)
+            .order(Order::Desc);
+        let req = ep.into_request("https://www.google.com").unwrap();
+        assert_eq!(req.uri().path(), "/accounts/abc123/operations");
+        assert_eq!(
+            req.uri().query(),
+            Some("order=desc&cursor=CURSOR&limit=123")
+        );
     }
 }

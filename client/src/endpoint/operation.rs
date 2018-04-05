@@ -4,6 +4,8 @@ use std::str::FromStr;
 use stellar_resources::Operation;
 use super::{Body, IntoRequest, Order, Records};
 use http::{Request, Uri};
+
+pub use super::account::Operations as ForAccount;
 pub use super::ledger::Operations as ForLedger;
 
 /// This endpoint represents all operations that have resulted from successful transactions in Stellar.
