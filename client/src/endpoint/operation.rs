@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::Operation;
-use super::{Body, IntoRequest, Order, Records};
+use super::{Body, Cursor, IntoRequest, Order, Records};
 use http::{Request, Uri};
 
 pub use super::account::Operations as ForAccount;
@@ -24,7 +24,7 @@ pub use super::ledger::Operations as ForLedger;
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Clone)]
 pub struct All {
     cursor: Option<String>,
     order: Option<Order>,
@@ -37,14 +37,9 @@ impl All {
     /// ## Example
     ///
     /// ```
-    /// # use stellar_client::sync::Client;
-    /// # use stellar_client::endpoint::{operation, Order};
-    /// #
-    /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = operation::All::default().order(Order::Asc);
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert!(records.records().len() > 0);
+    /// use stellar_client::endpoint::{operation, Order};
+    ///
+    /// let endpoint = operation::All::default().order(Order::Asc);
     /// ```
     pub fn order(mut self, order: Order) -> Self {
         self.order = Some(order);
@@ -56,21 +51,9 @@ impl All {
     /// ## Example
     ///
     /// ```
-    /// # use stellar_client::sync::Client;
-    /// # use stellar_client::endpoint::operation;
-    /// #
-    /// let client      = Client::horizon_test().unwrap();
-    /// #
-    /// # // grab first page and extract cursor
-    /// # let endpoint      = operation::All::default().limit(1);
-    /// # let first_page    = client.request(endpoint).unwrap();
-    /// # let cursor        = first_page.next_cursor();
-    /// #
-    /// let endpoint    = operation::All::default().cursor(cursor).limit(1);
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert!(records.records().len() > 0);
-    /// # assert_ne!(records.next_cursor(), cursor);
+    /// use stellar_client::endpoint::operation;
+    ///
+    /// let endpoint = operation::All::default().cursor("CURSOR").limit(1);
     /// ```
     pub fn cursor(mut self, cursor: &str) -> Self {
         self.cursor = Some(cursor.to_string());
@@ -82,14 +65,9 @@ impl All {
     /// ## Example
     ///
     /// ```
-    /// # use stellar_client::sync::Client;
-    /// # use stellar_client::endpoint::operation;
-    /// #
-    /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = operation::All::default().limit(3);
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert_eq!(records.records().len(), 3);
+    /// use stellar_client::endpoint::operation;
+    ///
+    /// let endpoint = operation::All::default().limit(3);
     /// ```
     pub fn limit(mut self, limit: u32) -> Self {
         self.limit = Some(limit);
@@ -129,6 +107,12 @@ impl IntoRequest for All {
     }
 }
 
+impl Cursor<Operation> for All {
+    fn cursor(self, cursor: &str) -> Self {
+        self.cursor(cursor)
+    }
+}
+
 #[cfg(test)]
 mod all_operationss_tests {
     use super::*;
@@ -153,5 +137,74 @@ mod all_operationss_tests {
             req.uri().query(),
             Some("order=desc&cursor=CURSOR&limit=123")
         );
+    }
+}
+
+/// The operation details endpoint provides information on a single operation. The operation ID
+/// provided in the id argument specifies which operation to load.
+///
+/// <https://www.stellar.org/developers/horizon/reference/endpoints/operations-single.html>
+///
+/// ## Example
+///
+/// ```
+/// use stellar_client::sync::Client;
+/// use stellar_client::endpoint::operation;
+///
+/// let client = Client::horizon_test().unwrap();
+///
+/// // Grab an operation so that we know that we can request one from
+/// // horizon that actually exists.
+/// let all = operation::All::default().limit(1);
+/// let all = client.request(all).unwrap();
+///
+/// let operation_id = all.records()[0].id();
+///
+/// let details = operation::Details::new(operation_id);
+/// let operation = client.request(details).unwrap();
+///
+/// assert_eq!(operation.id(), operation_id);
+/// ```
+#[derive(Debug, Clone, Copy)]
+pub struct Details {
+    id: i64,
+}
+
+impl Details {
+    /// Creates a new endpoint struct for use in requesting details about
+    /// an operation.
+    ///
+    /// ## Example
+    /// ```
+    /// use stellar_client::endpoint::operation;
+    ///
+    /// let details = operation::Details::new(123);
+    /// ```
+    pub fn new(id: i64) -> Details {
+        Details { id }
+    }
+}
+
+impl IntoRequest for Details {
+    type Response = Operation;
+
+    fn into_request(self, host: &str) -> Result<Request<Body>> {
+        let uri = format!("{}/operations/{}", host, self.id);
+        let uri = Uri::from_str(&uri)?;
+        let request = Request::get(uri).body(Body::None)?;
+        Ok(request)
+    }
+}
+
+#[cfg(test)]
+mod operation_details_tests {
+    use super::*;
+
+    #[test]
+    fn it_builds_a_uri_without_params() {
+        let ep = Details::new(123);
+        let req = ep.into_request("https://www.google.com").unwrap();
+        assert_eq!(req.uri().path(), "/operations/123");
+        assert_eq!(req.uri().query(), None);
     }
 }
