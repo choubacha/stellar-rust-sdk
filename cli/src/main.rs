@@ -1,3 +1,5 @@
+#![deny(warnings)]
+//! A basic CLI for interactions with the stellar network.
 extern crate clap;
 extern crate stellar_client;
 extern crate stellar_resources;
@@ -6,9 +8,16 @@ use clap::{App, AppSettings, Arg, SubCommand};
 use stellar_client::{error::Error, sync::Client};
 
 mod pager;
+mod ordering;
 use pager::Pager;
 
 fn build_app<'a, 'b>() -> App<'a, 'b> {
+    macro_rules! listable {
+        ($e:expr) => {
+            Pager::add(ordering::add($e))
+        }
+    }
+
     App::new("Stellar CLI")
         .version("0.1")
         .about("Access the stellar horizon API via the command line.")
@@ -47,7 +56,7 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                         ),
                 )
                 .subcommand(
-                    Pager::add(
+                    listable!(
                         SubCommand::with_name("transactions")
                             .about("Fetch transactions for an account")
                             .arg(
@@ -63,7 +72,7 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
             SubCommand::with_name("transactions")
                 .about("Access lists of transactions")
                 .setting(AppSettings::SubcommandRequired)
-                .subcommand(Pager::add(SubCommand::with_name("all").about("Fetch all transactions"))
+                .subcommand(listable!(SubCommand::with_name("all").about("Fetch all transactions"))
             ),
         )
         .subcommand(
@@ -71,7 +80,7 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                 .about("Access lists of assets")
                 .setting(AppSettings::SubcommandRequired)
                 .subcommand(
-                    Pager::add(
+                    listable!(
                         SubCommand::with_name("all")
                             .about("Fetch all assets")
                             .arg(

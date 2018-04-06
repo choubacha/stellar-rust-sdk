@@ -108,7 +108,7 @@ impl IntoRequest for All {
             uri.push_str("?");
 
             if let Some(order) = self.order {
-                uri.push_str(&format!("order={}&", order.to_param()));
+                uri.push_str(&format!("order={}&", order.to_string()));
             }
 
             if let Some(cursor) = self.cursor {
@@ -335,7 +335,7 @@ impl IntoRequest for Payments {
             uri.push_str("?");
 
             if let Some(order) = self.order {
-                uri.push_str(&format!("order={}&", order.to_param()));
+                uri.push_str(&format!("order={}&", order.to_string()));
             }
 
             if let Some(cursor) = self.cursor {
@@ -497,7 +497,7 @@ impl IntoRequest for Transactions {
             uri.push_str("?");
 
             if let Some(order) = self.order {
-                uri.push_str(&format!("order={}&", order.to_param()));
+                uri.push_str(&format!("order={}&", order.to_string()));
             }
 
             if let Some(cursor) = self.cursor {
@@ -661,7 +661,7 @@ impl IntoRequest for Effects {
             uri.push_str("?");
 
             if let Some(order) = self.order {
-                uri.push_str(&format!("order={}&", order.to_param()));
+                uri.push_str(&format!("order={}&", order.to_string()));
             }
 
             if let Some(cursor) = self.cursor {
@@ -824,7 +824,7 @@ impl IntoRequest for Operations {
             uri.push_str("?");
 
             if let Some(order) = self.order {
-                uri.push_str(&format!("order={}&", order.to_param()));
+                uri.push_str(&format!("order={}&", order.to_string()));
             }
 
             if let Some(cursor) = self.cursor {

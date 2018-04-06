@@ -110,7 +110,7 @@ impl IntoRequest for All {
             uri.push_str("?");
 
             if let Some(order) = self.order {
-                uri.push_str(&format!("order={}&", order.to_param()));
+                uri.push_str(&format!("order={}&", order.to_string()));
             }
 
             if let Some(cursor) = self.cursor {

@@ -1,6 +1,6 @@
 use clap::ArgMatches;
-use stellar_client::{sync, endpoint::{account, Order}, error::Result, sync::Client};
-use super::pager::Pager;
+use stellar_client::{sync, endpoint::account, error::Result, sync::Client};
+use super::{ordering, pager::Pager};
 
 pub fn details<'a>(client: Client, matches: &'a ArgMatches) -> Result<()> {
     let id = matches.value_of("ID").expect("ID is required");
@@ -18,7 +18,7 @@ pub fn transactions<'a>(client: Client, matches: &'a ArgMatches) -> Result<()> {
 
     let id = matches.value_of("ID").expect("ID is required");
     let endpoint = account::Transactions::new(id)
-        .order(Order::Desc)
+        .order(ordering::from_arg(matches))
         .limit(pager.horizon_page_limit() as u32);
     let iter = sync::Iter::new(&client, endpoint);
 

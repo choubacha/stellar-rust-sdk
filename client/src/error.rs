@@ -28,7 +28,7 @@ pub enum Error {
     /// An error occurred while parsing the json
     ///
     /// <https://docs.serde.rs/serde_json/error/struct.Error.html>
-    ParseError(serde_json::error::Error),
+    JsonParseError(serde_json::error::Error),
     /// Catch-all for reqwest error handling
     Reqwest(reqwest::Error),
     #[doc(hidden)]
@@ -45,7 +45,7 @@ impl StdError for Error {
             Error::BadSSL => "Unable to resolve tls",
             Error::Http(ref inner) => inner.description(),
             Error::Reqwest(ref inner) => inner.description(),
-            Error::ParseError(ref inner) => inner.description(),
+            Error::JsonParseError(ref inner) => inner.description(),
             Error::BadResponse(ref inner) => inner.description(),
             Error::ServerError => "An unknown error on the server has occurred",
             Error::__Nonexhaustive => unreachable!(),
@@ -97,7 +97,7 @@ impl From<reqwest::Error> for Error {
 
 impl From<serde_json::error::Error> for Error {
     fn from(inner: serde_json::error::Error) -> Self {
-        Error::ParseError(inner)
+        Error::JsonParseError(inner)
     }
 }
 
