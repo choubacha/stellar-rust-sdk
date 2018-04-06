@@ -115,7 +115,7 @@ impl IntoRequest for All {
             }
 
             if let Some(order) = self.order {
-                uri.push_str(&format!("order={}&", order.to_param()));
+                uri.push_str(&format!("order={}&", order.to_string()));
             }
 
             if let Some(limit) = self.limit {
@@ -358,7 +358,7 @@ impl IntoRequest for Payments {
             }
 
             if let Some(order) = self.order {
-                uri.push_str(&format!("order={}&", order.to_param()));
+                uri.push_str(&format!("order={}&", order.to_string()));
             }
 
             if let Some(limit) = self.limit {

@@ -33,7 +33,7 @@ pub trait IntoRequest {
 }
 
 /// The order to return results in.
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Order {
     /// Order the results ascending
     Asc,
@@ -41,11 +41,24 @@ pub enum Order {
     Desc,
 }
 
-impl Order {
-    pub(crate) fn to_param(&self) -> String {
+use std::string::ToString;
+
+impl ToString for Order {
+    fn to_string(&self) -> String {
         match *self {
             Order::Asc => "asc".to_string(),
             Order::Desc => "desc".to_string(),
         }
+    }
+}
+
+#[cfg(test)]
+mod order_tests {
+    use super::*;
+
+    #[test]
+    fn it_can_become_a_string() {
+        assert_eq!(Order::Asc.to_string(), "asc");
+        assert_eq!(Order::Desc.to_string(), "desc");
     }
 }
