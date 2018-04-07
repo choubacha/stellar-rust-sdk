@@ -1,4 +1,6 @@
 #![deny(warnings, missing_docs, missing_debug_implementations)]
+//! # Stellar Client
+//!
 //! Client implementation to the stellar horizon api.
 
 extern crate futures;

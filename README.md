@@ -14,14 +14,20 @@ they can be built together and tested at once.
 ## Resources
 
 The resources crate documents all the various data types in horizon. These resources
-are fully documented and can be deserialized from the client.
+are fully documented and can be deserialized from the client. There are many resources
+in the horizon API and you can read about all of them [here](https://www.stellar.org/developers/horizon/reference/index.html).
+
+They are deserialized into types that we think will make using them inside other rust applications
+easier.
 
 ## Client
 
 The client provides two interfaces. One is the synchronous client and the other is
 the asynchronous client. Both consume an IntoRequest trait and will return the appropriate
 response associated with the endpoint implementation. You should see the documentation
-associated with the code itself but below is a brief example
+associated with the code itself since there are active doctests available for all endpoints.
+However, the general gist is that the developer should create an endpoint and then exchange
+that endpoint for a response from the client:
 
 ```rust
 use stellar_client::sync::Client;
@@ -46,6 +52,9 @@ You can then use it with:
 ```
 stellar --help
 ```
+
+The CLI is most useful for easily perusing horizon/stellar data without needing to construct
+curl commands. It is also a working example of how the stellar SDK can be consumed and used.
 
 ## Testing
 
@@ -85,7 +94,7 @@ on how to contribute to our repo!
 
 - [x] Implement all resources
 - [x] Synchronous client
-- [ ] Asynchronous client
+- [ ] Asynchronous client (waiting stabilization of hyper)
 - [ ] Implement all endpoints to horizon
 - [ ] Implement complete CLI to request data from horizon
 - [ ] Implement informational CLI
