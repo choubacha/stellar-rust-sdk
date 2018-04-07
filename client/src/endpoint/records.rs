@@ -1,13 +1,9 @@
 use http;
 use serde::de::{Deserialize, DeserializeOwned, Deserializer};
-use super::IntoRequest;
 use std;
 
 /// Declares that this endpoint has a cursor and can have it set.
-pub trait Cursor<T>: IntoRequest<Response = Records<T>>
-where
-    T: DeserializeOwned,
-{
+pub trait Cursor {
     /// Sets a cursor on the endpoint.
     fn cursor(self, cursor: &str) -> Self;
 }

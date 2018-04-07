@@ -107,7 +107,7 @@ impl IntoRequest for All {
     }
 }
 
-impl Cursor<Operation> for All {
+impl Cursor for All {
     fn cursor(self, cursor: &str) -> Self {
         self.cursor(cursor)
     }

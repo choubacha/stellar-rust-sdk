@@ -199,7 +199,7 @@ impl Transactions {
     }
 }
 
-impl Cursor<Transaction> for Transactions {
+impl Cursor for Transactions {
     fn cursor(self, cursor: &str) -> Self {
         self.cursor(cursor)
     }
@@ -585,7 +585,7 @@ impl IntoRequest for Operations {
     }
 }
 
-impl Cursor<Operation> for Operations {
+impl Cursor for Operations {
     fn cursor(self, cursor: &str) -> Self {
         self.cursor(cursor)
     }
