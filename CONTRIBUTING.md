@@ -40,7 +40,10 @@ We run the tests on Travis currently, and they need to pass in order to merge:
 #### Doctests
 
 Doctests should provide usage demonstrations and we should hide aspects of the usage that doesn't
-provide clarity to users.
+provide clarity to users. It's a good idea to provide at least one "meaty" example per struct or
+module. This provides solid context to new developers that are just beginning to read and
+understand how the SDK works. However, for subsequent function documentation, only a light-weight
+example is needed.
 
 #### Unit Tests
 

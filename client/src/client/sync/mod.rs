@@ -1,4 +1,17 @@
-//! This module contains the client for synchronous communcation.
+//! This module contains the client for synchronous communcation. A synchronous
+//! client is one that will block the calling thread until a response has been
+//! returned. It requires that the caller passes it a struct that implements
+//! the `IntoRequest` trait.
+//!
+//! There are a few convenience functions for connecting to the horizon test
+//! and public net. However, most times, if you are running in production, you'll
+//! specify your own horizon server url.
+//!
+//! ```
+//! use stellar_client::sync::Client;
+//!
+//! let client = Client::new("https://horizon-testnet.stellar.org").unwrap();
+//! ```
 
 use reqwest;
 use http::{self, Uri};

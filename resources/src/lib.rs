@@ -1,4 +1,6 @@
 #![deny(warnings, missing_docs, missing_debug_implementations)]
+//! # Stellar Resources
+//!
 //! Defines the basic resources of stellar's horizon end points and
 //! implements their serialization.
 
