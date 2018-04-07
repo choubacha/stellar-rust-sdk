@@ -1,6 +1,6 @@
 use stellar_client::{endpoint::asset, error::Result, sync::{self, Client}};
 use clap::ArgMatches;
-use super::{ordering, pager::Pager};
+use super::{cursor, ordering, pager::Pager};
 
 /// Using a client and the arguments from the command line, iterates over the results
 /// and displays them to the end user.
@@ -13,13 +13,12 @@ pub fn all<'a>(client: Client, matches: &'a ArgMatches) -> Result<()> {
             .limit(pager.horizon_page_limit() as u32);
 
         if let Some(code) = matches.value_of("code") {
-            endpoint = endpoint.asset_code(code)
+            endpoint = endpoint.asset_code(code);
         }
         if let Some(issuer) = matches.value_of("issuer") {
-            endpoint = endpoint.asset_issuer(issuer)
+            endpoint = endpoint.asset_issuer(issuer);
         }
-
-        endpoint
+        cursor::assign_from_arg(matches, endpoint)
     };
     let iter = sync::Iter::new(&client, endpoint);
 
