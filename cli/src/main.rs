@@ -9,12 +9,17 @@ use stellar_client::{error::Error, sync::Client};
 
 mod pager;
 mod ordering;
+mod cursor;
 use pager::Pager;
 
 fn build_app<'a, 'b>() -> App<'a, 'b> {
     macro_rules! listable {
         ($e:expr) => {
-            Pager::add(ordering::add($e))
+            Pager::add(
+                ordering::add(
+                    cursor::add($e)
+                )
+            )
         }
     }
 
