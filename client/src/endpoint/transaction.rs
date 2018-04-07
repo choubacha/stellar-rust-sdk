@@ -129,7 +129,7 @@ impl IntoRequest for All {
     }
 }
 
-impl Cursor<Transaction> for All {
+impl Cursor for All {
     fn cursor(self, cursor: &str) -> Self {
         self.cursor(cursor)
     }
@@ -372,7 +372,7 @@ impl IntoRequest for Payments {
     }
 }
 
-impl Cursor<Operation> for Payments {
+impl Cursor for Payments {
     fn cursor(self, cursor: &str) -> Payments {
         self.cursor(cursor)
     }

@@ -145,7 +145,7 @@ impl All {
     }
 }
 
-impl Cursor<Asset> for All {
+impl Cursor for All {
     fn cursor(self, cursor: &str) -> Self {
         self.cursor(cursor)
     }

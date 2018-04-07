@@ -21,7 +21,7 @@ use error::Result;
 #[derive(Debug)]
 pub struct Iter<'a, T, E>
 where
-    E: IntoRequest<Response = Records<T>> + Clone + Cursor<T>,
+    E: IntoRequest<Response = Records<T>> + Clone + Cursor,
     T: DeserializeOwned + Clone,
 {
     client: &'a Client,
@@ -33,7 +33,7 @@ where
 
 impl<'a, T, E> Iter<'a, T, E>
 where
-    E: IntoRequest<Response = Records<T>> + Clone + Cursor<T>,
+    E: IntoRequest<Response = Records<T>> + Clone + Cursor,
     T: DeserializeOwned + Clone,
 {
     /// Creates a new iterator for the client and endpoint.
@@ -72,7 +72,7 @@ where
 
 impl<'a, T, E> Iterator for Iter<'a, T, E>
 where
-    E: IntoRequest<Response = Records<T>> + Clone + Cursor<T>,
+    E: IntoRequest<Response = Records<T>> + Clone + Cursor,
     T: DeserializeOwned + Clone,
 {
     type Item = Result<T>;

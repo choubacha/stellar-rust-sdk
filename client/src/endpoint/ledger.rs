@@ -126,7 +126,7 @@ impl IntoRequest for All {
     }
 }
 
-impl Cursor<Ledger> for All {
+impl Cursor for All {
     fn cursor(self, cursor: &str) -> Self {
         self.cursor(cursor)
     }
@@ -353,7 +353,7 @@ impl IntoRequest for Payments {
     }
 }
 
-impl Cursor<Operation> for Payments {
+impl Cursor for Payments {
     fn cursor(self, cursor: &str) -> Self {
         self.cursor(cursor)
     }
@@ -515,7 +515,7 @@ impl IntoRequest for Transactions {
     }
 }
 
-impl Cursor<Transaction> for Transactions {
+impl Cursor for Transactions {
     fn cursor(self, cursor: &str) -> Self {
         self.cursor(cursor)
     }
@@ -679,7 +679,7 @@ impl IntoRequest for Effects {
     }
 }
 
-impl Cursor<Effect> for Effects {
+impl Cursor for Effects {
     fn cursor(self, cursor: &str) -> Self {
         self.cursor(cursor)
     }
@@ -842,7 +842,7 @@ impl IntoRequest for Operations {
     }
 }
 
-impl Cursor<Operation> for Operations {
+impl Cursor for Operations {
     fn cursor(self, cursor: &str) -> Self {
         self.cursor(cursor)
     }
