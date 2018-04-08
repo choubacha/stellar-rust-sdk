@@ -1,7 +1,7 @@
 //! Contains endpoints for accessing accounts and related information.
 use error::Result;
 use std::str::FromStr;
-use stellar_resources::{Account, Datum, Effect, Operation, Transaction};
+use stellar_resources::{Account, Datum, Effect, Offer, Operation, Transaction};
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 
@@ -596,6 +596,117 @@ mod payments_tests {
             .with_limit(123);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/accounts/abc123/payments");
+        assert_eq!(
+            req.uri().query(),
+            Some("cursor=CURSOR&order=desc&limit=123")
+        );
+    }
+}
+
+/// Represents the offers for account endpoint on the stellar horizon server.
+/// The endpoint will return all the Offers that a specific account makes.
+///
+/// <https://www.stellar.org/developers/horizon/reference/endpoints/offers-for-account.html>
+///
+/// ## Example
+/// ```
+/// use stellar_client::sync::Client;
+/// use stellar_client::endpoint::{account, trades, Limit};
+///
+/// let client = Client::horizon_test().unwrap();
+///
+/// // Grab trades and associated base account to ensure an account with offers
+/// let trades      = client.request(trades::All::default().with_limit(1)).unwrap();
+/// let trade       = &trades.records()[0];
+/// let account_id  = trade.base_account();
+///
+/// // Now we issue a request for that account's offers
+/// let endpoint = account::Offers::new(account_id);
+/// let offers   = client.request(endpoint).unwrap();
+///
+/// assert!(offers.records().len() > 0);
+/// ```
+#[derive(Debug, Clone, Cursor, Limit, Order)]
+pub struct Offers {
+    account_id: String,
+    cursor: Option<String>,
+    order: Option<Direction>,
+    limit: Option<u32>,
+}
+
+impl Offers {
+    /// Creates a new account::Offers endpoint struct. Hand this to the client in order to
+    /// request offers made by a specific account.
+    ///
+    /// ```
+    /// use stellar_client::endpoint::account;
+    ///
+    /// let offers = account::Offers::new("abc123");
+    /// ```
+    pub fn new(account_id: &str) -> Self {
+        Self {
+            account_id: account_id.to_string(),
+            cursor: None,
+            order: None,
+            limit: None,
+        }
+    }
+
+    fn has_query(&self) -> bool {
+        self.order.is_some() || self.cursor.is_some() || self.limit.is_some()
+    }
+}
+
+impl IntoRequest for Offers {
+    type Response = Records<Offer>;
+
+    fn into_request(self, host: &str) -> Result<Request<Body>> {
+        let mut uri = format!("{}/accounts/{}/offers", host, self.account_id);
+        if self.has_query() {
+            uri.push_str("?");
+
+            if let Some(cursor) = self.cursor {
+                uri.push_str(&format!("cursor={}&", cursor));
+            }
+
+            if let Some(order) = self.order {
+                uri.push_str(&format!("order={}&", order.to_string()));
+            }
+
+            if let Some(limit) = self.limit {
+                uri.push_str(&format!("limit={}", limit));
+            }
+        }
+
+        let uri = Uri::from_str(&uri)?;
+        let request = Request::get(uri).body(Body::None)?;
+        Ok(request)
+    }
+}
+
+#[cfg(test)]
+mod offers_tests {
+    use super::*;
+
+    #[test]
+    fn it_can_make_an_offers_uri() {
+        let payments = Offers::new("abc123");
+        let request = payments
+            .into_request("https://horizon-testnet.stellar.org")
+            .unwrap();
+        assert_eq!(request.uri().host().unwrap(), "horizon-testnet.stellar.org");
+        assert_eq!(request.uri().path(), "/accounts/abc123/offers");
+        assert_eq!(request.uri().query(), None);
+    }
+
+    #[test]
+    fn it_puts_the_query_params_on_the_uri() {
+        let ep = Offers::new("abc123")
+            .with_cursor("CURSOR")
+            .with_order(Direction::Desc)
+            .with_limit(123);
+        let req = ep.into_request("https://www.google.com").unwrap();
+        assert_eq!(req.uri().path(), "/accounts/abc123/offers");
         assert_eq!(
             req.uri().query(),
             Some("cursor=CURSOR&order=desc&limit=123")
