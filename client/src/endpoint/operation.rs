@@ -25,7 +25,7 @@ pub use super::transaction::Operations as ForTransaction;
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Cursor)]
 pub struct All {
     cursor: Option<String>,
     order: Option<Order>,
@@ -44,20 +44,6 @@ impl All {
     /// ```
     pub fn order(mut self, order: Order) -> Self {
         self.order = Some(order);
-        self
-    }
-
-    /// Starts the page of results at a given cursor
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::operation;
-    ///
-    /// let endpoint = operation::All::default().cursor("CURSOR").limit(1);
-    /// ```
-    pub fn cursor(mut self, cursor: &str) -> Self {
-        self.cursor = Some(cursor.to_string());
         self
     }
 
@@ -105,12 +91,6 @@ impl IntoRequest for All {
         let uri = Uri::from_str(&uri)?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
-    }
-}
-
-impl Cursor for All {
-    fn cursor(self, cursor: &str) -> Self {
-        self.cursor(cursor)
     }
 }
 

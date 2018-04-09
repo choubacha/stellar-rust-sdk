@@ -22,7 +22,7 @@ use http::{Request, Uri};
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Cursor)]
 pub struct All {
     code: Option<String>,
     issuer: Option<String>,
@@ -113,41 +113,9 @@ impl All {
         self
     }
 
-    /// Starts the page of results at a given cursor
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::asset;
-    ///
-    /// let client      = Client::horizon_test().unwrap();
-    /// #
-    /// # // grab first page and extract cursor
-    /// # let endpoint      = asset::All::default();
-    /// # let first_page    = client.request(endpoint).unwrap();
-    /// # let cursor        = first_page.next_cursor();
-    /// #
-    /// let endpoint    = asset::All::default().cursor(cursor);
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert!(records.records().len() > 0);
-    /// # assert_ne!(records.next_cursor(), cursor);
-    /// ```
-    pub fn cursor(mut self, cursor: &str) -> Self {
-        self.cursor = Some(cursor.to_string());
-        self
-    }
-
     fn has_query(&self) -> bool {
         self.code.is_some() || self.issuer.is_some() || self.order.is_some()
             || self.cursor.is_some() || self.limit.is_some()
-    }
-}
-
-impl Cursor for All {
-    fn cursor(self, cursor: &str) -> Self {
-        self.cursor(cursor)
     }
 }
 

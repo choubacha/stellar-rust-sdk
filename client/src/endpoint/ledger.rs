@@ -21,7 +21,7 @@ use http::{Request, Uri};
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Cursor)]
 pub struct All {
     cursor: Option<String>,
     order: Option<Order>,
@@ -45,32 +45,6 @@ impl All {
     /// ```
     pub fn order(mut self, order: Order) -> Self {
         self.order = Some(order);
-        self
-    }
-
-    /// Starts the page of results at a given cursor
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// # use stellar_client::sync::Client;
-    /// # use stellar_client::endpoint::ledger;
-    /// #
-    /// let client      = Client::horizon_test().unwrap();
-    /// #
-    /// # // grab first page and extract cursor
-    /// # let endpoint      = ledger::All::default();
-    /// # let first_page    = client.request(endpoint).unwrap();
-    /// # let cursor        = first_page.next_cursor();
-    /// #
-    /// let endpoint    = ledger::All::default().cursor(cursor);
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert!(records.records().len() > 0);
-    /// # assert_ne!(records.next_cursor(), cursor);
-    /// ```
-    pub fn cursor(mut self, cursor: &str) -> Self {
-        self.cursor = Some(cursor.to_string());
         self
     }
 
@@ -123,12 +97,6 @@ impl IntoRequest for All {
         let uri = Uri::from_str(&uri)?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
-    }
-}
-
-impl Cursor for All {
-    fn cursor(self, cursor: &str) -> Self {
-        self.cursor(cursor)
     }
 }
 
@@ -247,7 +215,7 @@ mod ledger_details_tests {
 ///
 /// assert!(payments.records().len() > 0);
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Cursor)]
 pub struct Payments {
     sequence: u32,
     cursor: Option<String>,
@@ -285,22 +253,6 @@ impl Payments {
     /// ```
     pub fn order(mut self, order: Order) -> Self {
         self.order = Some(order);
-        self
-    }
-
-    /// Starts the page of results at a given cursor
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::ledger;
-    ///
-    /// # // Not making requests seeing as the main documentation has it.
-    /// # // This is just to document the usage and conserve hits to horizon.
-    /// let endpoint = ledger::Payments::new(123).cursor("cursor");
-    /// ```
-    pub fn cursor(mut self, cursor: &str) -> Self {
-        self.cursor = Some(cursor.to_string());
         self
     }
 
@@ -350,12 +302,6 @@ impl IntoRequest for Payments {
         let uri = Uri::from_str(&uri)?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
-    }
-}
-
-impl Cursor for Payments {
-    fn cursor(self, cursor: &str) -> Self {
-        self.cursor(cursor)
     }
 }
 
@@ -409,7 +355,7 @@ mod ledger_payments_tests {
 ///
 /// assert!(ledger_txns.records().len() > 0);
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Cursor)]
 pub struct Transactions {
     sequence: u32,
     cursor: Option<String>,
@@ -447,22 +393,6 @@ impl Transactions {
     /// ```
     pub fn order(mut self, order: Order) -> Self {
         self.order = Some(order);
-        self
-    }
-
-    /// Starts the page of results at a given cursor
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::ledger;
-    ///
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = ledger::Transactions::new(123).cursor("cursor");
-    /// ```
-    pub fn cursor(mut self, cursor: &str) -> Self {
-        self.cursor = Some(cursor.to_string());
         self
     }
 
@@ -512,12 +442,6 @@ impl IntoRequest for Transactions {
         let uri = Uri::from_str(&uri)?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
-    }
-}
-
-impl Cursor for Transactions {
-    fn cursor(self, cursor: &str) -> Self {
-        self.cursor(cursor)
     }
 }
 
@@ -573,7 +497,7 @@ mod ledger_transactions_tests {
 ///
 /// assert!(ledger_effects.records().len() > 0);
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Cursor)]
 pub struct Effects {
     sequence: u32,
     cursor: Option<String>,
@@ -611,22 +535,6 @@ impl Effects {
     /// ```
     pub fn order(mut self, order: Order) -> Self {
         self.order = Some(order);
-        self
-    }
-
-    /// Starts the page of results at a given cursor
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::ledger;
-    ///
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = ledger::Effects::new(123).cursor("cursor");
-    /// ```
-    pub fn cursor(mut self, cursor: &str) -> Self {
-        self.cursor = Some(cursor.to_string());
         self
     }
 
@@ -676,12 +584,6 @@ impl IntoRequest for Effects {
         let uri = Uri::from_str(&uri)?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
-    }
-}
-
-impl Cursor for Effects {
-    fn cursor(self, cursor: &str) -> Self {
-        self.cursor(cursor)
     }
 }
 
@@ -737,7 +639,7 @@ mod ledger_effects_tests {
 ///
 /// assert!(ledger_operations.records().len() > 0);
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Cursor)]
 pub struct Operations {
     sequence: u32,
     cursor: Option<String>,
@@ -778,22 +680,6 @@ impl Operations {
         self
     }
 
-    /// Starts the page of results at a given cursor
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::ledger;
-    ///
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = ledger::Operations::new(123).cursor("cursor");
-    /// ```
-    pub fn cursor(mut self, cursor: &str) -> Self {
-        self.cursor = Some(cursor.to_string());
-        self
-    }
-
     /// Sets the maximum number of records to return.
     ///
     /// ## Example
@@ -814,6 +700,7 @@ impl Operations {
         self.order.is_some() || self.cursor.is_some() || self.limit.is_some()
     }
 }
+
 impl IntoRequest for Operations {
     type Response = Records<Operation>;
 
@@ -839,12 +726,6 @@ impl IntoRequest for Operations {
         let uri = Uri::from_str(&uri)?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
-    }
-}
-
-impl Cursor for Operations {
-    fn cursor(self, cursor: &str) -> Self {
-        self.cursor(cursor)
     }
 }
 
