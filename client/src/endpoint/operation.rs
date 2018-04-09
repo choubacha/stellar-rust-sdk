@@ -7,6 +7,7 @@ use http::{Request, Uri};
 
 pub use super::account::Operations as ForAccount;
 pub use super::ledger::Operations as ForLedger;
+pub use super::transaction::Operations as ForTransaction;
 
 /// This endpoint represents all operations that have resulted from successful transactions in Stellar.
 /// The endpoint will return all operations and accepts query params for a cursor, order, and limit.
