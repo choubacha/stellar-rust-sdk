@@ -429,11 +429,11 @@ impl IntoRequest for Effects {
     }
 }
 
-// impl Cursor<Effect> for Effects {
-//     fn cursor(self, cursor: &str) -> Self {
-//         self.cursor(cursor)
-//     }
-// }
+impl Cursor<Effect> for Effects {
+    fn cursor(self, cursor: &str) -> Self {
+        self.cursor(cursor)
+    }
+}
 
 #[cfg(test)]
 mod effects_tests {
