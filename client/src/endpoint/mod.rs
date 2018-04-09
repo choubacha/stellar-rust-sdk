@@ -29,8 +29,10 @@ pub mod operation;
 pub mod payment;
 pub mod transaction;
 mod records;
+mod cursor;
 
-pub use self::records::{Cursor, Records};
+pub use self::records::Records;
+pub use self::cursor::Cursor;
 
 /// Represents the body of a request to an IntoRequest.
 #[derive(Debug)]

@@ -155,7 +155,7 @@ mod details_tests {
 ///
 /// assert!(acct_txns.records().len() > 0);
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Cursor)]
 pub struct Transactions {
     id: String,
     cursor: Option<String>,
@@ -179,21 +179,6 @@ impl Transactions {
             order: None,
             limit: None,
         }
-    }
-
-    /// Starts the page of results at a given cursor
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::account;
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = account::Transactions::new("abc123").cursor("cursor");
-    /// ```
-    pub fn cursor(mut self, cursor: &str) -> Self {
-        self.cursor = Some(cursor.to_string());
-        self
     }
 
     /// Sets the maximum number of records to return.
@@ -228,12 +213,6 @@ impl Transactions {
 
     fn has_query(&self) -> bool {
         self.order.is_some() || self.cursor.is_some() || self.limit.is_some()
-    }
-}
-
-impl Cursor for Transactions {
-    fn cursor(self, cursor: &str) -> Self {
-        self.cursor(cursor)
     }
 }
 
@@ -327,7 +306,7 @@ mod transactions_tests {
 ///
 /// assert!(effects.records().len() > 0);
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Cursor)]
 pub struct Effects {
     id: String,
     cursor: Option<String>,
@@ -351,20 +330,6 @@ impl Effects {
             order: None,
             limit: None,
         }
-    }
-    /// Starts the page of results at a given cursor
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::account;
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = account::Effects::new("abc123").cursor("cursor");
-    /// ```
-    pub fn cursor(mut self, cursor: &str) -> Self {
-        self.cursor = Some(cursor.to_string());
-        self
     }
 
     /// Sets the maximum number of records to return.
@@ -429,12 +394,6 @@ impl IntoRequest for Effects {
     }
 }
 
-// impl Cursor<Effect> for Effects {
-//     fn cursor(self, cursor: &str) -> Self {
-//         self.cursor(cursor)
-//     }
-// }
-
 #[cfg(test)]
 mod effects_tests {
     use super::*;
@@ -498,7 +457,7 @@ mod effects_tests {
 ///
 /// assert!(account_operations.records().len() > 0);
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Cursor)]
 pub struct Operations {
     account_id: String,
     cursor: Option<String>,
@@ -536,22 +495,6 @@ impl Operations {
     /// ```
     pub fn order(mut self, order: Order) -> Self {
         self.order = Some(order);
-        self
-    }
-
-    /// Starts the page of results at a given cursor
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::account;
-    ///
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = account::Operations::new("abc123").cursor("cursor");
-    /// ```
-    pub fn cursor(mut self, cursor: &str) -> Self {
-        self.cursor = Some(cursor.to_string());
         self
     }
 
@@ -601,12 +544,6 @@ impl IntoRequest for Operations {
         let uri = Uri::from_str(&uri)?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
-    }
-}
-
-impl Cursor for Operations {
-    fn cursor(self, cursor: &str) -> Self {
-        self.cursor(cursor)
     }
 }
 
@@ -670,7 +607,7 @@ mod ledger_operations_tests {
 /// assert!(acct_payments.records().len() > 0);
 /// # }
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Cursor)]
 pub struct Payments {
     id: String,
     cursor: Option<String>,
@@ -694,21 +631,6 @@ impl Payments {
             order: None,
             limit: None,
         }
-    }
-
-    /// Starts the page of results at a given cursor
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::account;
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = account::Payments::new("abc123").cursor("cursor");
-    /// ```
-    pub fn cursor(mut self, cursor: &str) -> Self {
-        self.cursor = Some(cursor.to_string());
-        self
     }
 
     /// Sets the maximum number of records to return.
@@ -743,12 +665,6 @@ impl Payments {
 
     fn has_query(&self) -> bool {
         self.order.is_some() || self.cursor.is_some() || self.limit.is_some()
-    }
-}
-
-impl Cursor for Payments {
-    fn cursor(self, cursor: &str) -> Self {
-        self.cursor(cursor)
     }
 }
 

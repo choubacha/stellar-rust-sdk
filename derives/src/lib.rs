@@ -1,0 +1,37 @@
+extern crate proc_macro;
+#[macro_use]
+extern crate quote;
+extern crate syn;
+
+use proc_macro::TokenStream;
+use syn::{Data, DeriveInput, Ident};
+
+#[proc_macro_derive(Cursor)]
+pub fn cursor(input: TokenStream) -> TokenStream {
+    // Parse the string representation
+    let ast: DeriveInput = syn::parse(input).unwrap();
+    let name = &ast.ident;
+
+    if let Data::Struct(data) = ast.data {
+        if data.fields
+            .iter()
+            .any(|f| f.ident == Some(Ident::from("cursor")))
+        {
+            let code = quote! {
+                impl Cursor for #name {
+                    fn cursor(mut self, cursor: &str) -> #name {
+                        self.cursor = Some(cursor.to_string());
+                        self
+                    }
+                }
+            };
+            code.into()
+        } else {
+            panic!(
+                "#[derive(Cursor)] is only valid for structs that define `cursor: Option<String>`"
+            )
+        }
+    } else {
+        panic!("#[derive(Cursor)] is only valid for structs")
+    }
+}

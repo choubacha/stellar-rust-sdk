@@ -24,7 +24,7 @@ pub use super::ledger::Transactions as ForLedger;
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Cursor)]
 pub struct All {
     cursor: Option<String>,
     order: Option<Order>,
@@ -32,33 +32,6 @@ pub struct All {
 }
 
 impl All {
-    /// Starts the page of results at a given cursor
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::transaction;
-    /// # use stellar_client::endpoint::Order;
-    ///
-    /// let client      = Client::horizon_test().unwrap();
-    /// #
-    /// # // grab first page and extract cursor
-    /// # let endpoint      = transaction::All::default();
-    /// # let first_page    = client.request(endpoint).unwrap();
-    /// # let cursor        = first_page.next_cursor();
-    /// #
-    /// let endpoint    = transaction::All::default().cursor(cursor);
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert!(records.records().len() > 0);
-    /// # assert_ne!(records.next_cursor(), cursor);
-    /// ```
-    pub fn cursor(mut self, cursor: &str) -> Self {
-        self.cursor = Some(cursor.to_string());
-        self
-    }
-
     /// Fetches all records with a given limit
     ///
     /// ## Example
@@ -126,12 +99,6 @@ impl IntoRequest for All {
         let uri = Uri::from_str(&uri)?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
-    }
-}
-
-impl Cursor for All {
-    fn cursor(self, cursor: &str) -> Self {
-        self.cursor(cursor)
     }
 }
 
@@ -246,7 +213,7 @@ mod transaction_details_tests {
 /// assert!(payments.records().len() > 0);
 /// assert_eq!(payments.records()[0].transaction(), hash);
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Cursor)]
 pub struct Payments {
     hash: String,
     cursor: Option<String>,
@@ -263,20 +230,6 @@ impl Payments {
             order: None,
             limit: None,
         }
-    }
-
-    /// Starts the page of results at a given cursor
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::transaction;
-    ///
-    /// let endpoint = transaction::Payments::new("ABC123").cursor("CURSOR");
-    /// ```
-    pub fn cursor(mut self, cursor: &str) -> Self {
-        self.cursor = Some(cursor.to_string());
-        self
     }
 
     /// Fetches all records with a given limit
@@ -339,12 +292,6 @@ impl IntoRequest for Payments {
     }
 }
 
-impl Cursor for Payments {
-    fn cursor(self, cursor: &str) -> Payments {
-        self.cursor(cursor)
-    }
-}
-
 #[cfg(test)]
 mod transaction_payments_test {
     use super::*;
@@ -396,7 +343,7 @@ mod transaction_payments_test {
 /// assert!(operations.records().len() > 0);
 /// assert_eq!(operations.records()[0].transaction(), hash);
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Cursor)]
 pub struct Operations {
     hash: String,
     cursor: Option<String>,
@@ -413,20 +360,6 @@ impl Operations {
             order: None,
             limit: None,
         }
-    }
-
-    /// Starts the page of results at a given cursor
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::transaction;
-    ///
-    /// let endpoint = transaction::Operations::new("ABC123").cursor("CURSOR");
-    /// ```
-    pub fn cursor(mut self, cursor: &str) -> Self {
-        self.cursor = Some(cursor.to_string());
-        self
     }
 
     /// Fetches all records with a given limit
@@ -486,12 +419,6 @@ impl IntoRequest for Operations {
         let uri = Uri::from_str(&uri)?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
-    }
-}
-
-impl Cursor for Operations {
-    fn cursor(self, cursor: &str) -> Operations {
-        self.cursor(cursor)
     }
 }
 

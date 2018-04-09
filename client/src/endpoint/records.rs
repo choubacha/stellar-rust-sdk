@@ -2,12 +2,6 @@ use http;
 use serde::de::{Deserialize, DeserializeOwned, Deserializer};
 use std;
 
-/// Declares that this endpoint has a cursor and can have it set.
-pub trait Cursor {
-    /// Sets a cursor on the endpoint.
-    fn cursor(self, cursor: &str) -> Self;
-}
-
 /// A struct that represents a set of records returned from the horizon api.
 ///
 /// Use this struct when querying an end point that returns an index route with
