@@ -10,10 +10,7 @@ pub struct Deauthorized {
 impl Deauthorized {
     /// Creates a new Trustline Deauthorized effect
     pub fn new(account: String, asset: AssetIdentifier) -> Deauthorized {
-        Deauthorized {
-            account: account,
-            asset: asset,
-        }
+        Deauthorized { account, asset }
     }
 
     /// The public address of the account that can no longer hold the asset

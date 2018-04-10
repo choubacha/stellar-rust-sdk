@@ -12,10 +12,10 @@ impl ThresholdsUpdated {
     /// Creates a new ThresholdsUpdated effect
     pub fn new(account: String, low: u32, med: u32, high: u32) -> ThresholdsUpdated {
         ThresholdsUpdated {
-            account: account,
-            low: low,
-            med: med,
-            high: high,
+            account,
+            low,
+            med,
+            high,
         }
     }
 

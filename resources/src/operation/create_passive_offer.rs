@@ -26,12 +26,12 @@ impl CreatePassiveOffer {
         price: Amount,
     ) -> CreatePassiveOffer {
         CreatePassiveOffer {
-            offer_id: offer_id,
-            selling: selling,
-            buying: buying,
-            amount: amount,
-            price_ratio: price_ratio,
-            price: price,
+            offer_id,
+            selling,
+            buying,
+            amount,
+            price_ratio,
+            price,
         }
     }
     /// Offer ID.

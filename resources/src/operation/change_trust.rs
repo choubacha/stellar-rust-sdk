@@ -20,10 +20,10 @@ impl ChangeTrust {
         limit: Amount,
     ) -> ChangeTrust {
         ChangeTrust {
-            trustee: trustee,
-            trustor: trustor,
-            asset: asset,
-            limit: limit,
+            trustee,
+            trustor,
+            asset,
+            limit,
         }
     }
 

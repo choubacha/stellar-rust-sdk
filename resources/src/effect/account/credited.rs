@@ -14,9 +14,9 @@ impl Credited {
     /// Creates a new Credited effect
     pub fn new(account: String, amount: Amount, asset: AssetIdentifier) -> Credited {
         Credited {
-            account: account,
-            amount: amount,
-            asset: asset,
+            account,
+            amount,
+            asset,
         }
     }
     /// The public address of the account that was removed

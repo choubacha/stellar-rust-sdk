@@ -42,7 +42,7 @@ impl<'de> Deserialize<'de> for AssetIdentifier {
     {
         let rep: IntermediateAssetIdentifier = IntermediateAssetIdentifier::deserialize(d)?;
         AssetIdentifier::new(&rep.asset_type, rep.asset_code, rep.asset_issuer)
-            .map_err(|err| de::Error::custom(err))
+            .map_err(de::Error::custom)
     }
 }
 
@@ -51,8 +51,8 @@ impl Serialize for AssetIdentifier {
     where
         S: Serializer,
     {
-        let rep = match self {
-            &AssetIdentifier::Native => IntermediateAssetIdentifier {
+        let rep = match *self {
+            AssetIdentifier::Native => IntermediateAssetIdentifier {
                 asset_type: "native".to_string(),
                 asset_code: None,
                 asset_issuer: None,
@@ -71,48 +71,48 @@ impl AssetIdentifier {
     /// The type of this asset: “credit_alphanum4”, or “credit_alphanum12”.
     /// Returns a slice that lives as long as the asset does.
     pub fn asset_type(&self) -> &str {
-        match self {
-            &AssetIdentifier::Native => &"native",
-            &AssetIdentifier::CreditAlphanum4(_) => &"credit_alphanum4",
-            &AssetIdentifier::CreditAlphanum12(_) => &"credit_alphanum12",
+        match *self {
+            AssetIdentifier::Native => &"native",
+            AssetIdentifier::CreditAlphanum4(_) => &"credit_alphanum4",
+            AssetIdentifier::CreditAlphanum12(_) => &"credit_alphanum12",
         }
     }
 
     /// The code of this asset.
     /// Returns a slice that lives as long as the asset does.
     pub fn code(&self) -> &str {
-        match self {
-            &AssetIdentifier::Native => &"XLM",
-            &AssetIdentifier::CreditAlphanum4(ref asset_id) => &asset_id.code,
-            &AssetIdentifier::CreditAlphanum12(ref asset_id) => &asset_id.code,
+        match *self {
+            AssetIdentifier::Native => &"XLM",
+            AssetIdentifier::CreditAlphanum4(ref asset_id) => &asset_id.code,
+            AssetIdentifier::CreditAlphanum12(ref asset_id) => &asset_id.code,
         }
     }
 
     /// The code of this asset as a result.
     pub fn asset_code(&self) -> Option<String> {
-        match self {
-            &AssetIdentifier::Native => None,
-            &AssetIdentifier::CreditAlphanum4(ref asset_id) => Some(asset_id.code.clone()),
-            &AssetIdentifier::CreditAlphanum12(ref asset_id) => Some(asset_id.code.clone()),
+        match *self {
+            AssetIdentifier::Native => None,
+            AssetIdentifier::CreditAlphanum4(ref asset_id) => Some(asset_id.code.clone()),
+            AssetIdentifier::CreditAlphanum12(ref asset_id) => Some(asset_id.code.clone()),
         }
     }
 
     /// The issuer of this asset.  This corresponds to the id of an account.
     /// Returns a slice that lives as long as the asset does.
     pub fn issuer(&self) -> &str {
-        match self {
-            &AssetIdentifier::Native => &"Stellar Foundation",
-            &AssetIdentifier::CreditAlphanum4(ref asset_id) => &asset_id.issuer,
-            &AssetIdentifier::CreditAlphanum12(ref asset_id) => &asset_id.issuer,
+        match *self {
+            AssetIdentifier::Native => &"Stellar Foundation",
+            AssetIdentifier::CreditAlphanum4(ref asset_id) => &asset_id.issuer,
+            AssetIdentifier::CreditAlphanum12(ref asset_id) => &asset_id.issuer,
         }
     }
 
     /// The issuer of this asset as a result
     pub fn asset_issuer(&self) -> Option<String> {
-        match self {
-            &AssetIdentifier::Native => None,
-            &AssetIdentifier::CreditAlphanum4(ref asset_id) => Some(asset_id.issuer.clone()),
-            &AssetIdentifier::CreditAlphanum12(ref asset_id) => Some(asset_id.issuer.clone()),
+        match *self {
+            AssetIdentifier::Native => None,
+            AssetIdentifier::CreditAlphanum4(ref asset_id) => Some(asset_id.issuer.clone()),
+            AssetIdentifier::CreditAlphanum12(ref asset_id) => Some(asset_id.issuer.clone()),
         }
     }
 
@@ -214,8 +214,8 @@ pub struct Flag {
 impl Flag {
     pub fn new(auth_required: bool, auth_revocable: bool) -> Flag {
         Flag {
-            auth_required: auth_required,
-            auth_revocable: auth_revocable,
+            auth_required,
+            auth_revocable,
         }
     }
 }
@@ -253,7 +253,7 @@ impl<'de> Deserialize<'de> for Asset {
         let rep: IntermediateAsset = IntermediateAsset::deserialize(d)?;
         let asset_identifier: Result<AssetIdentifier, D::Error> =
             AssetIdentifier::new(&rep.asset_type, rep.asset_code, rep.asset_issuer)
-                .map_err(|err| de::Error::custom(err));
+                .map_err(de::Error::custom);
         Ok(Asset {
             asset_identifier: asset_identifier.unwrap(),
             amount: rep.amount,
@@ -275,7 +275,7 @@ impl Serialize for Asset {
                 asset_issuer: None,
                 amount: self.amount,
                 num_accounts: self.num_accounts,
-                flags: self.flags.clone(),
+                flags: self.flags,
             },
             _ => IntermediateAsset {
                 asset_type: self.asset_type().to_owned(),
@@ -283,7 +283,7 @@ impl Serialize for Asset {
                 asset_issuer: Some(self.issuer().to_owned()),
                 amount: self.amount,
                 num_accounts: self.num_accounts,
-                flags: self.flags.clone(),
+                flags: self.flags,
             },
         };
         rep.serialize(s)

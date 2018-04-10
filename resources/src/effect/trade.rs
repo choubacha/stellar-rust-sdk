@@ -35,13 +35,13 @@ impl Trade {
         bought_asset: AssetIdentifier,
     ) -> Trade {
         Trade {
-            account: account,
-            offer_id: offer_id,
-            seller: seller,
-            sold_amount: sold_amount,
-            sold_asset: sold_asset,
-            bought_amount: bought_amount,
-            bought_asset: bought_asset,
+            account,
+            offer_id,
+            seller,
+            sold_amount,
+            sold_asset,
+            bought_amount,
+            bought_asset,
         }
     }
 

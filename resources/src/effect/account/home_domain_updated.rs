@@ -10,8 +10,8 @@ impl HomeDomainUpdated {
     /// Creates a HomeDomainUpdated effect
     pub fn new(account: String, home_domain: String) -> HomeDomainUpdated {
         HomeDomainUpdated {
-            account: account,
-            home_domain: home_domain,
+            account,
+            home_domain,
         }
     }
 

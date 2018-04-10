@@ -15,10 +15,10 @@ impl Payment {
     /// Creates a new Payment
     pub fn new(from: String, to: String, asset: AssetIdentifier, amount: Amount) -> Payment {
         Payment {
-            from: from,
-            to: to,
-            asset: asset,
-            amount: amount,
+            from,
+            to,
+            asset,
+            amount,
         }
     }
 

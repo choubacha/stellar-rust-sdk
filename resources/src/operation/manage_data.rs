@@ -8,10 +8,7 @@ pub struct ManageData {
 impl ManageData {
     /// Creates a new ManageData
     pub fn new(name: String, value: String) -> ManageData {
-        ManageData {
-            name: name,
-            value: value,
-        }
+        ManageData { name, value }
     }
 
     /// The key of the data value to update

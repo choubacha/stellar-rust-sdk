@@ -8,7 +8,7 @@ pub struct Removed {
 impl Removed {
     /// Creates a new account Removed effect
     pub fn new(account: String) -> Removed {
-        Removed { account: account }
+        Removed { account }
     }
     /// The public address of the account that was removed
     pub fn account(&self) -> &String {
