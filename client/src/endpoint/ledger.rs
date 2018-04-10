@@ -115,7 +115,7 @@ mod all_ledgers_tests {
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = All::default()
-            .cursor("CURSOR")
+            .with_cursor("CURSOR")
             .limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
@@ -320,7 +320,7 @@ mod ledger_payments_tests {
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Payments::new(123)
-            .cursor("CURSOR")
+            .with_cursor("CURSOR")
             .limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
@@ -460,7 +460,7 @@ mod ledger_transactions_tests {
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Transactions::new(123)
-            .cursor("CURSOR")
+            .with_cursor("CURSOR")
             .limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
@@ -602,7 +602,7 @@ mod ledger_effects_tests {
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Effects::new(123)
-            .cursor("CURSOR")
+            .with_cursor("CURSOR")
             .limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
@@ -744,7 +744,7 @@ mod ledger_operations_tests {
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Operations::new(123)
-            .cursor("CURSOR")
+            .with_cursor("CURSOR")
             .limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();

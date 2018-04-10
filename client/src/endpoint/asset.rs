@@ -171,7 +171,7 @@ mod all_assets_tests {
         let ep = All::default()
             .asset_code("CODE")
             .asset_issuer("ISSUER")
-            .cursor("CURSOR")
+            .with_cursor("CURSOR")
             .limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();

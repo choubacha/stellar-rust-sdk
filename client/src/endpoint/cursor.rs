@@ -5,11 +5,19 @@
 /// ```
 /// use stellar_client::endpoint::{Cursor, transaction};
 ///
-/// let txns = transaction::All::default().cursor("CURSOR");
+/// let txns = transaction::All::default();
+/// assert_eq!(txns.cursor(), None);
+///
+/// let txns = txns.with_cursor("CURSOR");
+/// assert_eq!(txns.cursor(), Some("CURSOR"));
+///
 /// ```
 pub trait Cursor {
     /// Sets a cursor on the struct and returns an owned version.
-    fn cursor(self, cursor: &str) -> Self;
+    fn with_cursor(self, cursor: &str) -> Self;
+
+    /// Returns the cursor that has been set, if it has been set.
+    fn cursor(&self) -> Option<&str>;
 }
 
 #[cfg(test)]
@@ -23,8 +31,8 @@ mod test {
             cursor: Option<String>,
         }
 
-        let foo = Foo { cursor: None };
-        let foo = foo.cursor("CURSOR");
+        let foo = Foo { cursor: None }.with_cursor("CURSOR");
         assert_eq!(foo.cursor, Some("CURSOR".to_string()));
+        assert_eq!(foo.cursor(), Some("CURSOR"));
     }
 }
