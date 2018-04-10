@@ -19,9 +19,15 @@ pub fn cursor(input: TokenStream) -> TokenStream {
         {
             let code = quote! {
                 impl Cursor for #name {
-                    fn cursor(mut self, cursor: &str) -> #name {
+                    fn with_cursor(mut self, cursor: &str) -> #name {
                         self.cursor = Some(cursor.to_string());
                         self
+                    }
+
+                    fn cursor(&self) -> Option<&str> {
+                        // Take the cursor as a ref, then map the string to a slice. Needs
+                        // two derefs to deref to String then to str then return reference
+                        self.cursor.as_ref().map(|s| &**s)
                     }
                 }
             };

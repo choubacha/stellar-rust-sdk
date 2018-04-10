@@ -117,7 +117,7 @@ mod all_transactions_test {
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = All::default()
-            .cursor("CURSOR")
+            .with_cursor("CURSOR")
             .order(Order::Desc)
             .limit(123);
         let req = ep.into_request("https://www.google.com").unwrap();
@@ -307,7 +307,7 @@ mod transaction_payments_test {
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Payments::new("HASH123")
-            .cursor("CURSOR")
+            .with_cursor("CURSOR")
             .order(Order::Desc)
             .limit(123);
         let req = ep.into_request("https://www.google.com").unwrap();
@@ -437,7 +437,7 @@ mod transaction_operations_test {
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Operations::new("HASH123")
-            .cursor("CURSOR")
+            .with_cursor("CURSOR")
             .order(Order::Desc)
             .limit(123);
         let req = ep.into_request("https://www.google.com").unwrap();

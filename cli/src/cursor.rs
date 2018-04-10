@@ -19,7 +19,7 @@ where
     C: Cursor,
 {
     match arg.value_of(ARG_NAME) {
-        Some(cur) => endpoint.cursor(cur),
+        Some(cur) => endpoint.with_cursor(cur),
         None => endpoint,
     }
 }
@@ -28,14 +28,18 @@ where
 mod tests {
     use super::*;
 
-    struct TestCurse {
+    struct TestCursor {
         cursor: Option<String>,
     }
 
-    impl Cursor for TestCurse {
-        fn cursor(mut self, cursor: &str) -> TestCurse {
+    impl Cursor for TestCursor {
+        fn with_cursor(mut self, cursor: &str) -> TestCursor {
             self.cursor = Some(cursor.to_owned());
             self
+        }
+
+        fn cursor(&self) -> Option<&str> {
+            self.cursor.as_ref().map(|s| &**s)
         }
     }
 
@@ -51,16 +55,16 @@ mod tests {
     #[test]
     fn it_sets_the_cursor_if_provided() {
         let arg_matches = get_matches(vec!["test", "--cursor", "123abc"]);
-        let cursor = TestCurse { cursor: None };
+        let cursor = TestCursor { cursor: None };
         let cursor = assign_from_arg(&arg_matches, cursor);
-        assert_eq!(cursor.cursor, Some("123abc".to_owned()));
+        assert_eq!(cursor.cursor(), Some("123abc"));
     }
 
     #[test]
     fn it_defaults_to_none() {
         let arg_matches = get_matches(vec!["test"]);
-        let cursor = TestCurse { cursor: None };
+        let cursor = TestCursor { cursor: None };
         let cursor = assign_from_arg(&arg_matches, cursor);
-        assert_eq!(cursor.cursor, None);
+        assert_eq!(cursor.cursor(), None);
     }
 }

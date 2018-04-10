@@ -109,7 +109,7 @@ mod all_operationss_tests {
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = All::default()
-            .cursor("CURSOR")
+            .with_cursor("CURSOR")
             .limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();

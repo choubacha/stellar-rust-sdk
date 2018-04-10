@@ -55,7 +55,7 @@ where
         self.next = 0;
         let mut endpoint = self.endpoint.clone();
         if let Some(ref records) = self.records {
-            endpoint = endpoint.cursor(records.next_cursor());
+            endpoint = endpoint.with_cursor(records.next_cursor());
         }
         self.records = Some(self.client.request(endpoint)?);
         Ok(())

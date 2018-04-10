@@ -270,7 +270,7 @@ mod transactions_tests {
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Transactions::new("abc123")
-            .cursor("CURSOR")
+            .with_cursor("CURSOR")
             .order(Order::Desc)
             .limit(123);
         let req = ep.into_request("https://www.google.com").unwrap();
@@ -421,7 +421,7 @@ mod effects_tests {
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Effects::new("abc123")
-            .cursor("CURSOR")
+            .with_cursor("CURSOR")
             .order(Order::Asc)
             .limit(123);
         let req = ep.into_request("https://horizon-testnet.stellar.org")
@@ -562,7 +562,7 @@ mod ledger_operations_tests {
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Operations::new("abc123")
-            .cursor("CURSOR")
+            .with_cursor("CURSOR")
             .limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
@@ -713,7 +713,7 @@ mod payments_tests {
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Payments::new("abc123")
-            .cursor("CURSOR")
+            .with_cursor("CURSOR")
             .order(Order::Desc)
             .limit(123);
         let req = ep.into_request("https://www.google.com").unwrap();
