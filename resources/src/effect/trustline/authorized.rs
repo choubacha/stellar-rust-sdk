@@ -10,10 +10,7 @@ pub struct Authorized {
 impl Authorized {
     /// Creates a new Trustline Authorized effect
     pub fn new(account: String, asset: AssetIdentifier) -> Authorized {
-        Authorized {
-            account: account,
-            asset: asset,
-        }
+        Authorized { account, asset }
     }
 
     /// The public address of the account that can now hold the asset

@@ -27,13 +27,13 @@ impl PathPayment {
         source_amount: Amount,
     ) -> PathPayment {
         PathPayment {
-            from: from,
-            to: to,
-            destination_asset: destination_asset,
-            destination_amount: destination_amount,
-            source_asset: source_asset,
-            source_amount: source_amount,
-            source_max: source_max,
+            from,
+            to,
+            destination_asset,
+            destination_amount,
+            source_asset,
+            source_amount,
+            source_max,
         }
     }
     /// Sender of a payment.

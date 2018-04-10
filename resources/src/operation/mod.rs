@@ -104,18 +104,18 @@ impl Operation {
 
     /// Specifies the type of operation, See “Types” section below for reference.
     pub fn type_i(&self) -> u32 {
-        match &self.kind {
-            &Kind::CreateAccount(_) => 0,
-            &Kind::Payment(_) => 1,
-            &Kind::PathPayment(_) => 2,
-            &Kind::ManageOffer(_) => 3,
-            &Kind::CreatePassiveOffer(_) => 4,
-            &Kind::SetOptions(_) => 5,
-            &Kind::ChangeTrust(_) => 6,
-            &Kind::AllowTrust(_) => 7,
-            &Kind::AccountMerge(_) => 8,
-            &Kind::Inflation => 9,
-            &Kind::ManageData(_) => 10,
+        match self.kind {
+            Kind::CreateAccount(_) => 0,
+            Kind::Payment(_) => 1,
+            Kind::PathPayment(_) => 2,
+            Kind::ManageOffer(_) => 3,
+            Kind::CreatePassiveOffer(_) => 4,
+            Kind::SetOptions(_) => 5,
+            Kind::ChangeTrust(_) => 6,
+            Kind::AllowTrust(_) => 7,
+            Kind::AccountMerge(_) => 8,
+            Kind::Inflation => 9,
+            Kind::ManageData(_) => 10,
         }
     }
 
@@ -305,12 +305,12 @@ impl<'de> Deserialize<'de> for Operation {
                 } => {
                     let destination_asset_identifier =
                         AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                            .map_err(|err| de::Error::custom(err))?;
+                            .map_err(de::Error::custom)?;
                     let source_asset_identifier = AssetIdentifier::new(
                         &source_asset_type,
                         source_asset_code,
                         source_asset_issuer,
-                    ).map_err(|err| de::Error::custom(err))?;
+                    ).map_err(de::Error::custom)?;
                     Kind::PathPayment(PathPayment::new(
                         from,
                         to,
@@ -339,7 +339,7 @@ impl<'de> Deserialize<'de> for Operation {
                 } => {
                     let asset_identifier =
                         AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                            .map_err(|err| de::Error::custom(err))?;
+                            .map_err(de::Error::custom)?;
                     Kind::Payment(Payment::new(from, to, asset_identifier, amount))
                 }
                 _ => return Err(de::Error::custom("Missing fields for payment operation.")),
@@ -362,13 +362,13 @@ impl<'de> Deserialize<'de> for Operation {
                         &buying_asset_type,
                         buying_asset_code,
                         buying_asset_issuer,
-                    ).map_err(|err| de::Error::custom(err))?;
+                    ).map_err(de::Error::custom)?;
 
                     let selling_asset_identifier = AssetIdentifier::new(
                         &selling_asset_type,
                         selling_asset_code,
                         selling_asset_issuer,
-                    ).map_err(|err| de::Error::custom(err))?;
+                    ).map_err(de::Error::custom)?;
                     Kind::CreatePassiveOffer(CreatePassiveOffer::new(
                         offer_id,
                         selling_asset_identifier,
@@ -402,13 +402,13 @@ impl<'de> Deserialize<'de> for Operation {
                         &buying_asset_type,
                         buying_asset_code,
                         buying_asset_issuer,
-                    ).map_err(|err| de::Error::custom(err))?;
+                    ).map_err(de::Error::custom)?;
 
                     let selling_asset_identifier = AssetIdentifier::new(
                         &selling_asset_type,
                         selling_asset_code,
                         selling_asset_issuer,
-                    ).map_err(|err| de::Error::custom(err))?;
+                    ).map_err(de::Error::custom)?;
                     Kind::ManageOffer(ManageOffer::new(
                         offer_id,
                         selling_asset_identifier,
@@ -431,9 +431,9 @@ impl<'de> Deserialize<'de> for Operation {
                     signer_key: Some(signer_key),
                     signer_weight: Some(signer_weight),
                     master_key_weight: Some(master_key_weight),
-                    low_threshold: Some(low_threshold),
-                    med_threshold: Some(med_threshold),
-                    high_threshold: Some(high_threshold),
+                    low_threshold: Some(low),
+                    med_threshold: Some(med),
+                    high_threshold: Some(high),
                     home_domain: Some(home_domain),
                     ..
                 } => {
@@ -461,9 +461,7 @@ impl<'de> Deserialize<'de> for Operation {
                         signer_key,
                         signer_weight,
                         master_key_weight,
-                        low_threshold,
-                        med_threshold,
-                        high_threshold,
+                        (low, med, high),
                         home_domain,
                         set_flags,
                         clear_flags,
@@ -486,7 +484,7 @@ impl<'de> Deserialize<'de> for Operation {
                     ..
                 } => {
                     let asset = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                        .map_err(|err| de::Error::custom(err))?;
+                        .map_err(de::Error::custom)?;
                     Kind::ChangeTrust(ChangeTrust::new(trustee, trustor, asset, limit))
                 }
                 _ => {
@@ -506,7 +504,7 @@ impl<'de> Deserialize<'de> for Operation {
                     ..
                 } => {
                     let asset = AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                        .map_err(|err| de::Error::custom(err))?;
+                        .map_err(de::Error::custom)?;
                     Kind::AllowTrust(AllowTrust::new(trustee, trustor, asset, authorize))
                 }
                 _ => {

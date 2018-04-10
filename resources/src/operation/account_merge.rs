@@ -9,10 +9,7 @@ pub struct AccountMerge {
 impl AccountMerge {
     /// Creates a new AccountMerge
     pub fn new(account: String, into: String) -> AccountMerge {
-        AccountMerge {
-            account: account,
-            into: into,
-        }
+        AccountMerge { account, into }
     }
 
     /// The account being deleted from the ledger

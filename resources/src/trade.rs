@@ -83,13 +83,13 @@ impl<'de> Deserialize<'de> for Trade {
             ledger_close_time: rep.ledger_close_time,
             offer_id: rep.offer_id,
             base_account: rep.base_account,
-            base_asset: base_asset,
+            base_asset,
             base_amount: rep.base_amount,
             counter_account: rep.counter_account,
-            counter_asset: counter_asset,
+            counter_asset,
             counter_amount: rep.counter_amount,
             price: PriceRatio::from(rep.price),
-            seller: seller,
+            seller,
         })
     }
 }

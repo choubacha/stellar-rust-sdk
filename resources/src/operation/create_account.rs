@@ -12,9 +12,9 @@ impl CreateAccount {
     /// Creates a new CreateAccount
     pub fn new(account: String, funder: String, starting_balance: Amount) -> CreateAccount {
         CreateAccount {
-            account: account,
-            funder: funder,
-            starting_balance: starting_balance,
+            account,
+            funder,
+            starting_balance,
         }
     }
     /// The public address of a new account that was funded.

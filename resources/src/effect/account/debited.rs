@@ -14,9 +14,9 @@ impl Debited {
     /// Creates a new Debited effect
     pub fn new(account: String, amount: Amount, asset: AssetIdentifier) -> Debited {
         Debited {
-            account: account,
-            amount: amount,
-            asset: asset,
+            account,
+            amount,
+            asset,
         }
     }
     /// The public address of the account that was removed

@@ -33,27 +33,27 @@ impl PaymentPath {
     }
 
     /// An array of assets that represents the intermediary assets this path hops through
-    pub fn path<'a>(&'a self) -> &'a Vec<AssetIdentifier> {
+    pub fn path(&self) -> &Vec<AssetIdentifier> {
         &self.path
     }
 
     /// Destination amount
-    pub fn destination_amount<'a>(&'a self) -> &'a Amount {
+    pub fn destination_amount(&self) -> &Amount {
         &self.destination_amount
     }
 
     /// Source amount
-    pub fn source_amount<'a>(&'a self) -> &'a Amount {
+    pub fn source_amount(&self) -> &Amount {
         &self.source_amount
     }
 
     /// Destination asset specified in the search that found this path
-    pub fn destination_asset<'a>(&'a self) -> &'a AssetIdentifier {
+    pub fn destination_asset(&self) -> &AssetIdentifier {
         &self.destination_asset
     }
 
     /// Source asset specified in the search that found this path
-    pub fn source_asset<'a>(&'a self) -> &'a AssetIdentifier {
+    pub fn source_asset(&self) -> &AssetIdentifier {
         &self.source_asset
     }
 }
@@ -81,19 +81,19 @@ impl<'de> Deserialize<'de> for PaymentPath {
             rep.destination_asset_type.as_str(),
             rep.destination_asset_code,
             rep.destination_asset_issuer,
-        ).map_err(|err| de::Error::custom(err))?;
+        ).map_err(de::Error::custom)?;
         let source_asset = AssetIdentifier::new(
             rep.source_asset_type.as_str(),
             rep.source_asset_code,
             rep.source_asset_issuer,
-        ).map_err(|err| de::Error::custom(err))?;
+        ).map_err(de::Error::custom)?;
         PaymentPath::new(
             rep.path,
             rep.source_amount,
             rep.destination_amount,
             destination_asset,
             source_asset,
-        ).map_err(|err| de::Error::custom(err))
+        ).map_err(de::Error::custom)
     }
 }
 

@@ -22,10 +22,10 @@ impl AllowTrust {
         authorize: bool,
     ) -> AllowTrust {
         AllowTrust {
-            trustee: trustee,
-            trustor: trustor,
-            asset: asset,
-            authorize: authorize,
+            trustee,
+            trustor,
+            asset,
+            authorize,
         }
     }
 

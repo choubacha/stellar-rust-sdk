@@ -10,10 +10,7 @@ pub struct FlagsUpdated {
 impl FlagsUpdated {
     /// Creates a new FlagsUpdated effect
     pub fn new(account: String, flags: Flag) -> FlagsUpdated {
-        FlagsUpdated {
-            account: account,
-            flags: flags,
-        }
+        FlagsUpdated { account, flags }
     }
 
     /// The public address of the account with updated flags

@@ -13,9 +13,9 @@ impl Created {
     /// Creates a new Trustline Created effect
     pub fn new(account: String, limit: Amount, asset: AssetIdentifier) -> Created {
         Created {
-            account: account,
-            limit: limit,
-            asset: asset,
+            account,
+            limit,
+            asset,
         }
     }
 

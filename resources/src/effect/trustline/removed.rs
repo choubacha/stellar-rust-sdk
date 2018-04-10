@@ -13,9 +13,9 @@ impl Removed {
     /// Creates a new Trustline Removed effect
     pub fn new(account: String, limit: Amount, asset: AssetIdentifier) -> Removed {
         Removed {
-            account: account,
-            limit: limit,
-            asset: asset,
+            account,
+            limit,
+            asset,
         }
     }
 

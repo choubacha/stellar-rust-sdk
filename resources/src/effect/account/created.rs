@@ -11,8 +11,8 @@ impl Created {
     /// Creates a new Account
     pub fn new(account: String, starting_balance: Amount) -> Created {
         Created {
-            account: account,
-            starting_balance: starting_balance,
+            account,
+            starting_balance,
         }
     }
     /// The public address of a new account that was funded.

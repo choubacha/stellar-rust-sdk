@@ -292,7 +292,7 @@ impl<'de> Deserialize<'de> for Effect {
                 } => {
                     let asset_identifier =
                         AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                            .map_err(|err| de::Error::custom(err))?;
+                            .map_err(de::Error::custom)?;
                     Kind::Account(account::Kind::Credited(account::Credited::new(
                         account,
                         amount,
@@ -316,7 +316,7 @@ impl<'de> Deserialize<'de> for Effect {
                 } => {
                     let asset_identifier =
                         AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                            .map_err(|err| de::Error::custom(err))?;
+                            .map_err(de::Error::custom)?;
                     Kind::Account(account::Kind::Debited(account::Debited::new(
                         account,
                         amount,
@@ -445,7 +445,7 @@ impl<'de> Deserialize<'de> for Effect {
                 } => {
                     let asset_identifier =
                         AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                            .map_err(|err| de::Error::custom(err))?;
+                            .map_err(de::Error::custom)?;
                     Kind::Trustline(trustline::Kind::Created(trustline::Created::new(
                         account,
                         limit,
@@ -469,7 +469,7 @@ impl<'de> Deserialize<'de> for Effect {
                 } => {
                     let asset_identifier =
                         AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                            .map_err(|err| de::Error::custom(err))?;
+                            .map_err(de::Error::custom)?;
                     Kind::Trustline(trustline::Kind::Removed(trustline::Removed::new(
                         account,
                         limit,
@@ -493,7 +493,7 @@ impl<'de> Deserialize<'de> for Effect {
                 } => {
                     let asset_identifier =
                         AssetIdentifier::new(&asset_type, asset_code, asset_issuer)
-                            .map_err(|err| de::Error::custom(err))?;
+                            .map_err(de::Error::custom)?;
                     Kind::Trustline(trustline::Kind::Updated(trustline::Updated::new(
                         account,
                         limit,
@@ -515,7 +515,7 @@ impl<'de> Deserialize<'de> for Effect {
                     ..
                 } => {
                     let asset_identifier = AssetIdentifier::new(&asset_type, asset_code, trustor)
-                        .map_err(|err| de::Error::custom(err))?;
+                        .map_err(de::Error::custom)?;
                     Kind::Trustline(trustline::Kind::Authorized(trustline::Authorized::new(
                         account,
                         asset_identifier,
@@ -536,7 +536,7 @@ impl<'de> Deserialize<'de> for Effect {
                     ..
                 } => {
                     let asset_identifier = AssetIdentifier::new(&asset_type, asset_code, trustor)
-                        .map_err(|err| de::Error::custom(err))?;
+                        .map_err(de::Error::custom)?;
                     Kind::Trustline(trustline::Kind::Deauthorized(
                         trustline::Deauthorized::new(account, asset_identifier),
                     ))
@@ -564,12 +564,12 @@ impl<'de> Deserialize<'de> for Effect {
                 } => {
                     let sold_asset =
                         AssetIdentifier::new(&sold_asset_type, sold_asset_code, sold_asset_issuer)
-                            .map_err(|err| de::Error::custom(err))?;
+                            .map_err(de::Error::custom)?;
                     let bought_asset = AssetIdentifier::new(
                         &bought_asset_type,
                         bought_asset_code,
                         bought_asset_issuer,
-                    ).map_err(|err| de::Error::custom(err))?;
+                    ).map_err(de::Error::custom)?;
                     Kind::Trade(trade::Kind::Trade(trade::Trade::new(
                         account,
                         offer_id,
