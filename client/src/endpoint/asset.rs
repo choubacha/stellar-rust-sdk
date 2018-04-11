@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::Asset;
-use super::{Body, Cursor, IntoRequest, Limit, Order, Records};
+use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 
 /// Represents the all assets end point for the stellar horizon server. The endpoint
@@ -22,12 +22,12 @@ use http::{Request, Uri};
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone, Cursor, Limit)]
+#[derive(Debug, Default, Clone, Cursor, Limit, Order)]
 pub struct All {
     code: Option<String>,
     issuer: Option<String>,
     cursor: Option<String>,
-    order: Option<Order>,
+    order: Option<Direction>,
     limit: Option<u32>,
 }
 
@@ -41,13 +41,13 @@ impl All {
     /// use stellar_client::endpoint::asset;
     ///
     /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = asset::All::default().asset_code("USD");
+    /// let endpoint    = asset::All::default().with_asset_code("USD");
     /// let records     = client.request(endpoint).unwrap();
     /// #
     /// # assert!(records.records().len() > 0);
     /// # assert_eq!(records.records()[0].code(), "USD");
     /// ```
-    pub fn asset_code(mut self, code: &str) -> Self {
+    pub fn with_asset_code(mut self, code: &str) -> Self {
         self.code = Some(code.to_string());
         self
     }
@@ -61,36 +61,17 @@ impl All {
     /// use stellar_client::endpoint::asset;
     ///
     /// let client = Client::horizon_test().unwrap();
-    /// # let endpoint = asset::All::default().asset_code("USD");
+    /// # let endpoint = asset::All::default().with_asset_code("USD");
     /// # let records = client.request(endpoint).unwrap();
     /// # let issuer = records.records()[0].issuer();
-    /// let endpoint = asset::All::default().asset_issuer(issuer);
+    /// let endpoint = asset::All::default().with_asset_issuer(issuer);
     /// let records = client.request(endpoint).unwrap();
     /// #
     /// # assert!(records.records().len() > 0);
     /// # assert_eq!(records.records()[0].issuer(), issuer);
     /// ```
-    pub fn asset_issuer(mut self, issuer: &str) -> Self {
+    pub fn with_asset_issuer(mut self, issuer: &str) -> Self {
         self.issuer = Some(issuer.to_string());
-        self
-    }
-
-    /// Fetches all records in a set order, either ascending or descending.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::{asset, Order};
-    ///
-    /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = asset::All::default().order(Order::Asc);
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert!(records.records().len() > 0);
-    /// ```
-    pub fn order(mut self, order: Order) -> Self {
-        self.order = Some(order);
         self
     }
 
@@ -150,11 +131,11 @@ mod all_assets_tests {
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = All::default()
-            .asset_code("CODE")
-            .asset_issuer("ISSUER")
+            .with_asset_code("CODE")
+            .with_asset_issuer("ISSUER")
             .with_cursor("CURSOR")
             .with_limit(123)
-            .order(Order::Desc);
+            .with_order(Direction::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/assets");
         assert_eq!(

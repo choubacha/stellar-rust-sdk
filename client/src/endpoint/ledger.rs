@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::{Effect, Ledger, Operation, Transaction};
-use super::{Body, Cursor, IntoRequest, Limit, Order, Records};
+use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 
 /// Represents the all ledgers end point for the stellar horizon server. The endpoint
@@ -21,33 +21,14 @@ use http::{Request, Uri};
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone, Cursor, Limit)]
+#[derive(Debug, Default, Clone, Cursor, Limit, Order)]
 pub struct All {
     cursor: Option<String>,
-    order: Option<Order>,
+    order: Option<Direction>,
     limit: Option<u32>,
 }
 
 impl All {
-    /// Fetches all records in a set order, either ascending or descending.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// # use stellar_client::sync::Client;
-    /// # use stellar_client::endpoint::{ledger, Order};
-    /// #
-    /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = ledger::All::default().order(Order::Asc);
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert!(records.records().len() > 0);
-    /// ```
-    pub fn order(mut self, order: Order) -> Self {
-        self.order = Some(order);
-        self
-    }
-
     fn has_query(&self) -> bool {
         self.order.is_some() || self.cursor.is_some() || self.limit.is_some()
     }
@@ -98,7 +79,7 @@ mod all_ledgers_tests {
         let ep = All::default()
             .with_cursor("CURSOR")
             .with_limit(123)
-            .order(Order::Desc);
+            .with_order(Direction::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/ledgers");
         assert_eq!(
@@ -196,11 +177,11 @@ mod ledger_details_tests {
 ///
 /// assert!(payments.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit)]
+#[derive(Debug, Clone, Cursor, Limit, Order)]
 pub struct Payments {
     sequence: u32,
     cursor: Option<String>,
-    order: Option<Order>,
+    order: Option<Direction>,
     limit: Option<u32>,
 }
 
@@ -219,22 +200,6 @@ impl Payments {
             order: None,
             limit: None,
         }
-    }
-
-    /// Fetches all records in a set order, either ascending or descending.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::{ledger, Order};
-    ///
-    /// # // Not making requests seeing as the main documentation has it.
-    /// # // This is just to document the usage and conserve hits to horizon.
-    /// let endpoint = ledger::Payments::new(123).order(Order::Asc);
-    /// ```
-    pub fn order(mut self, order: Order) -> Self {
-        self.order = Some(order);
-        self
     }
 
     fn has_query(&self) -> bool {
@@ -287,7 +252,7 @@ mod ledger_payments_tests {
         let ep = Payments::new(123)
             .with_cursor("CURSOR")
             .with_limit(123)
-            .order(Order::Desc);
+            .with_order(Direction::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/ledgers/123/payments");
         assert_eq!(
@@ -320,11 +285,11 @@ mod ledger_payments_tests {
 ///
 /// assert!(ledger_txns.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit)]
+#[derive(Debug, Clone, Cursor, Limit, Order)]
 pub struct Transactions {
     sequence: u32,
     cursor: Option<String>,
-    order: Option<Order>,
+    order: Option<Direction>,
     limit: Option<u32>,
 }
 
@@ -343,22 +308,6 @@ impl Transactions {
             order: None,
             limit: None,
         }
-    }
-
-    /// Fetches all records in a set order, either ascending or descending.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::{ledger, Order};
-    ///
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = ledger::Transactions::new(123).order(Order::Asc);
-    /// ```
-    pub fn order(mut self, order: Order) -> Self {
-        self.order = Some(order);
-        self
     }
 
     fn has_query(&self) -> bool {
@@ -411,7 +360,7 @@ mod ledger_transactions_tests {
         let ep = Transactions::new(123)
             .with_cursor("CURSOR")
             .with_limit(123)
-            .order(Order::Desc);
+            .with_order(Direction::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/ledgers/123/transactions");
         assert_eq!(
@@ -446,11 +395,11 @@ mod ledger_transactions_tests {
 ///
 /// assert!(ledger_effects.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit)]
+#[derive(Debug, Clone, Cursor, Limit, Order)]
 pub struct Effects {
     sequence: u32,
     cursor: Option<String>,
-    order: Option<Order>,
+    order: Option<Direction>,
     limit: Option<u32>,
 }
 
@@ -469,22 +418,6 @@ impl Effects {
             order: None,
             limit: None,
         }
-    }
-
-    /// Fetches all records in a set order, either ascending or descending.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::{ledger, Order};
-    ///
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = ledger::Effects::new(123).order(Order::Asc);
-    /// ```
-    pub fn order(mut self, order: Order) -> Self {
-        self.order = Some(order);
-        self
     }
 
     fn has_query(&self) -> bool {
@@ -537,7 +470,7 @@ mod ledger_effects_tests {
         let ep = Effects::new(123)
             .with_cursor("CURSOR")
             .with_limit(123)
-            .order(Order::Desc);
+            .with_order(Direction::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/ledgers/123/effects");
         assert_eq!(
@@ -572,11 +505,11 @@ mod ledger_effects_tests {
 ///
 /// assert!(ledger_operations.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit)]
+#[derive(Debug, Clone, Cursor, Limit, Order)]
 pub struct Operations {
     sequence: u32,
     cursor: Option<String>,
-    order: Option<Order>,
+    order: Option<Direction>,
     limit: Option<u32>,
 }
 
@@ -595,22 +528,6 @@ impl Operations {
             order: None,
             limit: None,
         }
-    }
-
-    /// Fetches all records in a set order, either ascending or descending.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::{ledger, Order};
-    ///
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = ledger::Operations::new(123).order(Order::Asc);
-    /// ```
-    pub fn order(mut self, order: Order) -> Self {
-        self.order = Some(order);
-        self
     }
 
     fn has_query(&self) -> bool {
@@ -663,7 +580,7 @@ mod ledger_operations_tests {
         let ep = Operations::new(123)
             .with_cursor("CURSOR")
             .with_limit(123)
-            .order(Order::Desc);
+            .with_order(Direction::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/ledgers/123/operations");
         assert_eq!(

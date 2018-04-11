@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::{Operation, Transaction};
-use super::{Body, Cursor, IntoRequest, Limit, Order, Records};
+use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 pub use super::account::Transactions as ForAccount;
 pub use super::ledger::Transactions as ForLedger;
@@ -24,33 +24,14 @@ pub use super::ledger::Transactions as ForLedger;
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone, Cursor, Limit)]
+#[derive(Debug, Default, Clone, Cursor, Limit, Order)]
 pub struct All {
     cursor: Option<String>,
-    order: Option<Order>,
+    order: Option<Direction>,
     limit: Option<u32>,
 }
 
 impl All {
-    /// Fetches all records in a set order, either ascending or descending.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::{transaction, Order};
-    ///
-    /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = transaction::All::default().order(Order::Asc);
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert!(records.records().len() > 0);
-    /// ```
-    pub fn order(mut self, order: Order) -> Self {
-        self.order = Some(order);
-        self
-    }
-
     fn has_query(&self) -> bool {
         self.order.is_some() || self.cursor.is_some() || self.limit.is_some()
     }
@@ -99,8 +80,8 @@ mod all_transactions_test {
     fn it_puts_the_query_params_on_the_uri() {
         let ep = All::default()
             .with_cursor("CURSOR")
-            .order(Order::Desc)
-            .with_limit(123);
+            .with_limit(123)
+            .with_order(Direction::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/transactions");
         assert_eq!(
@@ -194,11 +175,11 @@ mod transaction_details_tests {
 /// assert!(payments.records().len() > 0);
 /// assert_eq!(payments.records()[0].transaction(), hash);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit)]
+#[derive(Debug, Clone, Cursor, Limit, Order)]
 pub struct Payments {
     hash: String,
     cursor: Option<String>,
-    order: Option<Order>,
+    order: Option<Direction>,
     limit: Option<u32>,
 }
 
@@ -211,20 +192,6 @@ impl Payments {
             order: None,
             limit: None,
         }
-    }
-
-    /// Fetches all records in a set order, either ascending or descending.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::{transaction, Order};
-    ///
-    /// let endpoint = transaction::Payments::new("ABC123").order(Order::Asc);
-    /// ```
-    pub fn order(mut self, order: Order) -> Self {
-        self.order = Some(order);
-        self
     }
 
     fn has_query(&self) -> bool {
@@ -275,8 +242,8 @@ mod transaction_payments_test {
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Payments::new("HASH123")
             .with_cursor("CURSOR")
-            .order(Order::Desc)
-            .with_limit(123);
+            .with_limit(123)
+            .with_order(Direction::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/transactions/HASH123/payments");
         assert_eq!(
@@ -310,11 +277,11 @@ mod transaction_payments_test {
 /// assert!(operations.records().len() > 0);
 /// assert_eq!(operations.records()[0].transaction(), hash);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit)]
+#[derive(Debug, Clone, Cursor, Limit, Order)]
 pub struct Operations {
     hash: String,
     cursor: Option<String>,
-    order: Option<Order>,
+    order: Option<Direction>,
     limit: Option<u32>,
 }
 
@@ -327,20 +294,6 @@ impl Operations {
             order: None,
             limit: None,
         }
-    }
-
-    /// Fetches all records in a set order, either ascending or descending.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::{transaction, Order};
-    ///
-    /// let endpoint = transaction::Operations::new("ABC123").order(Order::Asc);
-    /// ```
-    pub fn order(mut self, order: Order) -> Self {
-        self.order = Some(order);
-        self
     }
 
     fn has_query(&self) -> bool {
@@ -391,8 +344,8 @@ mod transaction_operations_test {
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Operations::new("HASH123")
             .with_cursor("CURSOR")
-            .order(Order::Desc)
-            .with_limit(123);
+            .with_limit(123)
+            .with_order(Direction::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/transactions/HASH123/operations");
         assert_eq!(

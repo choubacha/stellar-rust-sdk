@@ -28,13 +28,16 @@ pub mod ledger;
 pub mod operation;
 pub mod payment;
 pub mod transaction;
+
 mod cursor;
 mod limit;
 mod records;
+mod order;
 
 pub use self::cursor::Cursor;
 pub use self::limit::Limit;
 pub use self::records::Records;
+pub use self::order::{Direction, Order};
 
 /// Represents the body of a request to an IntoRequest.
 #[derive(Debug)]
@@ -51,35 +54,4 @@ pub trait IntoRequest {
 
     /// Converts the implementing struct into an http request.
     fn into_request(self, host: &str) -> Result<http::Request<Body>>;
-}
-
-/// The order to return results in.
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-pub enum Order {
-    /// Order the results ascending
-    Asc,
-    /// Order the results descending
-    Desc,
-}
-
-use std::string::ToString;
-
-impl ToString for Order {
-    fn to_string(&self) -> String {
-        match *self {
-            Order::Asc => "asc".to_string(),
-            Order::Desc => "desc".to_string(),
-        }
-    }
-}
-
-#[cfg(test)]
-mod order_tests {
-    use super::*;
-
-    #[test]
-    fn it_can_become_a_string() {
-        assert_eq!(Order::Asc.to_string(), "asc");
-        assert_eq!(Order::Desc.to_string(), "desc");
-    }
 }

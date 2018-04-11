@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::Operation;
-use super::{Body, Cursor, IntoRequest, Limit, Order, Records};
+use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 
 pub use super::account::Operations as ForAccount;
@@ -25,28 +25,14 @@ pub use super::transaction::Operations as ForTransaction;
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone, Cursor, Limit)]
+#[derive(Debug, Default, Clone, Cursor, Limit, Order)]
 pub struct All {
     cursor: Option<String>,
-    order: Option<Order>,
+    order: Option<Direction>,
     limit: Option<u32>,
 }
 
 impl All {
-    /// Fetches all records in a set order, either ascending or descending.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::{operation, Order};
-    ///
-    /// let endpoint = operation::All::default().order(Order::Asc);
-    /// ```
-    pub fn order(mut self, order: Order) -> Self {
-        self.order = Some(order);
-        self
-    }
-
     fn has_query(&self) -> bool {
         self.order.is_some() || self.cursor.is_some() || self.limit.is_some()
     }
@@ -97,7 +83,7 @@ mod all_operationss_tests {
         let ep = All::default()
             .with_cursor("CURSOR")
             .with_limit(123)
-            .order(Order::Desc);
+            .with_order(Direction::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/operations");
         assert_eq!(
