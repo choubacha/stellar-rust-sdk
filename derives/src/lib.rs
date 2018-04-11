@@ -44,7 +44,6 @@ pub fn cursor(input: TokenStream) -> TokenStream {
 
 #[proc_macro_derive(Limit)]
 pub fn limit(input: TokenStream) -> TokenStream {
-    // Parse the string representation
     let ast: DeriveInput = syn::parse(input).unwrap();
     let name = &ast.ident;
 
@@ -71,5 +70,39 @@ pub fn limit(input: TokenStream) -> TokenStream {
         }
     } else {
         panic!("#[derive(Limit)] is only valid for structs")
+    }
+}
+
+#[proc_macro_derive(Order)]
+pub fn order(input: TokenStream) -> TokenStream {
+    // Parse the string representation
+    let ast: DeriveInput = syn::parse(input).unwrap();
+    let name = &ast.ident;
+
+    if let Data::Struct(data) = ast.data {
+        if data.fields
+            .iter()
+            .any(|f| f.ident == Some(Ident::from("order")))
+        {
+            let code = quote! {
+                impl Order for #name {
+                    fn with_order(mut self, order: Direction) -> #name {
+                        self.order = Some(order);
+                        self
+                    }
+
+                    fn order(&self) -> Option<Direction> {
+                        self.order
+                    }
+                }
+            };
+            code.into()
+        } else {
+            panic!(
+                "#[derive(Order)] is only valid for structs that define `order: Option<Direction>`"
+            )
+        }
+    } else {
+        panic!("#[derive(Order)] is only valid for structs")
     }
 }

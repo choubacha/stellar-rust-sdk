@@ -99,6 +99,8 @@ nursery: https://github.com/rust-lang-nursery/rustfmt
 Naming and conventions to improve the public interface should be followed and considered. We want
 sdk to be as easy to use as possible.
 
+### Traits
+
 When developing a trait please consider that traits are more like verbs than nouns. As such the
 convention has been to utilize words like `Clone` instead of `Cloneable` and `Write` instead of
 `Writer`. Sometimes a noun might make the right word but generally we should favor describing
@@ -106,6 +108,22 @@ what it does rather than what it is.
 
 There is an open proposal for this on the rust-lang nursery:
 https://github.com/rust-lang-nursery/api-guidelines/issues/28
+
+### Builder methods
+
+When making a builder method use a `with_` prefix instead of a setter:
+
+```rust
+
+// BAD
+fn set_value(mut self, val: Value) -> Self;
+
+// BAD
+fn value(mut self, val: Value) -> Self;
+
+// GOOD
+fn with_value(mut self, val: Value) -> Self;
+```
 
 ## Proposing changes
 

@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::{Account, Datum, Effect, Operation, Transaction};
-use super::{Body, Cursor, IntoRequest, Limit, Order, Records};
+use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 
 /// Represents the account details on the stellar horizon server.
@@ -155,11 +155,11 @@ mod details_tests {
 ///
 /// assert!(acct_txns.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit)]
+#[derive(Debug, Clone, Cursor, Limit, Order)]
 pub struct Transactions {
     id: String,
     cursor: Option<String>,
-    order: Option<Order>,
+    order: Option<Direction>,
     limit: Option<u32>,
 }
 
@@ -179,21 +179,6 @@ impl Transactions {
             order: None,
             limit: None,
         }
-    }
-
-    /// Fetches all records in a set order, either ascending or descending.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::{account, Order};
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = account::Transactions::new("abc123").order(Order::Asc);
-    /// ```
-    pub fn order(mut self, order: Order) -> Self {
-        self.order = Some(order);
-        self
     }
 
     fn has_query(&self) -> bool {
@@ -256,7 +241,7 @@ mod transactions_tests {
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Transactions::new("abc123")
             .with_cursor("CURSOR")
-            .order(Order::Desc)
+            .with_order(Direction::Desc)
             .with_limit(123);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/accounts/abc123/transactions");
@@ -291,11 +276,11 @@ mod transactions_tests {
 ///
 /// assert!(effects.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit)]
+#[derive(Debug, Clone, Cursor, Limit, Order)]
 pub struct Effects {
     id: String,
     cursor: Option<String>,
-    order: Option<Order>,
+    order: Option<Direction>,
     limit: Option<u32>,
 }
 
@@ -315,21 +300,6 @@ impl Effects {
             order: None,
             limit: None,
         }
-    }
-
-    /// Fetches all records in a set order, either ascending or descending.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::{account, Order};
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = account::Effects::new("abc123").order(Order::Asc);
-    /// ```
-    pub fn order(mut self, order: Order) -> Self {
-        self.order = Some(order);
-        self
     }
 
     fn has_query(&self) -> bool {
@@ -392,7 +362,7 @@ mod effects_tests {
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Effects::new("abc123")
             .with_cursor("CURSOR")
-            .order(Order::Asc)
+            .with_order(Direction::Asc)
             .with_limit(123);
         let req = ep.into_request("https://horizon-testnet.stellar.org")
             .unwrap();
@@ -427,11 +397,11 @@ mod effects_tests {
 ///
 /// assert!(account_operations.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit)]
+#[derive(Debug, Clone, Cursor, Limit, Order)]
 pub struct Operations {
     account_id: String,
     cursor: Option<String>,
-    order: Option<Order>,
+    order: Option<Direction>,
     limit: Option<u32>,
 }
 
@@ -450,22 +420,6 @@ impl Operations {
             order: None,
             limit: None,
         }
-    }
-
-    /// Fetches all records in a set order, either ascending or descending.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::{account, Order};
-    ///
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = account::Operations::new("abc123").order(Order::Asc);
-    /// ```
-    pub fn order(mut self, order: Order) -> Self {
-        self.order = Some(order);
-        self
     }
 
     fn has_query(&self) -> bool {
@@ -518,7 +472,7 @@ mod ledger_operations_tests {
         let ep = Operations::new("abc123")
             .with_cursor("CURSOR")
             .with_limit(123)
-            .order(Order::Desc);
+            .with_order(Direction::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/accounts/abc123/operations");
         assert_eq!(
@@ -561,11 +515,11 @@ mod ledger_operations_tests {
 /// assert!(acct_payments.records().len() > 0);
 /// # }
 /// ```
-#[derive(Debug, Clone, Cursor, Limit)]
+#[derive(Debug, Clone, Cursor, Limit, Order)]
 pub struct Payments {
     id: String,
     cursor: Option<String>,
-    order: Option<Order>,
+    order: Option<Direction>,
     limit: Option<u32>,
 }
 
@@ -585,21 +539,6 @@ impl Payments {
             order: None,
             limit: None,
         }
-    }
-
-    /// Fetches all records in a set order, either ascending or descending.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::{account, Order};
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = account::Payments::new("abc123").order(Order::Asc);
-    /// ```
-    pub fn order(mut self, order: Order) -> Self {
-        self.order = Some(order);
-        self
     }
 
     fn has_query(&self) -> bool {
@@ -653,7 +592,7 @@ mod payments_tests {
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Payments::new("abc123")
             .with_cursor("CURSOR")
-            .order(Order::Desc)
+            .with_order(Direction::Desc)
             .with_limit(123);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/accounts/abc123/payments");

@@ -1,5 +1,5 @@
 use clap::{App, Arg, ArgMatches};
-use stellar_client::endpoint::{Order, Order::Asc, Order::Desc};
+use stellar_client::endpoint::{Direction, Direction::Asc, Direction::Desc};
 
 static ARG_NAME: &'static str = "order";
 static ASC: &'static str = "asc";
@@ -19,7 +19,7 @@ pub fn add<'a, 'b>(app: App<'a, 'b>) -> App<'a, 'b> {
 }
 
 /// Parses the argument matches and returns the order to use.
-pub fn from_arg(arg: &ArgMatches) -> Order {
+pub fn from_arg(arg: &ArgMatches) -> Direction {
     match arg.value_of(ARG_NAME) {
         Some(s) if s == ASC => Asc,
         Some(s) if s == DESC => Desc,
