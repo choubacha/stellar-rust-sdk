@@ -14,7 +14,7 @@ pub fn add<'a, 'b>(app: App<'a, 'b>) -> App<'a, 'b> {
 }
 
 /// Parses the argument matches and returns the order to use.
-pub fn assign_from_arg<'a, C>(arg: &'a ArgMatches, endpoint: C) -> C
+pub fn assign_from_arg<C>(arg: &ArgMatches, endpoint: C) -> C
 where
     C: Cursor,
 {

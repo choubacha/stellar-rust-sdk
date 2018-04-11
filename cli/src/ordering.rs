@@ -19,7 +19,7 @@ pub fn add<'a, 'b>(app: App<'a, 'b>) -> App<'a, 'b> {
 }
 
 /// Parses the argument matches and returns the order to use.
-pub fn from_arg<'a>(arg: &'a ArgMatches) -> Order {
+pub fn from_arg(arg: &ArgMatches) -> Order {
     match arg.value_of(ARG_NAME) {
         Some(s) if s == ASC => Asc,
         Some(s) if s == DESC => Desc,

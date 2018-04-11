@@ -2,7 +2,7 @@ use stellar_client::{endpoint::{transaction, Limit}, error::Result, sync::{self,
 use clap::ArgMatches;
 use super::{cursor, ordering, pager::Pager};
 
-pub fn all<'a>(client: Client, matches: &'a ArgMatches) -> Result<()> {
+pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let pager = Pager::from_arg(&matches);
     let endpoint = {
         let endpoint = transaction::All::default()
@@ -18,7 +18,7 @@ pub fn all<'a>(client: Client, matches: &'a ArgMatches) -> Result<()> {
             println!("ID:             {}", txn.id());
             println!("source account: {}", txn.source_account());
             println!("created at:     {}", txn.created_at());
-            println!("");
+            println!();
         }
         Err(err) => res = Err(err),
     });
