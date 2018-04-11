@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::Asset;
-use super::{Body, Cursor, IntoRequest, Order, Records};
+use super::{Body, Cursor, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 
 /// Represents the all assets end point for the stellar horizon server. The endpoint
@@ -22,7 +22,7 @@ use http::{Request, Uri};
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone, Cursor)]
+#[derive(Debug, Default, Clone, Cursor, Limit)]
 pub struct All {
     code: Option<String>,
     issuer: Option<String>,
@@ -94,25 +94,6 @@ impl All {
         self
     }
 
-    /// Sets the maximum number of records to return.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::asset;
-    ///
-    /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = asset::All::default().limit(3);
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert_eq!(records.records().len(), 3);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
-        self
-    }
-
     fn has_query(&self) -> bool {
         self.code.is_some() || self.issuer.is_some() || self.order.is_some()
             || self.cursor.is_some() || self.limit.is_some()
@@ -172,7 +153,7 @@ mod all_assets_tests {
             .asset_code("CODE")
             .asset_issuer("ISSUER")
             .with_cursor("CURSOR")
-            .limit(123)
+            .with_limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/assets");

@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::{Operation, Transaction};
-use super::{Body, Cursor, IntoRequest, Order, Records};
+use super::{Body, Cursor, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 pub use super::account::Transactions as ForAccount;
 pub use super::ledger::Transactions as ForLedger;
@@ -24,7 +24,7 @@ pub use super::ledger::Transactions as ForLedger;
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone, Cursor)]
+#[derive(Debug, Default, Clone, Cursor, Limit)]
 pub struct All {
     cursor: Option<String>,
     order: Option<Order>,
@@ -32,25 +32,6 @@ pub struct All {
 }
 
 impl All {
-    /// Fetches all records with a given limit
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::transaction;
-    ///
-    /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = transaction::All::default().limit(1);
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert_eq!(records.records().len(), 1);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
-        self
-    }
-
     /// Fetches all records in a set order, either ascending or descending.
     ///
     /// ## Example
@@ -119,7 +100,7 @@ mod all_transactions_test {
         let ep = All::default()
             .with_cursor("CURSOR")
             .order(Order::Desc)
-            .limit(123);
+            .with_limit(123);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/transactions");
         assert_eq!(
@@ -137,10 +118,10 @@ mod all_transactions_test {
 ///
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::transaction;
+/// use stellar_client::endpoint::{transaction, Limit};
 ///
 /// let client   = Client::horizon_test().unwrap();
-/// # let transaction_ep   = transaction::All::default().limit(1);
+/// # let transaction_ep   = transaction::All::default().with_limit(1);
 /// # let txns             = client.request(transaction_ep).unwrap();
 /// # let txn              = &txns.records()[0];
 /// # let hash             = txn.hash();
@@ -197,12 +178,12 @@ mod transaction_details_tests {
 ///
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::{transaction, payment};
+/// use stellar_client::endpoint::{transaction, payment, Limit};
 ///
 /// let client   = Client::horizon_test().unwrap();
 ///
 /// // Grab a payment from the all payments end point
-/// let payments = client.request(payment::All::default().limit(1)).unwrap();
+/// let payments = client.request(payment::All::default().with_limit(1)).unwrap();
 /// let payment = &payments.records()[0];
 ///
 /// // All "operations" have transaction hashes, and a payment is a type of operation
@@ -213,7 +194,7 @@ mod transaction_details_tests {
 /// assert!(payments.records().len() > 0);
 /// assert_eq!(payments.records()[0].transaction(), hash);
 /// ```
-#[derive(Debug, Clone, Cursor)]
+#[derive(Debug, Clone, Cursor, Limit)]
 pub struct Payments {
     hash: String,
     cursor: Option<String>,
@@ -230,20 +211,6 @@ impl Payments {
             order: None,
             limit: None,
         }
-    }
-
-    /// Fetches all records with a given limit
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::transaction;
-    ///
-    /// let endpoint = transaction::Payments::new("ABC123").limit(1);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
-        self
     }
 
     /// Fetches all records in a set order, either ascending or descending.
@@ -309,7 +276,7 @@ mod transaction_payments_test {
         let ep = Payments::new("HASH123")
             .with_cursor("CURSOR")
             .order(Order::Desc)
-            .limit(123);
+            .with_limit(123);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/transactions/HASH123/payments");
         assert_eq!(
@@ -327,12 +294,12 @@ mod transaction_payments_test {
 ///
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::{transaction, operation};
+/// use stellar_client::endpoint::{transaction, operation, Limit};
 ///
 /// let client   = Client::horizon_test().unwrap();
 ///
 /// // Grab an operation from the all operations end point
-/// let operations = client.request(operation::All::default().limit(1)).unwrap();
+/// let operations = client.request(operation::All::default().with_limit(1)).unwrap();
 /// let operation = &operations.records()[0];
 ///
 /// // All "operations" have transaction hashes.
@@ -343,7 +310,7 @@ mod transaction_payments_test {
 /// assert!(operations.records().len() > 0);
 /// assert_eq!(operations.records()[0].transaction(), hash);
 /// ```
-#[derive(Debug, Clone, Cursor)]
+#[derive(Debug, Clone, Cursor, Limit)]
 pub struct Operations {
     hash: String,
     cursor: Option<String>,
@@ -360,20 +327,6 @@ impl Operations {
             order: None,
             limit: None,
         }
-    }
-
-    /// Fetches all records with a given limit
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::transaction;
-    ///
-    /// let endpoint = transaction::Operations::new("ABC123").limit(1);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
-        self
     }
 
     /// Fetches all records in a set order, either ascending or descending.
@@ -439,7 +392,7 @@ mod transaction_operations_test {
         let ep = Operations::new("HASH123")
             .with_cursor("CURSOR")
             .order(Order::Desc)
-            .limit(123);
+            .with_limit(123);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/transactions/HASH123/operations");
         assert_eq!(

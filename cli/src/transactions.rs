@@ -1,4 +1,4 @@
-use stellar_client::{endpoint::transaction, error::Result, sync::{self, Client}};
+use stellar_client::{endpoint::{transaction, Limit}, error::Result, sync::{self, Client}};
 use clap::ArgMatches;
 use super::{cursor, ordering, pager::Pager};
 
@@ -7,7 +7,7 @@ pub fn all<'a>(client: Client, matches: &'a ArgMatches) -> Result<()> {
     let endpoint = {
         let endpoint = transaction::All::default()
             .order(ordering::from_arg(matches))
-            .limit(pager.horizon_page_limit() as u32);
+            .with_limit(pager.horizon_page_limit() as u32);
         cursor::assign_from_arg(matches, endpoint)
     };
     let iter = sync::Iter::new(&client, endpoint);

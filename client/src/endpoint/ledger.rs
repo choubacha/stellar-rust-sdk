@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::{Effect, Ledger, Operation, Transaction};
-use super::{Body, Cursor, IntoRequest, Order, Records};
+use super::{Body, Cursor, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 
 /// Represents the all ledgers end point for the stellar horizon server. The endpoint
@@ -21,7 +21,7 @@ use http::{Request, Uri};
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone, Cursor)]
+#[derive(Debug, Default, Clone, Cursor, Limit)]
 pub struct All {
     cursor: Option<String>,
     order: Option<Order>,
@@ -45,25 +45,6 @@ impl All {
     /// ```
     pub fn order(mut self, order: Order) -> Self {
         self.order = Some(order);
-        self
-    }
-
-    /// Sets the maximum number of records to return.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// # use stellar_client::sync::Client;
-    /// # use stellar_client::endpoint::ledger;
-    /// #
-    /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = ledger::All::default().limit(3);
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert_eq!(records.records().len(), 3);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
         self
     }
 
@@ -116,7 +97,7 @@ mod all_ledgers_tests {
     fn it_puts_the_query_params_on_the_uri() {
         let ep = All::default()
             .with_cursor("CURSOR")
-            .limit(123)
+            .with_limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/ledgers");
@@ -215,7 +196,7 @@ mod ledger_details_tests {
 ///
 /// assert!(payments.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor)]
+#[derive(Debug, Clone, Cursor, Limit)]
 pub struct Payments {
     sequence: u32,
     cursor: Option<String>,
@@ -253,22 +234,6 @@ impl Payments {
     /// ```
     pub fn order(mut self, order: Order) -> Self {
         self.order = Some(order);
-        self
-    }
-
-    /// Sets the maximum number of records to return.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::ledger;
-    ///
-    /// # // Not making requests seeing as the main documentation has it.
-    /// # // This is just to document the usage and conserve hits to horizon.
-    /// let endpoint = ledger::Payments::new(123).limit(15);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
         self
     }
 
@@ -321,7 +286,7 @@ mod ledger_payments_tests {
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Payments::new(123)
             .with_cursor("CURSOR")
-            .limit(123)
+            .with_limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/ledgers/123/payments");
@@ -340,12 +305,12 @@ mod ledger_payments_tests {
 /// ## Example
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::{ledger, transaction};
+/// use stellar_client::endpoint::{ledger, transaction, Limit};
 ///
 /// let client   = Client::horizon_test().unwrap();
 ///
 /// // Grab transactions and associated ledger to ensure a ledger sequence with transactions
-/// let txns = client.request(transaction::All::default().limit(1)).unwrap();
+/// let txns = client.request(transaction::All::default().with_limit(1)).unwrap();
 /// let txn = &txns.records()[0];
 /// let sequence = txn.ledger();
 ///
@@ -355,7 +320,7 @@ mod ledger_payments_tests {
 ///
 /// assert!(ledger_txns.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor)]
+#[derive(Debug, Clone, Cursor, Limit)]
 pub struct Transactions {
     sequence: u32,
     cursor: Option<String>,
@@ -393,22 +358,6 @@ impl Transactions {
     /// ```
     pub fn order(mut self, order: Order) -> Self {
         self.order = Some(order);
-        self
-    }
-
-    /// Sets the maximum number of records to return.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::ledger;
-    ///
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = ledger::Transactions::new(123).limit(15);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
         self
     }
 
@@ -461,7 +410,7 @@ mod ledger_transactions_tests {
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Transactions::new(123)
             .with_cursor("CURSOR")
-            .limit(123)
+            .with_limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/ledgers/123/transactions");
@@ -480,14 +429,14 @@ mod ledger_transactions_tests {
 /// ## Example
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::{ledger, transaction};
+/// use stellar_client::endpoint::{ledger, transaction, Limit};
 ///
 /// let client   = Client::horizon_test().unwrap();
 ///
 /// // Grab transactions and associated ledger to ensure a ledger sequence with transactions.
 /// // We seek transactions because effects have no references to a ledger and a ledger with
 /// // transactions by definition has effects.
-/// let txns = client.request(transaction::All::default().limit(1)).unwrap();
+/// let txns = client.request(transaction::All::default().with_limit(1)).unwrap();
 /// let txn = &txns.records()[0];
 /// let sequence = txn.ledger();
 ///
@@ -497,7 +446,7 @@ mod ledger_transactions_tests {
 ///
 /// assert!(ledger_effects.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor)]
+#[derive(Debug, Clone, Cursor, Limit)]
 pub struct Effects {
     sequence: u32,
     cursor: Option<String>,
@@ -535,22 +484,6 @@ impl Effects {
     /// ```
     pub fn order(mut self, order: Order) -> Self {
         self.order = Some(order);
-        self
-    }
-
-    /// Sets the maximum number of records to return.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::ledger;
-    ///
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = ledger::Effects::new(123).limit(15);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
         self
     }
 
@@ -603,7 +536,7 @@ mod ledger_effects_tests {
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Effects::new(123)
             .with_cursor("CURSOR")
-            .limit(123)
+            .with_limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/ledgers/123/effects");
@@ -622,14 +555,14 @@ mod ledger_effects_tests {
 /// ## Example
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::{ledger, transaction};
+/// use stellar_client::endpoint::{ledger, transaction, Limit};
 ///
 /// let client   = Client::horizon_test().unwrap();
 ///
 /// // Grab transactions and associated ledger to ensure a ledger sequence with transactions.
 /// // We seek transactions because operations have no references to a ledger and a ledger with
 /// // transactions by definition has operations.
-/// let txns = client.request(transaction::All::default().limit(1)).unwrap();
+/// let txns = client.request(transaction::All::default().with_limit(1)).unwrap();
 /// let txn = &txns.records()[0];
 /// let sequence = txn.ledger();
 ///
@@ -639,7 +572,7 @@ mod ledger_effects_tests {
 ///
 /// assert!(ledger_operations.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor)]
+#[derive(Debug, Clone, Cursor, Limit)]
 pub struct Operations {
     sequence: u32,
     cursor: Option<String>,
@@ -677,22 +610,6 @@ impl Operations {
     /// ```
     pub fn order(mut self, order: Order) -> Self {
         self.order = Some(order);
-        self
-    }
-
-    /// Sets the maximum number of records to return.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::ledger;
-    ///
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = ledger::Operations::new(123).limit(15);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
         self
     }
 
@@ -745,7 +662,7 @@ mod ledger_operations_tests {
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Operations::new(123)
             .with_cursor("CURSOR")
-            .limit(123)
+            .with_limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/ledgers/123/operations");

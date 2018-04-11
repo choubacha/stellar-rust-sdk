@@ -1,5 +1,5 @@
 use clap::ArgMatches;
-use stellar_client::{sync, endpoint::account, error::Result, sync::Client};
+use stellar_client::{sync, endpoint::{account, Limit}, error::Result, sync::Client};
 use super::{cursor, ordering, pager::Pager};
 
 pub fn details<'a>(client: Client, matches: &'a ArgMatches) -> Result<()> {
@@ -20,7 +20,7 @@ pub fn transactions<'a>(client: Client, matches: &'a ArgMatches) -> Result<()> {
     let endpoint = {
         let endpoint = account::Transactions::new(id)
             .order(ordering::from_arg(matches))
-            .limit(pager.horizon_page_limit() as u32);
+            .with_limit(pager.horizon_page_limit() as u32);
         cursor::assign_from_arg(matches, endpoint)
     };
     let iter = sync::Iter::new(&client, endpoint);

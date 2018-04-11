@@ -41,3 +41,35 @@ pub fn cursor(input: TokenStream) -> TokenStream {
         panic!("#[derive(Cursor)] is only valid for structs")
     }
 }
+
+#[proc_macro_derive(Limit)]
+pub fn limit(input: TokenStream) -> TokenStream {
+    // Parse the string representation
+    let ast: DeriveInput = syn::parse(input).unwrap();
+    let name = &ast.ident;
+
+    if let Data::Struct(data) = ast.data {
+        if data.fields
+            .iter()
+            .any(|f| f.ident == Some(Ident::from("limit")))
+        {
+            let code = quote! {
+                impl Limit for #name {
+                    fn with_limit(mut self, limit: u32) -> #name {
+                        self.limit = Some(limit);
+                        self
+                    }
+
+                    fn limit(&self) -> Option<u32> {
+                        self.limit
+                    }
+                }
+            };
+            code.into()
+        } else {
+            panic!("#[derive(Limit)] is only valid for structs that define `limit: Option<u32>`")
+        }
+    } else {
+        panic!("#[derive(Limit)] is only valid for structs")
+    }
+}
