@@ -134,7 +134,7 @@ impl Client {
         E: IntoRequest,
     {
         let request = endpoint.into_request(&self.uri())?;
-        let request = Self::http_to_reqwest(request);
+        let request = Self::http_to_reqwest(&request);
         let response = self.inner.execute(request)?;
         if response.status().is_success() {
             let resp: E::Response = serde_json::from_reader(response)?;
@@ -147,7 +147,7 @@ impl Client {
         }
     }
 
-    fn http_to_reqwest<T>(request: http::Request<T>) -> reqwest::Request {
+    fn http_to_reqwest<T>(request: &http::Request<T>) -> reqwest::Request {
         use http::method::Method;
         let method = match *request.method() {
             Method::GET => reqwest::Method::Get,

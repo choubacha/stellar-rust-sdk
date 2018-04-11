@@ -35,7 +35,7 @@ impl Pager {
             .map_err(|_| String::from("Page size must be a positive integer"))
     }
 
-    pub fn from_arg<'a>(arg: &'a ArgMatches) -> Pager {
+    pub fn from_arg(arg: &ArgMatches) -> Pager {
         if let Some(size) = arg.value_of("page-size") {
             Pager {
                 size: PageSize::Size(usize::from_str(&size).unwrap_or(10)),
@@ -86,7 +86,7 @@ impl Pager {
         println!("-- press q to quit --");
         let mut input = String::new();
         match ::std::io::stdin().read_line(&mut input) {
-            Ok(_) => !input.starts_with("q"),
+            Ok(_) => !input.starts_with('q'),
             _ => false,
         }
     }

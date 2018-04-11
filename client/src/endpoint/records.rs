@@ -89,7 +89,7 @@ impl Href {
         // Any error should just result in an empty string cursor
         if let Ok(uri) = self.href.parse::<http::Uri>() {
             if let Some(queries) = uri.query() {
-                if let Some(query) = queries.split("&").find(|q| q.starts_with("cursor=")) {
+                if let Some(query) = queries.split('&').find(|q| q.starts_with("cursor=")) {
                     return query.replacen("cursor=", "", 1);
                 }
             }

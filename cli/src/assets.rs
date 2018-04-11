@@ -4,7 +4,7 @@ use super::{cursor, ordering, pager::Pager};
 
 /// Using a client and the arguments from the command line, iterates over the results
 /// and displays them to the end user.
-pub fn all<'a>(client: Client, matches: &'a ArgMatches) -> Result<()> {
+pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let pager = Pager::from_arg(&matches);
 
     let endpoint = {
@@ -37,7 +37,7 @@ pub fn all<'a>(client: Client, matches: &'a ArgMatches) -> Result<()> {
             if asset.is_auth_revocable() {
                 println!("  auth is revocable");
             }
-            println!("");
+            println!();
         }
         Err(err) => res = Err(err),
     });

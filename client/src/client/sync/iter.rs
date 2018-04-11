@@ -85,7 +85,7 @@ where
         match self.try_next_page() {
             Ok(()) => {
                 if let Some(ref records) = self.records {
-                    if records.records().len() > 0 {
+                    if !records.records().is_empty() {
                         let val = records.records()[self.next].clone();
                         self.next += 1;
                         return Some(Ok(val));

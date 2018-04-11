@@ -121,16 +121,16 @@ fn main() {
     // Master match block. All subcommands need to be captured here.
     let result = match matches.subcommand() {
         ("account", Some(sub_m)) => match sub_m.subcommand() {
-            ("details", Some(sub_m)) => account::details(client, sub_m),
-            ("transactions", Some(sub_m)) => account::transactions(client, sub_m),
+            ("details", Some(sub_m)) => account::details(&client, sub_m),
+            ("transactions", Some(sub_m)) => account::transactions(&client, sub_m),
             _ => return print_help_and_exit(),
         },
         ("transactions", Some(sub_m)) => match sub_m.subcommand() {
-            ("all", Some(sub_m)) => transactions::all(client, sub_m),
+            ("all", Some(sub_m)) => transactions::all(&client, sub_m),
             _ => return print_help_and_exit(),
         },
         ("assets", Some(sub_m)) => match sub_m.subcommand() {
-            ("all", Some(m)) => assets::all(client, m),
+            ("all", Some(m)) => assets::all(&client, m),
             _ => return print_help_and_exit(),
         },
         _ => return print_help_and_exit(),
