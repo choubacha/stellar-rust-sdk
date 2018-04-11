@@ -28,11 +28,13 @@ pub mod ledger;
 pub mod operation;
 pub mod payment;
 pub mod transaction;
-mod records;
 mod cursor;
+mod limit;
+mod records;
 
-pub use self::records::Records;
 pub use self::cursor::Cursor;
+pub use self::limit::Limit;
+pub use self::records::Records;
 
 /// Represents the body of a request to an IntoRequest.
 #[derive(Debug)]

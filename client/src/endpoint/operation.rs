@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::Operation;
-use super::{Body, Cursor, IntoRequest, Order, Records};
+use super::{Body, Cursor, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 
 pub use super::account::Operations as ForAccount;
@@ -25,7 +25,7 @@ pub use super::transaction::Operations as ForTransaction;
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone, Cursor)]
+#[derive(Debug, Default, Clone, Cursor, Limit)]
 pub struct All {
     cursor: Option<String>,
     order: Option<Order>,
@@ -44,20 +44,6 @@ impl All {
     /// ```
     pub fn order(mut self, order: Order) -> Self {
         self.order = Some(order);
-        self
-    }
-
-    /// Sets the maximum number of records to return.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::operation;
-    ///
-    /// let endpoint = operation::All::default().limit(3);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
         self
     }
 
@@ -110,7 +96,7 @@ mod all_operationss_tests {
     fn it_puts_the_query_params_on_the_uri() {
         let ep = All::default()
             .with_cursor("CURSOR")
-            .limit(123)
+            .with_limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/operations");
@@ -130,13 +116,13 @@ mod all_operationss_tests {
 ///
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::operation;
+/// use stellar_client::endpoint::{operation, Limit};
 ///
 /// let client = Client::horizon_test().unwrap();
 ///
 /// // Grab an operation so that we know that we can request one from
 /// // horizon that actually exists.
-/// let all = operation::All::default().limit(1);
+/// let all = operation::All::default().with_limit(1);
 /// let all = client.request(all).unwrap();
 ///
 /// let operation_id = all.records()[0].id();

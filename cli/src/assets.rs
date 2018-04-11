@@ -1,4 +1,4 @@
-use stellar_client::{endpoint::asset, error::Result, sync::{self, Client}};
+use stellar_client::{endpoint::{asset, Limit}, error::Result, sync::{self, Client}};
 use clap::ArgMatches;
 use super::{cursor, ordering, pager::Pager};
 
@@ -10,7 +10,7 @@ pub fn all<'a>(client: Client, matches: &'a ArgMatches) -> Result<()> {
     let endpoint = {
         let mut endpoint = asset::All::default()
             .order(ordering::from_arg(matches))
-            .limit(pager.horizon_page_limit() as u32);
+            .with_limit(pager.horizon_page_limit() as u32);
 
         if let Some(code) = matches.value_of("code") {
             endpoint = endpoint.asset_code(code);

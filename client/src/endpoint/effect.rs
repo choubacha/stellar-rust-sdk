@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::Effect;
-use super::{Body, IntoRequest, Order, Records};
+use super::{Body, Cursor, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 pub use super::account::Effects as ForAccount;
 pub use super::ledger::Effects as ForLedger;
@@ -23,7 +23,7 @@ pub use super::ledger::Effects as ForLedger;
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default)]
+#[derive(Debug, Default, Cursor, Limit)]
 pub struct All {
     cursor: Option<String>,
     order: Option<Order>,
@@ -47,51 +47,6 @@ impl All {
     /// ```
     pub fn order(mut self, order: Order) -> Self {
         self.order = Some(order);
-        self
-    }
-
-    /// Starts the page of results at a given cursor
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// # use stellar_client::sync::Client;
-    /// # use stellar_client::endpoint::effect;
-    /// #
-    /// let client      = Client::horizon_test().unwrap();
-    /// #
-    /// # // grab first page and extract cursor
-    /// # let endpoint      = effect::All::default().limit(1);
-    /// # let first_page    = client.request(endpoint).unwrap();
-    /// # let cursor        = first_page.next_cursor();
-    /// #
-    /// let endpoint    = effect::All::default().cursor(cursor).limit(1);
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert!(records.records().len() > 0);
-    /// # assert_ne!(records.next_cursor(), cursor);
-    /// ```
-    pub fn cursor(mut self, cursor: &str) -> Self {
-        self.cursor = Some(cursor.to_string());
-        self
-    }
-
-    /// Sets the maximum number of records to return.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// # use stellar_client::sync::Client;
-    /// # use stellar_client::endpoint::effect;
-    /// #
-    /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = effect::All::default().limit(3);
-    /// let records     = client.request(endpoint).unwrap();
-    /// #
-    /// # assert_eq!(records.records().len(), 3);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
         self
     }
 
@@ -143,8 +98,8 @@ mod all_effects_tests {
     #[test]
     fn it_puts_the_query_params_on_the_uri() {
         let ep = All::default()
-            .cursor("CURSOR")
-            .limit(123)
+            .with_cursor("CURSOR")
+            .with_limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/effects");

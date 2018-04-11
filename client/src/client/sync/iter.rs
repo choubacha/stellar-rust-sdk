@@ -10,11 +10,11 @@ use error::Result;
 ///
 /// ```
 /// use stellar_client::{
-///     endpoint::asset,
+///     endpoint::{asset, Limit},
 ///     sync::{Client, Iter},
 /// };
 /// let client = Client::horizon_test().unwrap();
-/// let endpoint = asset::All::default().limit(3);
+/// let endpoint = asset::All::default().with_limit(3);
 /// let iter = Iter::new(&client, endpoint);
 /// assert_eq!(iter.take(10).count(), 10);
 /// ```
@@ -104,13 +104,13 @@ where
 #[cfg(test)]
 mod iterator_tests {
     use super::*;
-    use endpoint::{account, asset};
+    use endpoint::{account, asset, Limit};
     use stellar_resources::Transaction;
 
     #[test]
     fn it_can_iterate_through_records() {
         let client = Client::horizon_test().unwrap();
-        let endpoint = asset::All::default().limit(3);
+        let endpoint = asset::All::default().with_limit(3);
         let iter = Iter::new(&client, endpoint);
         assert!(iter.take(10).count() > 3);
     }

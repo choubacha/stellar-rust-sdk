@@ -2,7 +2,7 @@
 use error::Result;
 use std::str::FromStr;
 use stellar_resources::{Account, Datum, Effect, Operation, Transaction};
-use super::{Body, Cursor, IntoRequest, Order, Records};
+use super::{Body, Cursor, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 
 /// Represents the account details on the stellar horizon server.
@@ -13,12 +13,12 @@ use http::{Request, Uri};
 /// ## Example
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::{account, transaction};
+/// use stellar_client::endpoint::{account, transaction, Limit};
 ///
 /// let client = Client::horizon_test().unwrap();
 ///
 /// // Grab transaction and associated account to ensure an account populated with transactions
-/// let transaction_ep = transaction::All::default().limit(1);
+/// let transaction_ep = transaction::All::default().with_limit(1);
 /// let all_txns       = client.request(transaction_ep).unwrap();
 /// let txn            = &all_txns.records()[0];
 /// let account_id     = txn.source_account();
@@ -139,12 +139,12 @@ mod details_tests {
 /// ## Example
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::{account, transaction};
+/// use stellar_client::endpoint::{account, transaction, Limit};
 ///
 /// let client = Client::horizon_test().unwrap();
 ///
 /// // Grab transaction and associated account to ensure an account populated with transactions
-/// let transaction_ep = transaction::All::default().limit(1);
+/// let transaction_ep = transaction::All::default().with_limit(1);
 /// let all_txns       = client.request(transaction_ep).unwrap();
 /// let txn            = &all_txns.records()[0];
 /// let account_id     = txn.source_account();
@@ -155,7 +155,7 @@ mod details_tests {
 ///
 /// assert!(acct_txns.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor)]
+#[derive(Debug, Clone, Cursor, Limit)]
 pub struct Transactions {
     id: String,
     cursor: Option<String>,
@@ -179,21 +179,6 @@ impl Transactions {
             order: None,
             limit: None,
         }
-    }
-
-    /// Sets the maximum number of records to return.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::account;
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = account::Transactions::new("abc123").limit(20);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
-        self
     }
 
     /// Fetches all records in a set order, either ascending or descending.
@@ -272,7 +257,7 @@ mod transactions_tests {
         let ep = Transactions::new("abc123")
             .with_cursor("CURSOR")
             .order(Order::Desc)
-            .limit(123);
+            .with_limit(123);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/accounts/abc123/transactions");
         assert_eq!(
@@ -290,12 +275,12 @@ mod transactions_tests {
 /// ## Example
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::{account, transaction};
+/// use stellar_client::endpoint::{account, transaction, Limit};
 ///
 /// let client = Client::horizon_test().unwrap();
 ///
 /// // Grab transaction and associated account to ensure an account populated with effects
-/// let transaction_ep = transaction::All::default().limit(1);
+/// let transaction_ep = transaction::All::default().with_limit(1);
 /// let all_txns       = client.request(transaction_ep).unwrap();
 /// let txn            = &all_txns.records()[0];
 /// let account_id     = txn.source_account();
@@ -306,7 +291,7 @@ mod transactions_tests {
 ///
 /// assert!(effects.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor)]
+#[derive(Debug, Clone, Cursor, Limit)]
 pub struct Effects {
     id: String,
     cursor: Option<String>,
@@ -330,21 +315,6 @@ impl Effects {
             order: None,
             limit: None,
         }
-    }
-
-    /// Sets the maximum number of records to return.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::account;
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = account::Effects::new("abc123").limit(20);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
-        self
     }
 
     /// Fetches all records in a set order, either ascending or descending.
@@ -423,7 +393,7 @@ mod effects_tests {
         let ep = Effects::new("abc123")
             .with_cursor("CURSOR")
             .order(Order::Asc)
-            .limit(123);
+            .with_limit(123);
         let req = ep.into_request("https://horizon-testnet.stellar.org")
             .unwrap();
         assert_eq!(req.uri().path(), "/accounts/abc123/effects");
@@ -439,7 +409,7 @@ mod effects_tests {
 /// ## Example
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::{account, transaction};
+/// use stellar_client::endpoint::{account, transaction, Limit};
 ///
 /// let client   = Client::horizon_test().unwrap();
 ///
@@ -447,7 +417,7 @@ mod effects_tests {
 /// // that has operations. We seek transactions because operations have no guaranteed
 /// // reference to an account but transactions do. And by definition every transaction
 /// // has at least one operation.
-/// let txns = client.request(transaction::All::default().limit(1)).unwrap();
+/// let txns = client.request(transaction::All::default().with_limit(1)).unwrap();
 /// let txn = &txns.records()[0];
 /// let account_id = txn.source_account();
 ///
@@ -457,7 +427,7 @@ mod effects_tests {
 ///
 /// assert!(account_operations.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor)]
+#[derive(Debug, Clone, Cursor, Limit)]
 pub struct Operations {
     account_id: String,
     cursor: Option<String>,
@@ -495,22 +465,6 @@ impl Operations {
     /// ```
     pub fn order(mut self, order: Order) -> Self {
         self.order = Some(order);
-        self
-    }
-
-    /// Sets the maximum number of records to return.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::account;
-    ///
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = account::Operations::new("abc123").limit(15);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
         self
     }
 
@@ -563,7 +517,7 @@ mod ledger_operations_tests {
     fn it_puts_the_query_params_on_the_uri() {
         let ep = Operations::new("abc123")
             .with_cursor("CURSOR")
-            .limit(123)
+            .with_limit(123)
             .order(Order::Desc);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/accounts/abc123/operations");
@@ -585,14 +539,14 @@ mod ledger_operations_tests {
 /// # extern crate stellar_client;
 /// # extern crate stellar_resources;
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::{account, payment};
+/// use stellar_client::endpoint::{account, payment, Limit};
 /// use stellar_resources::operation::OperationKind;
 ///
 /// # fn main() {
 /// let client = Client::horizon_test().unwrap();
 ///
 /// // Grab payments and associated account to ensure an account with payments
-/// let all_payments = client.request(payment::All::default().limit(1)).unwrap();
+/// let all_payments = client.request(payment::All::default().with_limit(1)).unwrap();
 /// let payment      = &all_payments.records()[0];
 /// let account_id   = match payment.kind() {
 ///     &OperationKind::Payment(ref payment)       => payment.from(),
@@ -607,7 +561,7 @@ mod ledger_operations_tests {
 /// assert!(acct_payments.records().len() > 0);
 /// # }
 /// ```
-#[derive(Debug, Clone, Cursor)]
+#[derive(Debug, Clone, Cursor, Limit)]
 pub struct Payments {
     id: String,
     cursor: Option<String>,
@@ -631,21 +585,6 @@ impl Payments {
             order: None,
             limit: None,
         }
-    }
-
-    /// Sets the maximum number of records to return.
-    ///
-    /// ## Example
-    ///
-    /// ```
-    /// use stellar_client::endpoint::account;
-    /// # // Not making requests seeing as the main documentation already does this.
-    /// # // This serves to document the usage while conserving hits to horizon.
-    /// let endpoint = account::Payments::new("abc123").limit(20);
-    /// ```
-    pub fn limit(mut self, limit: u32) -> Self {
-        self.limit = Some(limit);
-        self
     }
 
     /// Fetches all records in a set order, either ascending or descending.
@@ -715,7 +654,7 @@ mod payments_tests {
         let ep = Payments::new("abc123")
             .with_cursor("CURSOR")
             .order(Order::Desc)
-            .limit(123);
+            .with_limit(123);
         let req = ep.into_request("https://www.google.com").unwrap();
         assert_eq!(req.uri().path(), "/accounts/abc123/payments");
         assert_eq!(
