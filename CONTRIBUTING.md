@@ -138,6 +138,12 @@ describe the code change but provide clarity around why it was changed. It's ok 
 locally but when submitting your branch for review, please squash all commits into a logical series
 of changes.
 
+#### Changelogs
+
+We keep a change log of additions and fixes. Please review how changelogs are kept at the [keepachangelog](https://keepachangelog.com/en/1.0.0/)
+website. We have placed a change log in the crate directories of those crates that are released to
+crates.io.
+
 #### Pull Requests
 
 All submittals should be provided via PR. The PRs should be detailed and describe the intent of the
