@@ -6,7 +6,7 @@ use base64string::Base64String;
 /// corresponding keypair that can authorize transactions.
 ///
 /// <https://www.stellar.org/developers/horizon/reference/resources/account.html>
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct Account {
     id: String,
     account_id: String,

@@ -1,4 +1,4 @@
-use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+use serde::{de, Deserialize, Deserializer};
 use asset::AssetIdentifier;
 use amount::Amount;
 
@@ -58,7 +58,7 @@ impl PaymentPath {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 struct IntermediatePaymentPath {
     path: Vec<AssetIdentifier>,
     destination_amount: Amount,
@@ -97,26 +97,6 @@ impl<'de> Deserialize<'de> for PaymentPath {
     }
 }
 
-impl Serialize for PaymentPath {
-    fn serialize<S>(&self, s: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let rep = IntermediatePaymentPath {
-            path: self.path.clone(),
-            source_amount: self.source_amount().to_owned(),
-            destination_amount: self.destination_amount().to_owned(),
-            destination_asset_type: self.destination_asset().asset_type().to_string(),
-            destination_asset_code: self.destination_asset().asset_code(),
-            destination_asset_issuer: self.destination_asset().asset_issuer(),
-            source_asset_type: self.source_asset().asset_type().to_string(),
-            source_asset_code: self.source_asset().asset_code(),
-            source_asset_issuer: self.source_asset().asset_issuer(),
-        };
-        rep.serialize(s)
-    }
-}
-
 #[cfg(test)]
 mod payment_path_tests {
     use super::*;
@@ -134,31 +114,5 @@ mod payment_path_tests {
         assert_eq!(payment_path.destination_amount(), &Amount::new(200_000_000));
         assert_eq!(payment_path.destination_asset().code(), "EUR");
         assert_eq!(payment_path.source_asset().code(), "USD");
-    }
-
-    #[test]
-    fn it_serializes_payment_paths_from_json() {
-        let payment_path: PaymentPath = serde_json::from_str(&payment_path_json()).unwrap();
-        assert_eq!(
-            serde_json::to_string(&payment_path).unwrap(),
-            "{\
-             \"path\":[\
-             {\
-             \"asset_type\":\"credit_alphanum4\",\
-             \"asset_code\":\"1\",\
-             \"asset_issuer\":\"GDSBCQO34HWPGUGQSP3QBFEXVTSR2PW46UIGTHVWGWJGQKH3AFNHXHXN\"\
-             }\
-             ],\
-             \"destination_amount\":\"20.0000000\",\
-             \"destination_asset_type\":\"credit_alphanum4\",\
-             \"destination_asset_code\":\"EUR\",\
-             \"destination_asset_issuer\":\"GDSBCQO34HWPGUGQSP3QBFEXVTSR2PW46U\
-             IGTHVWGWJGQKH3AFNHXHXN\",\
-             \"source_amount\":\"20.0000000\",\
-             \"source_asset_type\":\"credit_alphanum4\",\
-             \"source_asset_code\":\"USD\",\
-             \"source_asset_issuer\":\"GDSBCQO34HWPGUGQSP3QBFEXVTSR2PW46UIGTHVWGWJGQKH3AFNHXHXN\"\
-             }"
-        );
     }
 }

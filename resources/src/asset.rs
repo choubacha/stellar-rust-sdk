@@ -255,7 +255,7 @@ mod asset_identifier_tests {
 
 /// Permissions around who can own an asset and whether or
 /// not the asset issuer can freeze the asset.
-#[derive(Serialize, Deserialize, Debug, Copy, Clone, PartialEq, Eq)]
+#[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq)]
 pub struct Flag {
     auth_required: bool,
     auth_revocable: bool,
@@ -283,7 +283,7 @@ pub struct Asset {
     flags: Flag,
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct IntermediateAsset {
     asset_type: String,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -310,33 +310,6 @@ impl<'de> Deserialize<'de> for Asset {
             num_accounts: rep.num_accounts,
             flags: rep.flags,
         })
-    }
-}
-
-impl Serialize for Asset {
-    fn serialize<S>(&self, s: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let rep: IntermediateAsset = match self.asset_type() {
-            "native" => IntermediateAsset {
-                asset_type: self.asset_type().to_owned(),
-                asset_code: None,
-                asset_issuer: None,
-                amount: self.amount,
-                num_accounts: self.num_accounts,
-                flags: self.flags,
-            },
-            _ => IntermediateAsset {
-                asset_type: self.asset_type().to_owned(),
-                asset_code: Some(self.code().to_owned()),
-                asset_issuer: Some(self.issuer().to_owned()),
-                amount: self.amount,
-                num_accounts: self.num_accounts,
-                flags: self.flags,
-            },
-        };
-        rep.serialize(s)
     }
 }
 
@@ -416,24 +389,4 @@ mod asset_tests {
         assert!(!asset.is_auth_required());
         assert!(asset.is_auth_revocable());
     }
-
-    #[test]
-    fn it_serializes_non_native_assets() {
-        let asset: Asset = serde_json::from_str(&asset_json()).unwrap();
-        assert_eq!(
-            serde_json::to_string(&asset).unwrap(),
-            "{\
-             \"asset_type\":\"credit_alphanum4\",\
-             \"asset_code\":\"USD\",\
-             \"asset_issuer\":\"GBAUUA74H4XOQYRSOW2RZUA4QL5PB37U3JS5NE3RTB2ELJVMIF5RLMAG\",\
-             \"amount\":\"100.0000000\",\
-             \"num_accounts\":91547871,\
-             \"flags\":{\
-             \"auth_required\":false,\
-             \"auth_revocable\":true\
-             }\
-             }"
-        );
-    }
-
 }

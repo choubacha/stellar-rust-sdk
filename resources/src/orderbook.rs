@@ -6,7 +6,7 @@ use asset::AssetIdentifier;
 /// The asset pairs are refered to as a base and counter.
 ///
 /// <https://www.stellar.org/developers/horizon/reference/resources/orderbook.html>
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct Orderbook {
     bids: Vec<OfferSummary>,
     asks: Vec<OfferSummary>,
