@@ -1,5 +1,5 @@
 use clap::{App, Arg, ArgMatches};
-use stellar_client::endpoint::{Direction, Direction::Asc, Direction::Desc};
+use stellar_client::endpoint::{Direction::{Asc, Desc}, Order};
 
 static ARG_NAME: &'static str = "order";
 static ASC: &'static str = "asc";
@@ -19,17 +19,36 @@ pub fn add<'a, 'b>(app: App<'a, 'b>) -> App<'a, 'b> {
 }
 
 /// Parses the argument matches and returns the order to use.
-pub fn from_arg(arg: &ArgMatches) -> Direction {
-    match arg.value_of(ARG_NAME) {
+pub fn assign_from_arg<T>(arg: &ArgMatches, order: T) -> T
+where
+    T: Order,
+{
+    order.with_order(match arg.value_of(ARG_NAME) {
         Some(s) if s == ASC => Asc,
         Some(s) if s == DESC => Desc,
         _ => Desc,
-    }
+    })
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
+    use stellar_client::endpoint::Direction;
+
+    struct Foo {
+        order: Option<Direction>,
+    }
+
+    impl Order for Foo {
+        fn with_order(mut self, order: Direction) -> Foo {
+            self.order = Some(order);
+            self
+        }
+
+        fn order(&self) -> Option<Direction> {
+            self.order
+        }
+    }
 
     fn test_app<'a, 'b>() -> App<'a, 'b> {
         add(App::new("test"))
@@ -42,19 +61,25 @@ mod tests {
 
     #[test]
     fn it_sets_desc() {
-        let order = from_arg(&get_matches(vec!["test", "--order", "desc"]));
-        assert_eq!(order, Desc);
+        let arg_matches = get_matches(vec!["test", "--order", "desc"]);
+        let foo = Foo { order: None };
+        let foo = assign_from_arg(&arg_matches, foo);
+        assert_eq!(foo.order(), Some(Desc));
     }
 
     #[test]
     fn it_sets_asc() {
-        let order = from_arg(&get_matches(vec!["test", "--order", "asc"]));
-        assert_eq!(order, Asc);
+        let arg_matches = get_matches(vec!["test", "--order", "asc"]);
+        let foo = Foo { order: None };
+        let foo = assign_from_arg(&arg_matches, foo);
+        assert_eq!(foo.order(), Some(Asc));
     }
 
     #[test]
     fn it_defaults_to_desc() {
-        let order = from_arg(&get_matches(vec!["test"]));
-        assert_eq!(order, Desc);
+        let arg_matches = get_matches(vec!["test"]);
+        let foo = Foo { order: None };
+        let foo = assign_from_arg(&arg_matches, foo);
+        assert_eq!(foo.order(), Some(Desc));
     }
 }

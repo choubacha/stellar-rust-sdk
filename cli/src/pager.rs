@@ -1,5 +1,6 @@
 use clap::{App, Arg, ArgMatches};
 use std::str::FromStr;
+use stellar_client::endpoint::Limit;
 
 #[derive(Debug, Clone, Copy, Eq, PartialEq)]
 pub struct Pager {
@@ -68,15 +69,22 @@ impl Pager {
         }
     }
 
-    pub fn horizon_page_limit(&self) -> usize {
+    pub fn assign<T>(&self, limit: T) -> T
+    where
+        T: Limit,
+    {
+        limit.with_limit(self.horizon_page_limit())
+    }
+
+    fn horizon_page_limit(&self) -> u32 {
         const MAX: usize = 200;
         match self.size {
-            PageSize::All => MAX,
+            PageSize::All => MAX as u32,
             PageSize::Size(size) => {
                 if size > MAX {
-                    MAX
+                    MAX as u32
                 } else {
-                    size
+                    size as u32
                 }
             }
         }
@@ -131,5 +139,27 @@ mod tests {
         let pager = Pager::from_arg(&get_matches(vec!["test", "--all"]));
         assert_eq!(pager.size, PageSize::All);
         assert_eq!(pager.horizon_page_limit(), 200);
+    }
+
+    #[test]
+    fn it_can_assign_a_limit() {
+        struct Foo {
+            limit: Option<u32>,
+        }
+
+        impl Limit for Foo {
+            fn with_limit(mut self, limit: u32) -> Foo {
+                self.limit = Some(limit);
+                self
+            }
+
+            fn limit(&self) -> Option<u32> {
+                self.limit
+            }
+        }
+
+        let pager = Pager::from_arg(&get_matches(vec!["test", "--page-by", "15"]));
+        let limit = pager.assign(Foo { limit: None });
+        assert_eq!(limit.limit(), Some(15));
     }
 }

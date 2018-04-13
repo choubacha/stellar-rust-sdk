@@ -13,14 +13,15 @@ pub fn add<'a, 'b>(app: App<'a, 'b>) -> App<'a, 'b> {
     )
 }
 
-/// Parses the argument matches and returns the order to use.
-pub fn assign_from_arg<C>(arg: &ArgMatches, endpoint: C) -> C
+/// Parses the argument matches and returns the cursor with the option
+/// attached to it.
+pub fn assign_from_arg<C>(arg: &ArgMatches, cursor: C) -> C
 where
     C: Cursor,
 {
     match arg.value_of(ARG_NAME) {
-        Some(cur) => endpoint.with_cursor(cur),
-        None => endpoint,
+        Some(cur) => cursor.with_cursor(cur),
+        None => cursor,
     }
 }
 
@@ -28,12 +29,12 @@ where
 mod tests {
     use super::*;
 
-    struct TestCursor {
+    struct Foo {
         cursor: Option<String>,
     }
 
-    impl Cursor for TestCursor {
-        fn with_cursor(mut self, cursor: &str) -> TestCursor {
+    impl Cursor for Foo {
+        fn with_cursor(mut self, cursor: &str) -> Foo {
             self.cursor = Some(cursor.to_owned());
             self
         }
@@ -55,7 +56,7 @@ mod tests {
     #[test]
     fn it_sets_the_cursor_if_provided() {
         let arg_matches = get_matches(vec!["test", "--cursor", "123abc"]);
-        let cursor = TestCursor { cursor: None };
+        let cursor = Foo { cursor: None };
         let cursor = assign_from_arg(&arg_matches, cursor);
         assert_eq!(cursor.cursor(), Some("123abc"));
     }
@@ -63,7 +64,7 @@ mod tests {
     #[test]
     fn it_defaults_to_none() {
         let arg_matches = get_matches(vec!["test"]);
-        let cursor = TestCursor { cursor: None };
+        let cursor = Foo { cursor: None };
         let cursor = assign_from_arg(&arg_matches, cursor);
         assert_eq!(cursor.cursor(), None);
     }
