@@ -1,4 +1,4 @@
-use stellar_client::{endpoint::{asset, Limit, Order}, error::Result, sync::{self, Client}};
+use stellar_client::{endpoint::asset, error::Result, sync::{self, Client}};
 use clap::ArgMatches;
 use super::{cursor, ordering, pager::Pager};
 
@@ -8,9 +8,7 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let pager = Pager::from_arg(&matches);
 
     let endpoint = {
-        let mut endpoint = asset::All::default()
-            .with_order(ordering::from_arg(matches))
-            .with_limit(pager.horizon_page_limit() as u32);
+        let mut endpoint = asset::All::default();
 
         if let Some(code) = matches.value_of("code") {
             endpoint = endpoint.with_asset_code(code);
@@ -18,6 +16,9 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
         if let Some(issuer) = matches.value_of("issuer") {
             endpoint = endpoint.with_asset_issuer(issuer);
         }
+
+        endpoint = pager.assign(endpoint);
+        endpoint = ordering::assign_from_arg(matches, endpoint);
         cursor::assign_from_arg(matches, endpoint)
     };
     let iter = sync::Iter::new(&client, endpoint);
