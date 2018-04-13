@@ -1,7 +1,7 @@
 //! Contains endpoints for transactions and related information.
 use error::Result;
 use std::str::FromStr;
-use stellar_resources::{Operation, Transaction};
+use stellar_resources::{Effect, Operation, Transaction};
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 pub use super::account::Transactions as ForAccount;
@@ -148,6 +148,106 @@ mod transaction_details_tests {
             .unwrap();
         assert_eq!(request.uri().host().unwrap(), "horizon-testnet.stellar.org");
         assert_eq!(request.uri().path(), "/transactions/123");
+    }
+}
+
+/// ```
+/// use stellar_client::sync::Client;
+/// use stellar_client::endpoint::{transaction, effect, Limit};
+///
+/// let client   = Client::horizon_test().unwrap();
+///
+/// // Grab a transaction from the all transactions endpoint
+/// let transaction_ep   = transaction::All::default().with_limit(1);
+/// let txns             = client.request(transaction_ep).unwrap();
+/// let txn              = &txns.records()[0];
+/// let hash             = txn.hash();
+///
+/// // Issue a request for that transactions's effects
+/// let endpoint = transaction::Effects::new(hash);
+/// let effects  = client.request(endpoint).unwrap();
+///
+/// assert!(effects.records().len() > 0);
+/// ```
+#[derive(Debug, Clone, Cursor, Limit, Order)]
+pub struct Effects {
+    hash: String,
+    cursor: Option<String>,
+    order: Option<Direction>,
+    limit: Option<u32>,
+}
+
+impl Effects {
+    /// Returns a new endpoint for effects. Hand this to the client in order
+    /// to request effects for a specific transaction by hash
+    pub fn new(hash: &str) -> Self {
+        Effects {
+            hash: hash.to_string(),
+            cursor: None,
+            order: None,
+            limit: None,
+        }
+    }
+
+    fn has_query(&self) -> bool {
+        self.order.is_some() || self.cursor.is_some() || self.limit.is_some()
+    }
+}
+
+impl IntoRequest for Effects {
+    type Response = Records<Effect>;
+
+    fn into_request(self, host: &str) -> Result<Request<Body>> {
+        let mut uri = format!("{}/transactions/{}/effects", host, self.hash);
+        if self.has_query() {
+            uri.push_str("?");
+
+            if let Some(cursor) = self.cursor {
+                uri.push_str(&format!("cursor={}&", cursor));
+            }
+
+            if let Some(order) = self.order {
+                uri.push_str(&format!("order={}&", order.to_string()));
+            }
+
+            if let Some(limit) = self.limit {
+                uri.push_str(&format!("limit={}", limit));
+            }
+        }
+
+        let uri = Uri::from_str(&uri)?;
+        let request = Request::get(uri).body(Body::None)?;
+        Ok(request)
+    }
+}
+
+#[cfg(test)]
+mod effects_tests {
+    use super::*;
+
+    #[test]
+    fn it_leaves_off_the_params_if_not_specified() {
+        let effects = Effects::new("abc123");
+        let req = effects
+            .into_request("https://horizon-testnet.stellar.org")
+            .unwrap();
+        assert_eq!(req.uri().path(), "/transactions/abc123/effects");
+        assert_eq!(req.uri().query(), None);
+    }
+
+    #[test]
+    fn it_puts_the_query_params_on_the_uri() {
+        let ep = Effects::new("abc123")
+            .with_cursor("CURSOR")
+            .with_limit(123)
+            .with_order(Direction::Desc);
+        let req = ep.into_request("https://horizon-testnet.stellar.org")
+            .unwrap();
+        assert_eq!(req.uri().path(), "/transactions/abc123/effects");
+        assert_eq!(
+            req.uri().query(),
+            Some("cursor=CURSOR&order=desc&limit=123")
+        );
     }
 }
 
