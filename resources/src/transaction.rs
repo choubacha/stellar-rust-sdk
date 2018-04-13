@@ -6,7 +6,7 @@ use deserialize;
 /// A transaction is a grouping of operations.
 ///
 /// To learn more about the concept of transactions in the Stellar network, take a look at the Stellar transactions concept guide.
-#[derive(Debug, Deserialize, Serialize, Clone)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Transaction {
     id: String,
     paging_token: String,

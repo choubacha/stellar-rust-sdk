@@ -31,7 +31,7 @@ impl PriceRatio {
 }
 
 /// Summary of an offer to be shown in an orderbook
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct OfferSummary {
     amount: Amount,
     #[serde(rename = "price_r")]
@@ -75,7 +75,7 @@ mod offer_summary_tests {
 }
 
 /// An offer being made for particular assets at a particular exchange rate.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct Offer {
     id: i64,
     paging_token: String,

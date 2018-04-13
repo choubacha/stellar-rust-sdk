@@ -5,7 +5,7 @@ use base64string::Base64String;
 /// for various reasons. Datum represents the value of a single key/value pair.
 ///
 /// <https://www.stellar.org/developers/horizon/reference/resources/data.html>
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct Datum {
     value: Base64String,
 }

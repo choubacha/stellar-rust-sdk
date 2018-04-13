@@ -2,7 +2,7 @@ use chrono::prelude::*;
 use amount::Amount;
 use asset::AssetIdentifier;
 use offer::PriceRatio;
-use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+use serde::{de, Deserialize, Deserializer};
 
 /// A trade represents an offer that was fulfilled between two assets and accounts.
 ///
@@ -94,59 +94,7 @@ impl<'de> Deserialize<'de> for Trade {
     }
 }
 
-impl Serialize for Trade {
-    fn serialize<S>(&self, s: S) -> Result<S::Ok, S::Error>
-    where
-        S: Serializer,
-    {
-        let rep = TradeRepresentation {
-            id: self.id.to_owned(),
-            paging_token: self.paging_token.to_owned(),
-            ledger_close_time: self.ledger_close_time,
-            offer_id: self.offer_id.to_owned(),
-
-            // Base asset and account information
-            base_account: self.base_account.to_owned(),
-            base_amount: self.base_amount,
-            base_asset_type: self.base_asset().asset_type().to_string(),
-            base_asset_code: if self.base_asset().is_native() {
-                None
-            } else {
-                Some(self.base_asset().code().to_string())
-            },
-            base_asset_issuer: if self.base_asset().is_native() {
-                None
-            } else {
-                Some(self.base_asset().issuer().to_string())
-            },
-
-            // Counter asset and account information
-            counter_amount: self.counter_amount,
-            counter_account: self.counter_account.to_owned(),
-            counter_asset_type: self.counter_asset().asset_type().to_string(),
-            counter_asset_code: if self.counter_asset().is_native() {
-                None
-            } else {
-                Some(self.counter_asset().code().to_string())
-            },
-            counter_asset_issuer: if self.counter_asset().is_native() {
-                None
-            } else {
-                Some(self.counter_asset().issuer().to_string())
-            },
-
-            // Price information
-            price: Price {
-                n: self.price.numerator(),
-                d: self.price.denominator(),
-            },
-            base_is_seller: self.seller.is_base(),
-        };
-        rep.serialize(s)
-    }
-}
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 struct Price {
     n: u64,
     d: u64,
@@ -158,7 +106,7 @@ impl From<Price> for PriceRatio {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Deserialize, Debug)]
 struct TradeRepresentation {
     id: String,
     paging_token: String,
@@ -275,37 +223,11 @@ mod trade_tests {
         assert_eq!(trade.price(), PriceRatio::new(10, 61));
         assert!(trade.seller().is_base());
     }
-
-    #[test]
-    fn it_can_serialize_to_a_trade() {
-        let trade: Trade = serde_json::from_str(&trade_json()).unwrap();
-        assert_eq!(
-            serde_json::to_string(&trade).unwrap(),
-            "{\
-             \"id\":\"68836918321750017-0\",\
-             \"paging_token\":\"68836918321750017-0\",\
-             \"ledger_close_time\":\"2018-02-02T00:20:10Z\",\
-             \"offer_id\":\"695254\",\
-             \"base_account\":\"GBZXCJIUEPDXGHMS64UBJHUVKV6ETWYOVHADLTBXJNJFUC7A7RU5B3GN\",\
-             \"base_amount\":\"0.1217566\",\
-             \"base_asset_type\":\"native\",\
-             \"counter_account\":\"GBHKUQDYXGK5IEYORI7DZMMXANOIEHHOF364LNT4Q7EWPUL7FOO2SP6D\",\
-             \"counter_amount\":\"0.0199601\",\
-             \"counter_asset_type\":\"credit_alphanum4\",\
-             \"counter_asset_code\":\"SLT\",\
-             \"counter_asset_issuer\":\"GCKA6K5PCQ6PNF5RQBF7PQDJWRHO6UOGFMRLK3DYHDOI244V47XKQ4GP\",\
-             \"base_is_seller\":true,\
-             \"price\":{\
-             \"n\":10,\
-             \"d\":61\
-             }}"
-        );
-    }
 }
 
 /// The aggregation of trades for a specifc base/counter pair of assets over a given
 /// time period.
-#[derive(Deserialize, Serialize, Debug)]
+#[derive(Deserialize, Debug)]
 pub struct TradeAggregation {
     // Several fields are omitted since they don't seem to be in the actual response from horizon.
     // Or they don't seem to make sense.

@@ -3,7 +3,7 @@ use amount::Amount;
 
 /// A ledger represents the state of the Stellar universe at a given point in time. It contains the list of all the accounts and balances, all the orders in the distributed exchange, and any other data that persists.
 /// The first ledger in the history of the network is called the genesis ledger.
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Deserialize)]
 pub struct Ledger {
     id: String,
     paging_token: String,
