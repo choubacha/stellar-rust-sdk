@@ -147,7 +147,6 @@ impl Serialize for Trade {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(rename_all = "UPPERCASE")]
 struct Price {
     n: u64,
     d: u64,
@@ -297,8 +296,8 @@ mod trade_tests {
              \"counter_asset_issuer\":\"GCKA6K5PCQ6PNF5RQBF7PQDJWRHO6UOGFMRLK3DYHDOI244V47XKQ4GP\",\
              \"base_is_seller\":true,\
              \"price\":{\
-             \"N\":10,\
-             \"D\":61\
+             \"n\":10,\
+             \"d\":61\
              }}"
         );
     }

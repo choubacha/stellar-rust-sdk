@@ -31,6 +31,7 @@ pub mod transaction;
 
 mod cursor;
 mod limit;
+pub mod trades;
 mod records;
 mod flat_records;
 mod order;
