@@ -140,6 +140,27 @@ impl AssetIdentifier {
             _ => Err("Invalid Asset Type.".to_string()),
         }
     }
+
+    /// A type safe way of creating a native asset AssetIdentifier
+    pub fn native() -> AssetIdentifier {
+        AssetIdentifier::Native
+    }
+
+    /// A type safe way of creating an alphanum4 asset AssetIdentifier
+    pub fn alphanum4(code: &str, issuer: &str) -> AssetIdentifier {
+        AssetIdentifier::CreditAlphanum4(AssetId {
+            code: code.to_string(),
+            issuer: issuer.to_string(),
+        })
+    }
+
+    /// A type safe way of creating an alphanum12 asset AssetIdentifier
+    pub fn alphanum12(code: &str, issuer: &str) -> AssetIdentifier {
+        AssetIdentifier::CreditAlphanum12(AssetId {
+            code: code.to_string(),
+            issuer: issuer.to_string(),
+        })
+    }
 }
 
 #[cfg(test)]
@@ -200,6 +221,35 @@ mod asset_identifier_tests {
              \"asset_type\":\"native\"\
              }"
         );
+    }
+
+    #[test]
+    fn it_creates_a_native_asset() {
+        let asset: AssetIdentifier = AssetIdentifier::native();
+        assert_eq!(asset.asset_type(), "native");
+        assert_eq!(asset.code(), "XLM");
+        assert_eq!(asset.asset_code(), None);
+        assert_eq!(asset.issuer(), "Stellar Foundation");
+        assert_eq!(asset.asset_issuer(), None);
+        assert!(asset.is_native());
+    }
+
+    #[test]
+    fn it_creates_an_alphanum4_asset() {
+        let asset: AssetIdentifier = AssetIdentifier::alphanum4("ABCD", "ISSUER");
+        assert_eq!(asset.asset_type(), "credit_alphanum4");
+        assert_eq!(asset.code(), "ABCD");
+        assert_eq!(asset.issuer(), "ISSUER");
+        assert!(!asset.is_native());
+    }
+
+    #[test]
+    fn it_creates_an_alphanum12_asset() {
+        let asset: AssetIdentifier = AssetIdentifier::alphanum12("ABCD", "ISSUER");
+        assert_eq!(asset.asset_type(), "credit_alphanum12");
+        assert_eq!(asset.code(), "ABCD");
+        assert_eq!(asset.issuer(), "ISSUER");
+        assert!(!asset.is_native());
     }
 }
 
