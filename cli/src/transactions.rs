@@ -60,3 +60,22 @@ pub fn payments(client: &Client, matches: &ArgMatches) -> Result<()> {
     });
     res
 }
+
+pub fn details(client: &Client, matches: &ArgMatches) -> Result<()> {
+    let hash = matches
+        .value_of("HASH")
+        .expect("Transaction identifier hash is required");
+    let endpoint = transaction::Details::new(&hash);
+    let txn = client.request(endpoint)?;
+
+    println!("Hash:                    {}", txn.hash());
+    println!("ledger:                  {}", txn.ledger());
+    println!("created at:              {}", txn.created_at());
+    println!("source account:          {}", txn.source_account());
+    println!("source account sequence: {}", txn.source_account_sequence());
+    println!("fee paid:                {}", txn.fee_as_amount());
+    println!("operation count:         {}", txn.operation_count());
+    println!();
+
+    Ok(())
+}
