@@ -77,8 +77,23 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
             SubCommand::with_name("transactions")
                 .about("Access lists of transactions")
                 .setting(AppSettings::SubcommandRequired)
-                .subcommand(listable!(SubCommand::with_name("all").about("Fetch all transactions"))
-            ),
+                .subcommand(
+                    listable!(
+                        SubCommand::with_name("all")
+                            .about("Fetch all transactions")
+                    )
+                )
+                .subcommand(
+                    listable!(
+                        SubCommand::with_name("payments")
+                            .about("Fetch payment operations part of a given transaction")
+                            .arg(
+                                Arg::with_name("Hash")
+                                    .required(true)
+                                    .help("The transaction hash for which to fetch payments")
+                            )
+                    )
+                ),
         )
         .subcommand(
             SubCommand::with_name("assets")
@@ -127,6 +142,7 @@ fn main() {
         },
         ("transactions", Some(sub_m)) => match sub_m.subcommand() {
             ("all", Some(sub_m)) => transactions::all(&client, sub_m),
+            ("payments", Some(sub_m)) => transactions::payments(&client, sub_m),
             _ => return print_help_and_exit(),
         },
         ("assets", Some(sub_m)) => match sub_m.subcommand() {
