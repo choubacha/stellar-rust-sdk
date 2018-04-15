@@ -93,7 +93,16 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                                     .help("The transaction hash for which to fetch payments")
                             )
                     )
-                ),
+                )
+                .subcommand(
+                    SubCommand::with_name("details")
+                        .about("Fetch details about a specific transaction")
+                        .arg(
+                            Arg::with_name("HASH")
+                                .required(true)
+                                .help("The identifier of the transaction to look up"),
+                        ),
+                )
         )
         .subcommand(
             SubCommand::with_name("assets")
@@ -142,6 +151,7 @@ fn main() {
         },
         ("transactions", Some(sub_m)) => match sub_m.subcommand() {
             ("all", Some(sub_m)) => transactions::all(&client, sub_m),
+            ("details", Some(sub_m)) => transactions::details(&client, sub_m),
             ("payments", Some(sub_m)) => transactions::payments(&client, sub_m),
             _ => return print_help_and_exit(),
         },
