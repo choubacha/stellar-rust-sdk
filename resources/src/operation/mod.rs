@@ -97,7 +97,7 @@ impl Operation {
         &self.paging_token
     }
 
-    /// The has for the transaction that the operation was part of
+    /// The hash for the transaction that the operation was part of
     pub fn transaction(&self) -> &str {
         &self.transaction_hash
     }
@@ -122,6 +122,23 @@ impl Operation {
     /// Returns the kind of the operation
     pub fn kind(&self) -> &Kind {
         &self.kind
+    }
+
+    /// Returns the name of the operation kind
+    pub fn kind_name(&self) -> &str {
+        match self.kind {
+            Kind::CreateAccount(_) => "Create Account",
+            Kind::Payment(_) => "Payment",
+            Kind::PathPayment(_) => "Path Payment",
+            Kind::ManageOffer(_) => "Manage Offer",
+            Kind::CreatePassiveOffer(_) => "Create Passive Offer",
+            Kind::SetOptions(_) => "Set Options",
+            Kind::ChangeTrust(_) => "Change Trust",
+            Kind::AllowTrust(_) => "Allow Trust",
+            Kind::AccountMerge(_) => "Account Merge",
+            Kind::Inflation => "Inflation",
+            Kind::ManageData(_) => "Manage Data",
+        }
     }
 
     /// Returns true if the operation is a create_account operation
