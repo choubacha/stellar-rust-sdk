@@ -2,7 +2,7 @@ use amount::Amount;
 use asset::AssetIdentifier;
 /// This effect can be the result of a change trust operation and represents
 /// the fact that a trustline has been updated between an asset and account
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Updated {
     account: String,
     limit: Amount,

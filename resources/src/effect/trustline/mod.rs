@@ -14,7 +14,7 @@ pub use self::updated::Updated;
 
 /// Enum representing all the different kinds of effects that represent
 /// changes made to an account.
-#[derive(Debug, Deserialize)]
+#[derive(Clone, Debug, Deserialize)]
 pub enum Kind {
     /// An effect representing the creation of a trustline as a result of an operation
     Created(Created),

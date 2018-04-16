@@ -1,7 +1,7 @@
 use asset::Flag;
 /// This effect can be the result of a set options operation and represents
 /// the fact that an account's flags have been updated
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct FlagsUpdated {
     account: String,
     flags: Flag,

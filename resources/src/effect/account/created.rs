@@ -1,7 +1,7 @@
 use amount::Amount;
 /// This effect is the result of a create account operation and represents
 /// the fact that an account was created
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Created {
     account: String,
     starting_balance: Amount,

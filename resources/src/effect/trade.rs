@@ -4,7 +4,7 @@ use asset::AssetIdentifier;
 
 /// Enum representing all the different kinds of effects that represent
 /// changes made to an account.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub enum Kind {
     /// An effect representing the fact that an trade occured
     Trade(Trade),
@@ -12,7 +12,7 @@ pub enum Kind {
 
 /// People on the Stellar network can make offers to buy or sell assets. When an offer is fully or
 /// partially fulfilled, a trade happens.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Trade {
     account: String,
     offer_id: i64,

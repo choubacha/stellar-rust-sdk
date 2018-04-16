@@ -1,6 +1,6 @@
 /// This effect can be the result of a set options operation and represents
 /// the fact that an account's weight thresholds have changed.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct ThresholdsUpdated {
     account: String,
     low: u32,

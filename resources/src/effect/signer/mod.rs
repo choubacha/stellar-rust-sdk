@@ -10,7 +10,7 @@ pub use self::updated::Updated;
 
 /// Enum representing all the different kinds of effects that represent
 /// changes made to an account signer.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub enum Kind {
     /// An effect representing the creation of a new account signer as a result of an operation
     Created(Created),

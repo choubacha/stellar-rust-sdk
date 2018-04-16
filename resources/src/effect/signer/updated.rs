@@ -1,6 +1,6 @@
 /// This effect can be the result of a set options operation and represents
 /// the fact that a signer has been updated for an account.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Updated {
     account: String,
     public_key: String,

@@ -13,7 +13,7 @@ mod test;
 /// A successful operation will yield zero or more effects. These effects represent specific
 /// changes that occur in the ledger, but are not necessarily directly reflected in the ledger or
 /// history, as transactions and operations are.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Effect {
     id: String,
     paging_token: String,
@@ -22,7 +22,7 @@ pub struct Effect {
 
 /// Each effect type is representing by a kind and captures data specific to that
 /// type within it's newtype.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub enum EffectKind {
     /// A collection of effects that represent updates to an account
     Account(account::Kind),
@@ -80,6 +80,34 @@ impl Effect {
     /// Returns the kind of the effect
     pub fn kind(&self) -> &Kind {
         &self.kind
+    }
+
+    /// Returns the name of the effect kind
+    pub fn kind_name(&self) -> &str {
+        match self.kind {
+            Kind::Account(ref account_kind) => match *account_kind {
+                account::Kind::Created(_) => "Account created",
+                account::Kind::Removed(_) => "Account removed",
+                account::Kind::Credited(_) => "Account credited",
+                account::Kind::Debited(_) => "Account debited",
+                account::Kind::ThresholdsUpdated(_) => "Account tresholds updated",
+                account::Kind::HomeDomainUpdated(_) => "Account home domain updated",
+                account::Kind::FlagsUpdated(_) => "Flags updated",
+            },
+            Kind::Signer(ref signer_kind) => match *signer_kind {
+                signer::Kind::Created(_) => "Signer created",
+                signer::Kind::Removed(_) => "Signer removed",
+                signer::Kind::Updated(_) => "Signed updated",
+            },
+            Kind::Trustline(ref trustline_kind) => match *trustline_kind {
+                trustline::Kind::Created(_) => "Trustline created",
+                trustline::Kind::Removed(_) => "Trustline removed",
+                trustline::Kind::Updated(_) => "Trustline updated",
+                trustline::Kind::Authorized(_) => "Trustline authorized",
+                trustline::Kind::Deauthorized(_) => "Trustline deauthorized",
+            },
+            Kind::Trade(_) => "Trade",
+        }
     }
 
     /// Returns true if the effect is an account_created effect

@@ -1,6 +1,6 @@
 /// This effect can be the result of a set options operation and represents
 /// the fact that a new signer has been removed from an account.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Removed {
     account: String,
     public_key: String,

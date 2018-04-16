@@ -1,6 +1,6 @@
 /// This effect is the result of a create merge operation and represents
 /// the fact that an account was removed in the merge
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Removed {
     account: String,
 }

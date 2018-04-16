@@ -18,7 +18,7 @@ pub use self::thresholds_updated::ThresholdsUpdated;
 
 /// Enum representing all the different kinds of effects that represent
 /// changes made to an account.
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub enum Kind {
     /// An effect representing the fact that an account was created
     Created(Created),

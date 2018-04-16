@@ -3,7 +3,7 @@ use asset::AssetIdentifier;
 /// This effect can be the result of a create_account, payment, path_payment
 /// or merge_account operation.  It represents the fact that assets were
 /// removed to an account
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Debited {
     account: String,
     amount: Amount,

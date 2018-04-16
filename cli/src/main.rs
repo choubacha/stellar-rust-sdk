@@ -113,6 +113,17 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                                     .help("The transaction hash for which to fetch operations")
                             )
                     )
+                )
+                .subcommand(
+                    listable!(
+                        SubCommand::with_name("effects")
+                            .about("Fetch effects that resulted from a given transaction")
+                            .arg(
+                                Arg::with_name("Hash")
+                                    .required(true)
+                                    .help("The transaction hash for which to fetch effects")
+                            )
+                    )
                 ),
         )
         .subcommand(
@@ -176,6 +187,7 @@ fn main() {
             ("details", Some(sub_m)) => transactions::details(&client, sub_m),
             ("operations", Some(sub_m)) => transactions::operations(&client, sub_m),
             ("payments", Some(sub_m)) => transactions::payments(&client, sub_m),
+            ("effects", Some(sub_m)) => transactions::effects(&client, sub_m),
             _ => return print_help_and_exit(),
         },
         ("assets", Some(sub_m)) => match sub_m.subcommand() {
