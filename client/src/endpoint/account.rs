@@ -108,7 +108,7 @@ impl IntoRequest for Data {
 }
 
 #[cfg(test)]
-mod details_tests {
+mod account_tests {
     use super::*;
 
     #[test]

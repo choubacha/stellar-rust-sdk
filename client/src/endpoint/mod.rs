@@ -26,6 +26,7 @@ pub mod asset;
 pub mod effect;
 pub mod ledger;
 pub mod operation;
+pub mod orderbook;
 pub mod payment;
 pub mod transaction;
 
