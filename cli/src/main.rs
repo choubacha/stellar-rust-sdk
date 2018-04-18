@@ -140,6 +140,17 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                     ),
                 ),
         )
+        .subcommand(
+            SubCommand::with_name("ledgers")
+                .about("Access lists of ledgers")
+                .setting(AppSettings::SubcommandRequired)
+                .subcommand(
+                    listable!(
+                        SubCommand::with_name("all")
+                            .about("Fetch all ledgers")
+                    ),
+                ),
+        )
 }
 
 fn main() {
@@ -171,6 +182,10 @@ fn main() {
             ("all", Some(m)) => assets::all(&client, m),
             _ => return print_help_and_exit(),
         },
+        ("ledgers", Some(sub_m)) => match sub_m.subcommand() {
+            ("all", Some(m)) => ledgers::all(&client, m),
+            _ => return print_help_and_exit(),
+        },
         _ => return print_help_and_exit(),
     };
 
@@ -196,3 +211,4 @@ fn print_help_and_exit() {
 mod account;
 mod transactions;
 mod assets;
+mod ledgers;
