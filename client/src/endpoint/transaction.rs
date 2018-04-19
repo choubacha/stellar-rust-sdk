@@ -1,9 +1,11 @@
 //! Contains endpoints for transactions and related information.
 use error::Result;
+use http::{Request, Uri};
 use std::str::FromStr;
 use stellar_resources::{Effect, Operation, Transaction};
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
-use http::{Request, Uri};
+use uri::{self, TryFromUri, UriWrap};
+
 pub use super::account::Transactions as ForAccount;
 pub use super::ledger::Transactions as ForLedger;
 
@@ -64,6 +66,17 @@ impl IntoRequest for All {
     }
 }
 
+impl TryFromUri for All {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<All, uri::Error> {
+        let params = wrap.params();
+        Ok(All {
+            cursor: params.get_parse("cursor").ok(),
+            order: params.get_parse("order").ok(),
+            limit: params.get_parse("limit").ok(),
+        })
+    }
+}
+
 #[cfg(test)]
 mod all_transactions_test {
     use super::*;
@@ -88,6 +101,17 @@ mod all_transactions_test {
             req.uri().query(),
             Some("cursor=CURSOR&order=desc&limit=123")
         );
+    }
+
+    #[test]
+    fn it_parses_query_params_from_uri() {
+        let uri: Uri = "/transactions?order=desc&cursor=CURSOR&limit=123"
+            .parse()
+            .unwrap();
+        let all = All::try_from(&uri).unwrap();
+        assert_eq!(all.order, Some(Direction::Desc));
+        assert_eq!(all.cursor, Some("CURSOR".to_string()));
+        assert_eq!(all.limit, Some(123));
     }
 }
 
@@ -221,6 +245,24 @@ impl IntoRequest for Effects {
     }
 }
 
+impl TryFromUri for Effects {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
+        let path = wrap.path();
+        match (path.get(0), path.get(1), path.get(2)) {
+            (Some(&"transactions"), Some(hash), Some(&"effects")) => {
+                let params = wrap.params();
+                Ok(Self {
+                    hash: hash.to_string(),
+                    cursor: params.get_parse("cursor").ok(),
+                    order: params.get_parse("order").ok(),
+                    limit: params.get_parse("limit").ok(),
+                })
+            }
+            _ => Err(uri::Error::invalid_path()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod effects_tests {
     use super::*;
@@ -248,6 +290,18 @@ mod effects_tests {
             req.uri().query(),
             Some("cursor=CURSOR&order=desc&limit=123")
         );
+    }
+
+    #[test]
+    fn it_parses_from_a_uri() {
+        let uri: Uri = "/transactions/abc123/effects?cursor=CURSOR&order=desc&limit=123"
+            .parse()
+            .unwrap();
+        let ep = Effects::try_from(&uri).unwrap();
+        assert_eq!(ep.hash, "abc123");
+        assert_eq!(ep.limit, Some(123));
+        assert_eq!(ep.cursor, Some("CURSOR".to_string()));
+        assert_eq!(ep.order, Some(Direction::Desc));
     }
 }
 
@@ -326,6 +380,24 @@ impl IntoRequest for Payments {
     }
 }
 
+impl TryFromUri for Payments {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
+        let path = wrap.path();
+        match (path.get(0), path.get(1), path.get(2)) {
+            (Some(&"transactions"), Some(hash), Some(&"payments")) => {
+                let params = wrap.params();
+                Ok(Self {
+                    hash: hash.to_string(),
+                    cursor: params.get_parse("cursor").ok(),
+                    order: params.get_parse("order").ok(),
+                    limit: params.get_parse("limit").ok(),
+                })
+            }
+            _ => Err(uri::Error::invalid_path()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod transaction_payments_test {
     use super::*;
@@ -350,6 +422,18 @@ mod transaction_payments_test {
             req.uri().query(),
             Some("cursor=CURSOR&order=desc&limit=123")
         );
+    }
+
+    #[test]
+    fn it_parses_from_a_uri() {
+        let uri: Uri = "/transactions/abc123/payments?cursor=CURSOR&order=desc&limit=123"
+            .parse()
+            .unwrap();
+        let ep = Payments::try_from(&uri).unwrap();
+        assert_eq!(ep.hash, "abc123");
+        assert_eq!(ep.limit, Some(123));
+        assert_eq!(ep.cursor, Some("CURSOR".to_string()));
+        assert_eq!(ep.order, Some(Direction::Desc));
     }
 }
 
@@ -428,6 +512,24 @@ impl IntoRequest for Operations {
     }
 }
 
+impl TryFromUri for Operations {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
+        let path = wrap.path();
+        match (path.get(0), path.get(1), path.get(2)) {
+            (Some(&"transactions"), Some(hash), Some(&"operations")) => {
+                let params = wrap.params();
+                Ok(Self {
+                    hash: hash.to_string(),
+                    cursor: params.get_parse("cursor").ok(),
+                    order: params.get_parse("order").ok(),
+                    limit: params.get_parse("limit").ok(),
+                })
+            }
+            _ => Err(uri::Error::invalid_path()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod transaction_operations_test {
     use super::*;
@@ -452,5 +554,17 @@ mod transaction_operations_test {
             req.uri().query(),
             Some("cursor=CURSOR&order=desc&limit=123")
         );
+    }
+
+    #[test]
+    fn it_parses_from_a_uri() {
+        let uri: Uri = "/transactions/abc123/operations?cursor=CURSOR&order=desc&limit=123"
+            .parse()
+            .unwrap();
+        let ep = Operations::try_from(&uri).unwrap();
+        assert_eq!(ep.hash, "abc123");
+        assert_eq!(ep.limit, Some(123));
+        assert_eq!(ep.cursor, Some("CURSOR".to_string()));
+        assert_eq!(ep.order, Some(Direction::Desc));
     }
 }

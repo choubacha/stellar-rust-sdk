@@ -1,9 +1,10 @@
 //! Contains the endpoint for all ledgers.
 use error::Result;
+use http::{Request, Uri};
 use std::str::FromStr;
 use stellar_resources::{Effect, Ledger, Operation, Transaction};
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
-use http::{Request, Uri};
+use uri::{self, TryFromUri, UriWrap};
 
 /// Represents the all ledgers end point for the stellar horizon server. The endpoint
 /// will return all ledgers filtered by a myriad of different query params.
@@ -62,6 +63,17 @@ impl IntoRequest for All {
     }
 }
 
+impl TryFromUri for All {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<All, uri::Error> {
+        let params = wrap.params();
+        Ok(All {
+            cursor: params.get_parse("cursor").ok(),
+            order: params.get_parse("order").ok(),
+            limit: params.get_parse("limit").ok(),
+        })
+    }
+}
+
 #[cfg(test)]
 mod all_ledgers_tests {
     use super::*;
@@ -86,6 +98,17 @@ mod all_ledgers_tests {
             req.uri().query(),
             Some("order=desc&cursor=CURSOR&limit=123")
         );
+    }
+
+    #[test]
+    fn it_parses_query_params_from_uri() {
+        let uri: Uri = "/ledgers?order=desc&cursor=CURSOR&limit=123"
+            .parse()
+            .unwrap();
+        let all = All::try_from(&uri).unwrap();
+        assert_eq!(all.order, Some(Direction::Desc));
+        assert_eq!(all.cursor, Some("CURSOR".to_string()));
+        assert_eq!(all.limit, Some(123));
     }
 }
 
@@ -235,6 +258,24 @@ impl IntoRequest for Payments {
     }
 }
 
+impl TryFromUri for Payments {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
+        let path = wrap.path();
+        match (path.get(0), path.get(1), path.get(2)) {
+            (Some(&"ledgers"), Some(sequence), Some(&"payments")) => {
+                let params = wrap.params();
+                Ok(Self {
+                    sequence: sequence.parse()?,
+                    cursor: params.get_parse("cursor").ok(),
+                    order: params.get_parse("order").ok(),
+                    limit: params.get_parse("limit").ok(),
+                })
+            }
+            _ => Err(uri::Error::invalid_path()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod ledger_payments_tests {
     use super::*;
@@ -259,6 +300,18 @@ mod ledger_payments_tests {
             req.uri().query(),
             Some("order=desc&cursor=CURSOR&limit=123")
         );
+    }
+
+    #[test]
+    fn it_parses_from_a_uri() {
+        let uri: Uri = "/ledgers/123/payments?cursor=CURSOR&order=desc&limit=123"
+            .parse()
+            .unwrap();
+        let ep = Payments::try_from(&uri).unwrap();
+        assert_eq!(ep.sequence, 123);
+        assert_eq!(ep.limit, Some(123));
+        assert_eq!(ep.cursor, Some("CURSOR".to_string()));
+        assert_eq!(ep.order, Some(Direction::Desc));
     }
 }
 
@@ -343,6 +396,24 @@ impl IntoRequest for Transactions {
     }
 }
 
+impl TryFromUri for Transactions {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
+        let path = wrap.path();
+        match (path.get(0), path.get(1), path.get(2)) {
+            (Some(&"ledgers"), Some(sequence), Some(&"transactions")) => {
+                let params = wrap.params();
+                Ok(Self {
+                    sequence: sequence.parse()?,
+                    cursor: params.get_parse("cursor").ok(),
+                    order: params.get_parse("order").ok(),
+                    limit: params.get_parse("limit").ok(),
+                })
+            }
+            _ => Err(uri::Error::invalid_path()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod ledger_transactions_tests {
     use super::*;
@@ -367,6 +438,18 @@ mod ledger_transactions_tests {
             req.uri().query(),
             Some("order=desc&cursor=CURSOR&limit=123")
         );
+    }
+
+    #[test]
+    fn it_parses_from_a_uri() {
+        let uri: Uri = "/ledgers/123/transactions?cursor=CURSOR&order=desc&limit=123"
+            .parse()
+            .unwrap();
+        let ep = Transactions::try_from(&uri).unwrap();
+        assert_eq!(ep.sequence, 123);
+        assert_eq!(ep.limit, Some(123));
+        assert_eq!(ep.cursor, Some("CURSOR".to_string()));
+        assert_eq!(ep.order, Some(Direction::Desc));
     }
 }
 
@@ -453,6 +536,24 @@ impl IntoRequest for Effects {
     }
 }
 
+impl TryFromUri for Effects {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
+        let path = wrap.path();
+        match (path.get(0), path.get(1), path.get(2)) {
+            (Some(&"ledgers"), Some(sequence), Some(&"effects")) => {
+                let params = wrap.params();
+                Ok(Self {
+                    sequence: sequence.parse()?,
+                    cursor: params.get_parse("cursor").ok(),
+                    order: params.get_parse("order").ok(),
+                    limit: params.get_parse("limit").ok(),
+                })
+            }
+            _ => Err(uri::Error::invalid_path()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod ledger_effects_tests {
     use super::*;
@@ -477,6 +578,18 @@ mod ledger_effects_tests {
             req.uri().query(),
             Some("order=desc&cursor=CURSOR&limit=123")
         );
+    }
+
+    #[test]
+    fn it_parses_from_a_uri() {
+        let uri: Uri = "/ledgers/123/effects?cursor=CURSOR&order=desc&limit=123"
+            .parse()
+            .unwrap();
+        let ep = Effects::try_from(&uri).unwrap();
+        assert_eq!(ep.sequence, 123);
+        assert_eq!(ep.limit, Some(123));
+        assert_eq!(ep.cursor, Some("CURSOR".to_string()));
+        assert_eq!(ep.order, Some(Direction::Desc));
     }
 }
 
@@ -563,6 +676,24 @@ impl IntoRequest for Operations {
     }
 }
 
+impl TryFromUri for Operations {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
+        let path = wrap.path();
+        match (path.get(0), path.get(1), path.get(2)) {
+            (Some(&"ledgers"), Some(sequence), Some(&"operations")) => {
+                let params = wrap.params();
+                Ok(Self {
+                    sequence: sequence.parse()?,
+                    cursor: params.get_parse("cursor").ok(),
+                    order: params.get_parse("order").ok(),
+                    limit: params.get_parse("limit").ok(),
+                })
+            }
+            _ => Err(uri::Error::invalid_path()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod ledger_operations_tests {
     use super::*;
@@ -587,5 +718,17 @@ mod ledger_operations_tests {
             req.uri().query(),
             Some("order=desc&cursor=CURSOR&limit=123")
         );
+    }
+
+    #[test]
+    fn it_parses_from_a_uri() {
+        let uri: Uri = "/ledgers/123/operations?cursor=CURSOR&order=desc&limit=123"
+            .parse()
+            .unwrap();
+        let ep = Operations::try_from(&uri).unwrap();
+        assert_eq!(ep.sequence, 123);
+        assert_eq!(ep.limit, Some(123));
+        assert_eq!(ep.cursor, Some("CURSOR".to_string()));
+        assert_eq!(ep.order, Some(Direction::Desc));
     }
 }

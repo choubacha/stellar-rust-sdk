@@ -21,6 +21,7 @@ pub mod client;
 pub mod endpoint;
 pub mod error;
 mod stellar_error;
+mod uri;
 
 /// The stellar client is a data structure that wraps the logic and state of the
 /// stellar horizon api. Interaction generally relies on building resources from

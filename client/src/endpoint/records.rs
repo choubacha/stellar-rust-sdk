@@ -13,8 +13,8 @@ where
     T: DeserializeOwned,
 {
     records: Vec<T>,
-    next: String,
-    prev: String,
+    next: Option<http::Uri>,
+    prev: Option<http::Uri>,
 }
 
 impl<T> Records<T>
@@ -26,14 +26,14 @@ where
         &self.records
     }
 
-    /// Returns the pagination cursor for the next page
-    pub fn next_cursor(&self) -> &str {
-        &self.next
+    /// Returns the uri to the next page.
+    pub fn next(&self) -> Option<&http::Uri> {
+        self.next.as_ref()
     }
 
-    /// Returns the pagination cursor for the previous page
-    pub fn prev_cursor(&self) -> &str {
-        &self.prev
+    /// Returns the uri to the previous page.
+    pub fn prev(&self) -> Option<&http::Uri> {
+        self.prev.as_ref()
     }
 }
 
@@ -46,11 +46,19 @@ where
         D: Deserializer<'de>,
     {
         let embedded: Embedded<RecordsIntermediate<T>> = Embedded::deserialize(d)?;
-        Ok(Records {
-            records: embedded.embedded.records,
-            next: embedded.links.next.cursor(),
-            prev: embedded.links.prev.cursor(),
-        })
+        if let Some(links) = embedded.links {
+            Ok(Records {
+                records: embedded.embedded.records,
+                next: links.next.and_then(|v| v.uri()),
+                prev: links.prev.and_then(|v| v.uri()),
+            })
+        } else {
+            Ok(Records {
+                records: embedded.embedded.records,
+                next: None,
+                prev: None,
+            })
+        }
     }
 }
 
@@ -63,7 +71,7 @@ struct Embedded<T> {
     #[serde(rename = "_embedded")]
     embedded: T,
     #[serde(rename = "_links")]
-    links: Links,
+    links: Option<Links>,
 }
 
 /// If the embedded resource is a set of records, this can provide that data back in
@@ -75,8 +83,8 @@ struct RecordsIntermediate<T> {
 
 #[derive(Deserialize)]
 struct Links {
-    next: Href,
-    prev: Href,
+    next: Option<Href>,
+    prev: Option<Href>,
 }
 
 #[derive(Deserialize)]
@@ -85,16 +93,8 @@ struct Href {
 }
 
 impl Href {
-    fn cursor(&self) -> String {
-        // Any error should just result in an empty string cursor
-        if let Ok(uri) = self.href.parse::<http::Uri>() {
-            if let Some(queries) = uri.query() {
-                if let Some(query) = queries.split('&').find(|q| q.starts_with("cursor=")) {
-                    return query.replacen("cursor=", "", 1);
-                }
-            }
-        }
-        String::new()
+    fn uri(&self) -> Option<http::Uri> {
+        self.href.parse().ok()
     }
 }
 
@@ -126,17 +126,55 @@ mod records_test {
                 ]
             }
         }"#;
+        let next: http::Uri = "/assets?order=asc&limit=10&cursor=NEXT_CURSOR"
+            .parse()
+            .unwrap();
+        let prev: http::Uri = "/assets?order=asc&limit=10&cursor=PREV_CURSOR"
+            .parse()
+            .unwrap();
         let records: Records<Foo> = serde_json::from_str(&json).unwrap();
         assert_eq!(records.records().first().unwrap().foo, "bar");
-        assert_eq!(records.next_cursor(), "NEXT_CURSOR");
-        assert_eq!(records.prev_cursor(), "PREV_CURSOR");
+        assert_eq!(records.next(), Some(&next));
+        assert_eq!(records.prev(), Some(&prev));
     }
 
     #[test]
-    fn it_parses_the_cursor_out_of_an_href() {
-        let href = Href {
-            href: "/assets?order=asc\u{0026}limit=10\u{0026}cursor=NEXT_CURSOR".to_string(),
-        };
-        assert_eq!(href.cursor(), "NEXT_CURSOR");
+    fn it_parses_out_none_if_blank() {
+        let json = r#"
+        {
+            "_links": {
+                "next": {
+                    "href": ""
+                },
+                "prev": {
+                    "href": ""
+                }
+            },
+            "_embedded": {
+                "records": [
+                    { "foo": "bar" }
+                ]
+            }
+        }"#;
+        let records: Records<Foo> = serde_json::from_str(&json).unwrap();
+        assert_eq!(records.records().first().unwrap().foo, "bar");
+        assert_eq!(records.next(), None);
+        assert_eq!(records.prev(), None);
+    }
+
+    #[test]
+    fn it_parses_out_if_no_links() {
+        let json = r#"
+        {
+            "_embedded": {
+                "records": [
+                    { "foo": "bar" }
+                ]
+            }
+        }"#;
+        let records: Records<Foo> = serde_json::from_str(&json).unwrap();
+        assert_eq!(records.records().first().unwrap().foo, "bar");
+        assert_eq!(records.next(), None);
+        assert_eq!(records.prev(), None);
     }
 }
