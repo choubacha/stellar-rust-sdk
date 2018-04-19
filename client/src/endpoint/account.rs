@@ -4,6 +4,7 @@ use std::str::FromStr;
 use stellar_resources::{Account, Datum, Effect, Offer, Operation, Transaction};
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
+use uri::{self, TryFromUri, UriWrap};
 
 /// Represents the account details on the stellar horizon server.
 /// The endpoint will return information relating to a specific account.
@@ -31,7 +32,7 @@ use http::{Request, Uri};
 /// ```
 #[derive(Debug)]
 pub struct Details {
-    id: String,
+    account_id: String,
 }
 
 impl Details {
@@ -43,8 +44,10 @@ impl Details {
     ///
     /// let details = account::Details::new("abc123");
     /// ```
-    pub fn new(id: &str) -> Self {
-        Self { id: id.to_string() }
+    pub fn new(account_id: &str) -> Self {
+        Self {
+            account_id: account_id.to_string(),
+        }
     }
 }
 
@@ -52,7 +55,7 @@ impl IntoRequest for Details {
     type Response = Account;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {
-        let uri = Uri::from_str(&format!("{}/accounts/{}", host, self.id))?;
+        let uri = Uri::from_str(&format!("{}/accounts/{}", host, self.account_id))?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
     }
@@ -76,7 +79,7 @@ impl IntoRequest for Details {
 /// ```
 #[derive(Debug)]
 pub struct Data {
-    id: String,
+    account_id: String,
     key: String,
 }
 
@@ -89,9 +92,9 @@ impl Data {
     ///
     /// let data = account::Data::new("abc123", "Food");
     /// ```
-    pub fn new(id: &str, key: &str) -> Self {
+    pub fn new(account_id: &str, key: &str) -> Self {
         Self {
-            id: id.to_string(),
+            account_id: account_id.to_string(),
             key: key.to_string(),
         }
     }
@@ -101,7 +104,10 @@ impl IntoRequest for Data {
     type Response = Datum;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {
-        let uri = Uri::from_str(&format!("{}/accounts/{}/data/{}", host, self.id, self.key))?;
+        let uri = Uri::from_str(&format!(
+            "{}/accounts/{}/data/{}",
+            host, self.account_id, self.key
+        ))?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
     }
@@ -157,7 +163,7 @@ mod account_tests {
 /// ```
 #[derive(Debug, Clone, Cursor, Limit, Order)]
 pub struct Transactions {
-    id: String,
+    account_id: String,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
@@ -172,9 +178,9 @@ impl Transactions {
     ///
     /// let txns = account::Transactions::new("abc123");
     /// ```
-    pub fn new(id: &str) -> Self {
+    pub fn new(account_id: &str) -> Self {
         Self {
-            id: id.to_string(),
+            account_id: account_id.to_string(),
             cursor: None,
             order: None,
             limit: None,
@@ -190,7 +196,7 @@ impl IntoRequest for Transactions {
     type Response = Records<Transaction>;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {
-        let mut uri = format!("{}/accounts/{}/transactions", host, self.id);
+        let mut uri = format!("{}/accounts/{}/transactions", host, self.account_id);
         if self.has_query() {
             uri.push_str("?");
 
@@ -210,6 +216,24 @@ impl IntoRequest for Transactions {
         let uri = Uri::from_str(&uri)?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
+    }
+}
+
+impl TryFromUri for Transactions {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
+        let path = wrap.path();
+        match (path.get(0), path.get(1), path.get(2)) {
+            (Some(&"accounts"), Some(account_id), Some(&"transactions")) => {
+                let params = wrap.params();
+                Ok(Self {
+                    account_id: account_id.to_string(),
+                    cursor: params.get_parse("cursor").ok(),
+                    order: params.get_parse("order").ok(),
+                    limit: params.get_parse("limit").ok(),
+                })
+            }
+            _ => Err(uri::Error::invalid_path()),
+        }
     }
 }
 
@@ -250,6 +274,18 @@ mod transactions_tests {
             Some("cursor=CURSOR&order=desc&limit=123")
         );
     }
+
+    #[test]
+    fn it_parses_from_a_uri() {
+        let uri: Uri = "/accounts/abc123/transactions?cursor=CURSOR&order=desc&limit=123"
+            .parse()
+            .unwrap();
+        let ep = Transactions::try_from(&uri).unwrap();
+        assert_eq!(ep.account_id, "abc123");
+        assert_eq!(ep.limit, Some(123));
+        assert_eq!(ep.cursor, Some("CURSOR".to_string()));
+        assert_eq!(ep.order, Some(Direction::Desc));
+    }
 }
 
 /// Represents the effects for account endpoint on the stellar horizon server.
@@ -278,7 +314,7 @@ mod transactions_tests {
 /// ```
 #[derive(Debug, Clone, Cursor, Limit, Order)]
 pub struct Effects {
-    id: String,
+    account_id: String,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
@@ -293,9 +329,9 @@ impl Effects {
     ///
     /// let effects = account::Effects::new("abc123");
     /// ```
-    pub fn new(id: &str) -> Self {
+    pub fn new(account_id: &str) -> Self {
         Self {
-            id: id.to_string(),
+            account_id: account_id.to_string(),
             cursor: None,
             order: None,
             limit: None,
@@ -311,7 +347,7 @@ impl IntoRequest for Effects {
     type Response = Records<Effect>;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {
-        let mut uri = format!("{}/accounts/{}/effects", host, self.id);
+        let mut uri = format!("{}/accounts/{}/effects", host, self.account_id);
         if self.has_query() {
             uri.push_str("?");
 
@@ -331,6 +367,24 @@ impl IntoRequest for Effects {
         let uri = Uri::from_str(&uri)?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
+    }
+}
+
+impl TryFromUri for Effects {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
+        let path = wrap.path();
+        match (path.get(0), path.get(1), path.get(2)) {
+            (Some(&"accounts"), Some(account_id), Some(&"effects")) => {
+                let params = wrap.params();
+                Ok(Self {
+                    account_id: account_id.to_string(),
+                    cursor: params.get_parse("cursor").ok(),
+                    order: params.get_parse("order").ok(),
+                    limit: params.get_parse("limit").ok(),
+                })
+            }
+            _ => Err(uri::Error::invalid_path()),
+        }
     }
 }
 
@@ -368,6 +422,18 @@ mod effects_tests {
             .unwrap();
         assert_eq!(req.uri().path(), "/accounts/abc123/effects");
         assert_eq!(req.uri().query(), Some("cursor=CURSOR&order=asc&limit=123"));
+    }
+
+    #[test]
+    fn it_parses_from_a_uri() {
+        let uri: Uri = "/accounts/abc123/effects?cursor=CURSOR&order=desc&limit=123"
+            .parse()
+            .unwrap();
+        let ep = Effects::try_from(&uri).unwrap();
+        assert_eq!(ep.account_id, "abc123");
+        assert_eq!(ep.limit, Some(123));
+        assert_eq!(ep.cursor, Some("CURSOR".to_string()));
+        assert_eq!(ep.order, Some(Direction::Desc));
     }
 }
 
@@ -455,6 +521,24 @@ impl IntoRequest for Operations {
     }
 }
 
+impl TryFromUri for Operations {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
+        let path = wrap.path();
+        match (path.get(0), path.get(1), path.get(2)) {
+            (Some(&"accounts"), Some(account_id), Some(&"operations")) => {
+                let params = wrap.params();
+                Ok(Self {
+                    account_id: account_id.to_string(),
+                    cursor: params.get_parse("cursor").ok(),
+                    order: params.get_parse("order").ok(),
+                    limit: params.get_parse("limit").ok(),
+                })
+            }
+            _ => Err(uri::Error::invalid_path()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod ledger_operations_tests {
     use super::*;
@@ -479,6 +563,18 @@ mod ledger_operations_tests {
             req.uri().query(),
             Some("order=desc&cursor=CURSOR&limit=123")
         );
+    }
+
+    #[test]
+    fn it_parses_from_a_uri() {
+        let uri: Uri = "/accounts/abc123/operations?cursor=CURSOR&order=desc&limit=123"
+            .parse()
+            .unwrap();
+        let ep = Operations::try_from(&uri).unwrap();
+        assert_eq!(ep.account_id, "abc123");
+        assert_eq!(ep.limit, Some(123));
+        assert_eq!(ep.cursor, Some("CURSOR".to_string()));
+        assert_eq!(ep.order, Some(Direction::Desc));
     }
 }
 
@@ -517,7 +613,7 @@ mod ledger_operations_tests {
 /// ```
 #[derive(Debug, Clone, Cursor, Limit, Order)]
 pub struct Payments {
-    id: String,
+    account_id: String,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
@@ -532,9 +628,9 @@ impl Payments {
     ///
     /// let payments = account::Payments::new("abc123");
     /// ```
-    pub fn new(id: &str) -> Self {
+    pub fn new(account_id: &str) -> Self {
         Self {
-            id: id.to_string(),
+            account_id: account_id.to_string(),
             cursor: None,
             order: None,
             limit: None,
@@ -550,7 +646,7 @@ impl IntoRequest for Payments {
     type Response = Records<Operation>;
 
     fn into_request(self, host: &str) -> Result<Request<Body>> {
-        let mut uri = format!("{}/accounts/{}/payments", host, self.id);
+        let mut uri = format!("{}/accounts/{}/payments", host, self.account_id);
         if self.has_query() {
             uri.push_str("?");
 
@@ -570,6 +666,24 @@ impl IntoRequest for Payments {
         let uri = Uri::from_str(&uri)?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
+    }
+}
+
+impl TryFromUri for Payments {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
+        let path = wrap.path();
+        match (path.get(0), path.get(1), path.get(2)) {
+            (Some(&"accounts"), Some(account_id), Some(&"payments")) => {
+                let params = wrap.params();
+                Ok(Self {
+                    account_id: account_id.to_string(),
+                    cursor: params.get_parse("cursor").ok(),
+                    order: params.get_parse("order").ok(),
+                    limit: params.get_parse("limit").ok(),
+                })
+            }
+            _ => Err(uri::Error::invalid_path()),
+        }
     }
 }
 
@@ -600,6 +714,18 @@ mod payments_tests {
             req.uri().query(),
             Some("cursor=CURSOR&order=desc&limit=123")
         );
+    }
+
+    #[test]
+    fn it_parses_from_a_uri() {
+        let uri: Uri = "/accounts/abc123/payments?cursor=CURSOR&order=desc&limit=123"
+            .parse()
+            .unwrap();
+        let ep = Payments::try_from(&uri).unwrap();
+        assert_eq!(ep.account_id, "abc123");
+        assert_eq!(ep.limit, Some(123));
+        assert_eq!(ep.cursor, Some("CURSOR".to_string()));
+        assert_eq!(ep.order, Some(Direction::Desc));
     }
 }
 
@@ -684,6 +810,24 @@ impl IntoRequest for Offers {
     }
 }
 
+impl TryFromUri for Offers {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
+        let path = wrap.path();
+        match (path.get(0), path.get(1), path.get(2)) {
+            (Some(&"accounts"), Some(account_id), Some(&"offers")) => {
+                let params = wrap.params();
+                Ok(Self {
+                    account_id: account_id.to_string(),
+                    cursor: params.get_parse("cursor").ok(),
+                    order: params.get_parse("order").ok(),
+                    limit: params.get_parse("limit").ok(),
+                })
+            }
+            _ => Err(uri::Error::invalid_path()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod offers_tests {
     use super::*;
@@ -711,5 +855,17 @@ mod offers_tests {
             req.uri().query(),
             Some("cursor=CURSOR&order=desc&limit=123")
         );
+    }
+
+    #[test]
+    fn it_parses_from_a_uri() {
+        let uri: Uri = "/accounts/abc123/offers?cursor=CURSOR&order=desc&limit=123"
+            .parse()
+            .unwrap();
+        let ep = Offers::try_from(&uri).unwrap();
+        assert_eq!(ep.account_id, "abc123");
+        assert_eq!(ep.limit, Some(123));
+        assert_eq!(ep.cursor, Some("CURSOR".to_string()));
+        assert_eq!(ep.order, Some(Direction::Desc));
     }
 }

@@ -4,6 +4,7 @@ use std::str::FromStr;
 use stellar_resources::Asset;
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
+use uri::{self, TryFromUri, UriWrap};
 
 /// Represents the all assets end point for the stellar horizon server. The endpoint
 /// will return all assets filtered by a myriad of different query params.
@@ -116,6 +117,19 @@ impl IntoRequest for All {
     }
 }
 
+impl TryFromUri for All {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<All, uri::Error> {
+        let params = wrap.params();
+        Ok(All {
+            code: params.get_parse("asset_code").ok(),
+            issuer: params.get_parse("asset_issuer").ok(),
+            cursor: params.get_parse("cursor").ok(),
+            order: params.get_parse("order").ok(),
+            limit: params.get_parse("limit").ok(),
+        })
+    }
+}
+
 #[cfg(test)]
 mod all_assets_tests {
     use super::*;
@@ -142,5 +156,19 @@ mod all_assets_tests {
             req.uri().query(),
             Some("asset_code=CODE&asset_issuer=ISSUER&order=desc&cursor=CURSOR&limit=123")
         );
+    }
+
+    #[test]
+    fn it_parses_the_query_params_on_the_uri() {
+        let uri: Uri =
+            "/path?asset_code=CODE&asset_issuer=ISSUER&order=desc&cursor=CURSOR&limit=123"
+                .parse()
+                .unwrap();
+        let ep = All::try_from(&uri).unwrap();
+        assert_eq!(ep.code, Some("CODE".to_string()));
+        assert_eq!(ep.issuer, Some("ISSUER".to_string()));
+        assert_eq!(ep.limit, Some(123));
+        assert_eq!(ep.cursor, Some("CURSOR".to_string()));
+        assert_eq!(ep.order, Some(Direction::Desc));
     }
 }

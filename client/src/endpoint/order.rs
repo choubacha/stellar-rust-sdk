@@ -1,3 +1,4 @@
+use std::{fmt, error::Error, str::FromStr, string::ToString};
 /// Declares that this endpoint has an order field and can have it set.
 ///
 /// ## Example
@@ -29,8 +30,6 @@ pub enum Direction {
     Desc,
 }
 
-use std::string::ToString;
-
 impl ToString for Direction {
     fn to_string(&self) -> String {
         match *self {
@@ -39,6 +38,47 @@ impl ToString for Direction {
         }
     }
 }
+
+/// When a bad token or string is provided to parsing into a direction
+/// you get an error.
+#[derive(Debug)]
+pub struct ParseDirectionError {
+    kind: ErrorKind,
+}
+
+#[derive(Debug)]
+enum ErrorKind {
+    InvalidToken,
+}
+
+impl Error for ParseDirectionError {
+    fn description(&self) -> &str {
+        match self.kind {
+            ErrorKind::InvalidToken => "Invalid token specified",
+        }
+    }
+}
+
+impl fmt::Display for ParseDirectionError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        f.write_str(self.description())
+    }
+}
+
+impl FromStr for Direction {
+    type Err = ParseDirectionError;
+
+    fn from_str(s: &str) -> Result<Direction, Self::Err> {
+        match s.to_lowercase().as_ref() {
+            "asc" => Ok(Direction::Asc),
+            "desc" => Ok(Direction::Desc),
+            _ => Err(ParseDirectionError {
+                kind: ErrorKind::InvalidToken,
+            }),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -59,5 +99,14 @@ mod tests {
         let foo = Foo { order: None }.with_order(Direction::Asc);
         assert_eq!(foo.order, Some(Direction::Asc));
         assert_eq!(foo.order(), Some(Direction::Asc));
+    }
+
+    #[test]
+    fn it_can_be_parsed() {
+        assert_eq!("asc".parse::<Direction>().unwrap(), Direction::Asc);
+        assert_eq!("aSc".parse::<Direction>().unwrap(), Direction::Asc);
+        assert_eq!("desc".parse::<Direction>().unwrap(), Direction::Desc);
+        assert_eq!("DESC".parse::<Direction>().unwrap(), Direction::Desc);
+        assert!("no".parse::<Direction>().is_err());
     }
 }

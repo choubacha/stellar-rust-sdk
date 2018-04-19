@@ -1,4 +1,5 @@
-use endpoint::{Cursor, IntoRequest, Records};
+use endpoint::{IntoRequest, Records};
+use uri::TryFromUri;
 use serde::de::DeserializeOwned;
 use super::Client;
 use error::Result;
@@ -21,19 +22,26 @@ use error::Result;
 #[derive(Debug)]
 pub struct Iter<'a, T, E>
 where
-    E: IntoRequest<Response = Records<T>> + Clone + Cursor,
+    E: IntoRequest<Response = Records<T>> + TryFromUri + Clone,
     T: DeserializeOwned + Clone,
 {
     client: &'a Client,
     endpoint: E,
     records: Option<Records<T>>,
-    next: usize,
-    has_err: bool,
+    state: State,
+}
+
+#[derive(Debug, Clone, Copy, Eq, PartialEq)]
+enum State {
+    Fetching,
+    OnCache(usize),
+    EOF,
+    Error,
 }
 
 impl<'a, T, E> Iter<'a, T, E>
 where
-    E: IntoRequest<Response = Records<T>> + Clone + Cursor,
+    E: IntoRequest<Response = Records<T>> + TryFromUri + Clone,
     T: DeserializeOwned + Clone,
 {
     /// Creates a new iterator for the client and endpoint.
@@ -41,61 +49,75 @@ where
         Iter {
             client,
             endpoint,
-            next: 0,
             records: None,
-            has_err: false,
+            state: State::Fetching,
         }
     }
 
-    fn try_next_page(&mut self) -> Result<()> {
-        if self.has_cache() {
-            return Ok(());
+    fn fetch(&mut self) -> Result<()> {
+        // We already have records meaning we've made a request already
+        if let Some(ref records) = self.records {
+            // When we have a next link, use it for the next endpoint, otherwise
+            // return early and set state to the end of file.
+            if let Some(ref uri) = records.next() {
+                self.endpoint = E::try_from(uri)?;
+            } else {
+                self.state = State::EOF;
+                return Ok(());
+            }
         }
 
-        self.next = 0;
-        let mut endpoint = self.endpoint.clone();
-        if let Some(ref records) = self.records {
-            endpoint = endpoint.with_cursor(records.next_cursor());
+        // If there are records on this page, we switch to being
+        // on the cache. If there aren't then we assume we are at
+        // the end of the file.
+        let records = self.client.request(self.endpoint.clone())?;
+        if records.records().is_empty() {
+            self.records = None;
+            self.state = State::EOF;
+        } else {
+            self.records = Some(records);
+            self.state = State::OnCache(0);
         }
-        self.records = Some(self.client.request(endpoint)?);
         Ok(())
     }
 
-    fn has_cache(&self) -> bool {
+    fn get_cache(&mut self, next: usize) -> Option<T> {
         if let Some(ref records) = self.records {
-            self.next < records.records().len()
-        } else {
-            false
+            if next < records.records().len() {
+                let val = records.records()[next].clone();
+                self.state = State::OnCache(next + 1);
+                return Some(val);
+            }
         }
+        self.state = State::Fetching;
+        None
     }
 }
 
 impl<'a, T, E> Iterator for Iter<'a, T, E>
 where
-    E: IntoRequest<Response = Records<T>> + Clone + Cursor,
+    E: IntoRequest<Response = Records<T>> + TryFromUri + Clone,
     T: DeserializeOwned + Clone,
 {
     type Item = Result<T>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.has_err {
-            return None;
-        }
-
-        match self.try_next_page() {
-            Ok(()) => {
-                if let Some(ref records) = self.records {
-                    if !records.records().is_empty() {
-                        let val = records.records()[self.next].clone();
-                        self.next += 1;
+        loop {
+            match self.state {
+                State::EOF | State::Error => {
+                    return None;
+                }
+                State::Fetching => {
+                    if let Err(err) = self.fetch() {
+                        self.state = State::Error;
+                        return Some(Err(err));
+                    }
+                }
+                State::OnCache(next) => {
+                    if let Some(val) = self.get_cache(next) {
                         return Some(Ok(val));
                     }
                 }
-                None
-            }
-            Err(err) => {
-                self.has_err = true;
-                Some(Err(err))
             }
         }
     }
@@ -104,8 +126,8 @@ where
 #[cfg(test)]
 mod iterator_tests {
     use super::*;
-    use endpoint::{account, asset, Limit};
-    use stellar_resources::Transaction;
+    use endpoint::{account, asset, trades, Limit};
+    use stellar_resources::{AssetIdentifier, Transaction};
 
     #[test]
     fn it_can_iterate_through_records() {
@@ -113,6 +135,18 @@ mod iterator_tests {
         let endpoint = asset::All::default().with_limit(3);
         let iter = Iter::new(&client, endpoint);
         assert!(iter.take(10).count() > 3);
+    }
+
+    #[test]
+    fn it_breaks_if_no_records_returned_from_horizon() {
+        let client = Client::horizon_test().unwrap();
+        // Aggregations are odd in that they always provide a `next` url even if there
+        // is no next page. So this test will ensure that the iteration actually finishes
+        // if the current page has no results.
+        let endpoint =
+            trades::Aggregations::new(&AssetIdentifier::native(), &AssetIdentifier::native());
+        let iter = Iter::new(&client, endpoint);
+        assert_eq!(iter.count(), 0);
     }
 
     #[test]

@@ -61,7 +61,7 @@ impl<'de> Deserialize<'de> for Trade {
     where
         D: Deserializer<'de>,
     {
-        let rep: TradeRepresentation = TradeRepresentation::deserialize(d)?;
+        let rep: TradeIntermediate = TradeIntermediate::deserialize(d)?;
         let seller = if rep.base_is_seller {
             Seller::Base
         } else {
@@ -107,7 +107,7 @@ impl From<Price> for PriceRatio {
 }
 
 #[derive(Deserialize, Debug)]
-struct TradeRepresentation {
+struct TradeIntermediate {
     id: String,
     paging_token: String,
     ledger_close_time: DateTime<Utc>,
@@ -227,7 +227,7 @@ mod trade_tests {
 
 /// The aggregation of trades for a specifc base/counter pair of assets over a given
 /// time period.
-#[derive(Deserialize, Debug)]
+#[derive(Clone, Deserialize, Debug)]
 pub struct TradeAggregation {
     // Several fields are omitted since they don't seem to be in the actual response from horizon.
     // Or they don't seem to make sense.

@@ -7,6 +7,7 @@ use serde_json;
 use std::error::Error as StdError;
 use std::fmt;
 use super::StellarError;
+use uri;
 
 /// A set of errors for use in the client
 #[derive(Debug)]
@@ -31,6 +32,8 @@ pub enum Error {
     JsonParseError(serde_json::error::Error),
     /// Catch-all for reqwest error handling
     Reqwest(reqwest::Error),
+    /// Errors that occur when converting from uri into something else.
+    TryFromUri(uri::Error),
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -47,6 +50,7 @@ impl StdError for Error {
             Error::Reqwest(ref inner) => inner.description(),
             Error::JsonParseError(ref inner) => inner.description(),
             Error::BadResponse(ref inner) => inner.description(),
+            Error::TryFromUri(ref inner) => inner.description(),
             Error::ServerError => "An unknown error on the server has occurred",
             Error::__Nonexhaustive => unreachable!(),
         }
@@ -98,6 +102,12 @@ impl From<reqwest::Error> for Error {
 impl From<serde_json::error::Error> for Error {
     fn from(inner: serde_json::error::Error) -> Self {
         Error::JsonParseError(inner)
+    }
+}
+
+impl From<uri::Error> for Error {
+    fn from(inner: uri::Error) -> Self {
+        Error::TryFromUri(inner)
     }
 }
 

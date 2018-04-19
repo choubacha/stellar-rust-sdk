@@ -1,9 +1,10 @@
 //! Contains the endpoint for all operations.
 use error::Result;
+use http::{Request, Uri};
 use std::str::FromStr;
 use stellar_resources::Operation;
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
-use http::{Request, Uri};
+use uri::{self, TryFromUri, UriWrap};
 
 pub use super::account::Operations as ForAccount;
 pub use super::ledger::Operations as ForLedger;
@@ -66,6 +67,17 @@ impl IntoRequest for All {
     }
 }
 
+impl TryFromUri for All {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
+        let params = wrap.params();
+        Ok(Self {
+            cursor: params.get_parse("cursor").ok(),
+            order: params.get_parse("order").ok(),
+            limit: params.get_parse("limit").ok(),
+        })
+    }
+}
+
 #[cfg(test)]
 mod all_operationss_tests {
     use super::*;
@@ -90,6 +102,17 @@ mod all_operationss_tests {
             req.uri().query(),
             Some("order=desc&cursor=CURSOR&limit=123")
         );
+    }
+
+    #[test]
+    fn it_parses_query_params_from_uri() {
+        let uri: Uri = "/operations?order=desc&cursor=CURSOR&limit=123"
+            .parse()
+            .unwrap();
+        let all = All::try_from(&uri).unwrap();
+        assert_eq!(all.order, Some(Direction::Desc));
+        assert_eq!(all.cursor, Some("CURSOR".to_string()));
+        assert_eq!(all.limit, Some(123));
     }
 }
 

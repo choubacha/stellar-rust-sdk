@@ -34,14 +34,12 @@ mod cursor;
 mod limit;
 pub mod trades;
 mod records;
-mod flat_records;
 mod order;
 
 pub use self::cursor::Cursor;
 pub use self::limit::Limit;
 pub use self::records::Records;
-pub use self::flat_records::FlatRecords;
-pub use self::order::{Direction, Order};
+pub use self::order::{Direction, Order, ParseDirectionError};
 
 /// Represents the body of a request to an IntoRequest.
 #[derive(Debug)]
