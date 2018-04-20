@@ -28,11 +28,11 @@ pub mod ledger;
 pub mod operation;
 pub mod orderbook;
 pub mod payment;
+pub mod trade;
 pub mod transaction;
 
 mod cursor;
 mod limit;
-pub mod trades;
 mod records;
 mod order;
 

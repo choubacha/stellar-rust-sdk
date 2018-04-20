@@ -13,12 +13,12 @@ use http::{Request, Uri};
 /// ## Example
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::{orderbook, trades, Limit};
+/// use stellar_client::endpoint::{orderbook, trade, Limit};
 ///
 /// let client = Client::horizon_test().unwrap();
 ///
 /// // Grab a trade so we can get two valid assets.
-///  let endpoint = trades::All::default().with_limit(1);
+///  let endpoint = trade::All::default().with_limit(1);
 ///  let records = client.request(endpoint).unwrap();
 ///  let trade = &records.records()[0];
 ///  let asset1 = trade.base_asset().clone();

@@ -126,7 +126,7 @@ where
 #[cfg(test)]
 mod iterator_tests {
     use super::*;
-    use endpoint::{account, asset, trades, Limit};
+    use endpoint::{account, asset, trade, Limit};
     use stellar_resources::{AssetIdentifier, Transaction};
 
     #[test]
@@ -144,7 +144,7 @@ mod iterator_tests {
         // is no next page. So this test will ensure that the iteration actually finishes
         // if the current page has no results.
         let endpoint =
-            trades::Aggregations::new(&AssetIdentifier::native(), &AssetIdentifier::native());
+            trade::Aggregations::new(&AssetIdentifier::native(), &AssetIdentifier::native());
         let iter = Iter::new(&client, endpoint);
         assert_eq!(iter.count(), 0);
     }
