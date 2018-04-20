@@ -138,7 +138,7 @@ mod asset_pair_tests {
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Clone, Debug, Default, Cursor, Limit, Order)]
+#[derive(Debug, Default, Cursor, Limit, Order, Clone)]
 pub struct All {
     asset_pair: Option<AssetPair>,
     offer_id: Option<u32>,
