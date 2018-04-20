@@ -15,16 +15,31 @@ pub trait Limit {
     fn limit(&self) -> Option<u32>;
 }
 
+macro_rules! impl_limit {
+    ($name:path) => {
+        impl Limit for $name {
+            fn with_limit(mut self, limit: u32) -> $name {
+                self.limit = Some(limit);
+                self
+            }
+
+            fn limit(&self) -> Option<u32> {
+                self.limit
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
 
     #[test]
     fn it_can_be_derived() {
-        #[derive(Limit)]
         struct Foo {
             limit: Option<u32>,
         }
+        impl_limit!(Foo);
 
         let foo = Foo { limit: None };
         let foo = foo.with_limit(7);

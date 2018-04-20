@@ -3,6 +3,8 @@
 //!
 //! Client implementation to the stellar horizon api.
 
+extern crate base64;
+extern crate chrono;
 extern crate futures;
 extern crate http;
 extern crate hyper;
@@ -12,14 +14,12 @@ extern crate serde;
 #[macro_use]
 extern crate serde_derive;
 extern crate serde_json;
-#[macro_use]
-extern crate stellar_derives;
-extern crate stellar_resources;
 extern crate tokio_core;
 
 pub mod client;
 pub mod endpoint;
 pub mod error;
+pub mod resources;
 mod stellar_error;
 mod uri;
 

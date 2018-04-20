@@ -2,7 +2,7 @@
 use error::Result;
 use http::{Request, Uri};
 use std::str::FromStr;
-use stellar_resources::{Amount, AssetIdentifier, Operation, PaymentPath};
+use resources::{Amount, AssetIdentifier, Operation, PaymentPath};
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use uri::{self, TryFromUri, UriWrap};
 
@@ -26,12 +26,16 @@ pub use super::account::Payments as ForAccount;
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Cursor, Limit, Order)]
+#[derive(Debug, Default, Clone)]
 pub struct All {
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(All);
+impl_limit!(All);
+impl_order!(All);
 
 impl All {
     fn has_query(&self) -> bool {
@@ -125,13 +129,10 @@ mod all_payments_tests {
 ///
 /// ## Example
 /// ```
-/// # extern crate stellar_client;
-/// # extern crate stellar_resources;
 /// use stellar_client::sync::Client;
 /// use stellar_client::endpoint::{payment, Limit};
-/// use stellar_resources::{Amount, AssetIdentifier, OperationKind};
+/// use stellar_client::resources::{Amount, AssetIdentifier, OperationKind};
 ///
-/// # fn main() {
 /// let client = Client::horizon_test().unwrap();
 ///
 /// // Cast a wide net for `create_account` operations to ensure two valid accounts.
@@ -160,7 +161,6 @@ mod all_payments_tests {
 /// let records = client.request(endpoint).unwrap();
 ///
 /// assert!(records.records().len() > 0);
-/// # }
 /// ```
 #[derive(Debug)]
 pub struct FindPath {
@@ -176,12 +176,9 @@ impl FindPath {
     /// payment.
     ///
     /// ```
-    /// # extern crate stellar_client;
-    /// # extern crate stellar_resources;
     /// use stellar_client::endpoint::payment;
-    /// use stellar_resources::{Amount, AssetIdentifier};
+    /// use stellar_client::resources::{Amount, AssetIdentifier};
     ///
-    /// # fn main() {
     /// let paths = payment::FindPath::new(
     ///     "source_account",
     ///     "destination_account",
@@ -192,7 +189,6 @@ impl FindPath {
     ///     ).unwrap(),
     ///     Amount::new(8675309)
     /// );
-    /// # }
     /// ```
     pub fn new(
         source_account: &str,

@@ -1,5 +1,4 @@
-use stellar_resources::OperationKind;
-use stellar_client::{endpoint::transaction, sync::{self, Client}};
+use stellar_client::{endpoint::transaction, resources::OperationKind, sync::{self, Client}};
 use clap::ArgMatches;
 use super::{cursor, ordering, pager::Pager};
 use error::Result;

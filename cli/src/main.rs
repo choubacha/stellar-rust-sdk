@@ -2,7 +2,6 @@
 //! A basic CLI for interactions with the stellar network.
 extern crate clap;
 extern crate stellar_client;
-extern crate stellar_resources;
 
 use clap::{App, AppSettings, Arg, SubCommand};
 use pager::Pager;

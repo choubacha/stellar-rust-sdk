@@ -1,5 +1,4 @@
-use stellar_client::{endpoint::trade, sync::{self, Client}};
-use stellar_resources::AssetIdentifier;
+use stellar_client::{endpoint::trade, resources::AssetIdentifier, sync::{self, Client}};
 use clap::ArgMatches;
 use super::{cursor, ordering, pager::Pager};
 use error::Result;

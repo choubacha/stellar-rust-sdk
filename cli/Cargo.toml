@@ -9,5 +9,4 @@ path = "src/main.rs"
 
 [dependencies]
 clap = "2.31"
-stellar-resources = { path = "../resources" }
 stellar-client = { path = "../client" }

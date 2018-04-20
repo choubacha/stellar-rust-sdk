@@ -1,7 +1,7 @@
 //! Contains the endpoint for all effects.
 use error::Result;
 use std::str::FromStr;
-use stellar_resources::Effect;
+use resources::Effect;
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 use uri::{self, TryFromUri, UriWrap};
@@ -27,12 +27,16 @@ pub use super::operation::Effects as ForOperation;
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Cursor, Limit, Order)]
+#[derive(Debug, Default, Clone)]
 pub struct All {
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(All);
+impl_limit!(All);
+impl_order!(All);
 
 impl All {
     fn has_query(&self) -> bool {

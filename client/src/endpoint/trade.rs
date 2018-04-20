@@ -1,7 +1,7 @@
 //! Contains the endpoint for all trades.
 use error::Result;
 use std::str::FromStr;
-use stellar_resources::{AssetIdentifier, Trade, TradeAggregation};
+use resources::{AssetIdentifier, Trade, TradeAggregation};
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 use uri::{self, TryFromUri, UriWrap};
@@ -138,7 +138,7 @@ mod asset_pair_tests {
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Cursor, Limit, Order, Clone)]
+#[derive(Debug, Default, Clone)]
 pub struct All {
     asset_pair: Option<AssetPair>,
     offer_id: Option<u32>,
@@ -147,20 +147,20 @@ pub struct All {
     limit: Option<u32>,
 }
 
+impl_cursor!(All);
+impl_limit!(All);
+impl_order!(All);
+
 impl All {
     /// Fetches the record for a specified trade pair.
     ///
     /// ## Example
     ///
     /// ```
-    /// # extern crate stellar_resources;
-    /// # extern crate stellar_client;
-    ///
     /// use stellar_client::sync::Client;
     /// use stellar_client::endpoint::trade;
-    /// use stellar_resources::AssetIdentifier;
+    /// use stellar_client::resources::AssetIdentifier;
     ///
-    /// # fn main() {
     /// let base_asset = AssetIdentifier::native();
     /// let counter_asset = AssetIdentifier::native();
     ///
@@ -169,7 +169,6 @@ impl All {
     /// let records     = client.request(endpoint).unwrap();
     ///
     /// # assert!(records.records().len() == 0);
-    /// # }
     /// ```
     pub fn with_asset_pair(
         mut self,
@@ -338,15 +337,11 @@ mod all_trades_tests {
 /// ## Example
 ///
 /// ```
-/// # extern crate stellar_resources;
-/// # extern crate stellar_client;
-///
 /// use stellar_client::sync::Client;
 /// use stellar_client::endpoint::{Direction, Order, trade};
-/// use stellar_resources::AssetIdentifier;
+/// use stellar_client::resources::AssetIdentifier;
 /// use std::time::{SystemTime, UNIX_EPOCH};
 ///
-/// # fn main() {
 /// let client = Client::horizon_test().unwrap();
 ///
 /// // Grab a trade so that we know aggregations should exist.
@@ -370,9 +365,8 @@ mod all_trades_tests {
 ///
 /// let records = client.request(agg).unwrap();
 /// # assert!(records.records().len() > 0);
-/// # }
 /// ```
-#[derive(Debug, Clone, Limit, Order)]
+#[derive(Debug, Clone)]
 pub struct Aggregations {
     asset_pair: AssetPair,
     resolution: u64,
@@ -381,6 +375,9 @@ pub struct Aggregations {
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_limit!(Aggregations);
+impl_order!(Aggregations);
 
 impl Aggregations {
     /// Creates a new aggregations endpoint. There are some defaults but generally
@@ -405,20 +402,15 @@ impl Aggregations {
     /// # Examples
     ///
     /// ```
-    /// # extern crate stellar_resources;
-    /// # extern crate stellar_client;
-    ///
     /// use stellar_client::sync::Client;
     /// use stellar_client::endpoint::trade;
-    /// use stellar_resources::AssetIdentifier;
+    /// use stellar_client::resources::AssetIdentifier;
     ///
-    /// # fn main() {
     /// let base = AssetIdentifier::native();
     /// let counter = AssetIdentifier::native();
     ///
     /// let endpoint = trade::Aggregations::new(&base, &counter)
     ///     .with_resolution(300_000);
-    /// # }
     /// ```
     pub fn with_resolution(mut self, r: u64) -> Self {
         self.resolution = r;
@@ -431,20 +423,15 @@ impl Aggregations {
     /// # Examples
     ///
     /// ```
-    /// # extern crate stellar_resources;
-    /// # extern crate stellar_client;
-    ///
     /// use stellar_client::sync::Client;
     /// use stellar_client::endpoint::trade;
-    /// use stellar_resources::AssetIdentifier;
+    /// use stellar_client::resources::AssetIdentifier;
     ///
-    /// # fn main() {
     /// let base = AssetIdentifier::native();
     /// let counter = AssetIdentifier::native();
     ///
     /// let endpoint = trade::Aggregations::new(&base, &counter)
     ///     .with_start_time(300_000);
-    /// # }
     /// ```
     pub fn with_start_time(mut self, s: u64) -> Self {
         self.start_time = s;
@@ -457,20 +444,15 @@ impl Aggregations {
     /// # Examples
     ///
     /// ```
-    /// # extern crate stellar_resources;
-    /// # extern crate stellar_client;
-    ///
     /// use stellar_client::sync::Client;
     /// use stellar_client::endpoint::trade;
-    /// use stellar_resources::AssetIdentifier;
+    /// use stellar_client::resources::AssetIdentifier;
     ///
-    /// # fn main() {
     /// let base = AssetIdentifier::native();
     /// let counter = AssetIdentifier::native();
     ///
     /// let endpoint = trade::Aggregations::new(&base, &counter)
     ///     .with_end_time(300_000);
-    /// # }
     /// ```
     pub fn with_end_time(mut self, s: u64) -> Self {
         self.end_time = s;

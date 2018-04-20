@@ -1,7 +1,7 @@
 //! Contains endpoints for assets and related information to specific assets.
 use error::Result;
 use std::str::FromStr;
-use stellar_resources::Asset;
+use resources::Asset;
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 use uri::{self, TryFromUri, UriWrap};
@@ -23,7 +23,7 @@ use uri::{self, TryFromUri, UriWrap};
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Default, Clone)]
 pub struct All {
     code: Option<String>,
     issuer: Option<String>,
@@ -31,6 +31,10 @@ pub struct All {
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(All);
+impl_limit!(All);
+impl_order!(All);
 
 impl All {
     /// Fetches all records for a given asset code.

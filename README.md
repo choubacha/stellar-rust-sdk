@@ -12,15 +12,6 @@ This repository is broken into multiple crates. Each crate is designed to be use
 as a different component. The crates are organized as a virtual workspace so that
 they can be built together and tested at once.
 
-## Resources
-
-The resources crate documents all the various data types in horizon. These resources
-are fully documented and can be deserialized from the client. There are many resources
-in the horizon API and you can read about all of them [here](https://www.stellar.org/developers/horizon/reference/index.html).
-
-They are deserialized into types that we think will make using them inside other rust applications
-easier.
-
 ## Client
 
 The client provides two interfaces. One is the synchronous client and the other is
@@ -38,6 +29,19 @@ let client      = Client::horizon_test().unwrap();
 let endpoint    = asset::All::default();
 let records     = client.request(endpoint).unwrap();
 ```
+
+### Endpoints
+
+The endpoints module in the client crate houses all the horizon API endpoint definitions. Each
+struct will define what parameters are required for making requests.
+
+### Resources
+The resources module contains the return values of the various endpoints. These resources are
+fully documented and can be deserialized from the client. There are many resources
+in the horizon API and you can read about all of them [here](https://www.stellar.org/developers/horizon/reference/index.html).
+
+They are deserialized into types that we think will make using them inside other rust applications
+easier.
 
 ## CLI
 
