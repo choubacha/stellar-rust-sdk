@@ -5,9 +5,11 @@ use stellar_resources::Effect;
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 use uri::{self, TryFromUri, UriWrap};
+
 pub use super::account::Effects as ForAccount;
 pub use super::ledger::Effects as ForLedger;
 pub use super::transaction::Effects as ForTransaction;
+pub use super::operation::Effects as ForOperation;
 
 /// This endpoint represents all effects that have resulted from successful opreations in Stellar.
 /// The endpoint will return all effects and accepts query params for a cursor, order, and limit.
@@ -105,10 +107,7 @@ mod all_effects_tests {
 
     #[test]
     fn it_parses_query_params_from_uri() {
-        let uri: Uri = "/effects?\
-                        order=desc&\
-                        cursor=CURSOR&\
-                        limit=123"
+        let uri: Uri = "/effects?order=desc&cursor=CURSOR&limit=123"
             .parse()
             .unwrap();
         let all = All::try_from(&uri).unwrap();
