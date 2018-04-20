@@ -1,4 +1,4 @@
-use stellar_client::{endpoint::trades, sync::{self, Client}};
+use stellar_client::{endpoint::trade, sync::{self, Client}};
 use stellar_resources::AssetIdentifier;
 use clap::ArgMatches;
 use super::{cursor, ordering, pager::Pager};
@@ -8,7 +8,7 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let pager = Pager::from_arg(&matches);
 
     let endpoint = {
-        let mut endpoint = trades::All::default();
+        let mut endpoint = trade::All::default();
 
         if let Some(offer_id) = matches.value_of("offer_id") {
             let offer_id = offer_id.parse::<u32>().unwrap();

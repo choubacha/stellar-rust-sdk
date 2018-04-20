@@ -130,10 +130,10 @@ mod asset_pair_tests {
 /// ## Example
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::trades;
+/// use stellar_client::endpoint::trade;
 ///
 /// let client      = Client::horizon_test().unwrap();
-/// let endpoint    = trades::All::default();
+/// let endpoint    = trade::All::default();
 /// let records     = client.request(endpoint).unwrap();
 /// #
 /// # assert!(records.records().len() > 0);
@@ -157,7 +157,7 @@ impl All {
     /// # extern crate stellar_client;
     ///
     /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::trades;
+    /// use stellar_client::endpoint::trade;
     /// use stellar_resources::AssetIdentifier;
     ///
     /// # fn main() {
@@ -165,7 +165,7 @@ impl All {
     /// let counter_asset = AssetIdentifier::native();
     ///
     /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = trades::All::default().with_asset_pair(base_asset, counter_asset);
+    /// let endpoint    = trade::All::default().with_asset_pair(base_asset, counter_asset);
     /// let records     = client.request(endpoint).unwrap();
     ///
     /// # assert!(records.records().len() == 0);
@@ -189,10 +189,10 @@ impl All {
     ///
     /// ```
     /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::trades;
+    /// use stellar_client::endpoint::trade;
     ///
     /// let client      = Client::horizon_test().unwrap();
-    /// let endpoint    = trades::All::default().with_offer_id(100);
+    /// let endpoint    = trade::All::default().with_offer_id(100);
     /// let records     = client.request(endpoint).unwrap();
     /// #
     /// # assert!(records.records().len() > 0);
@@ -342,7 +342,7 @@ mod all_trades_tests {
 /// # extern crate stellar_client;
 ///
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::{Direction, Order, trades};
+/// use stellar_client::endpoint::{Direction, Order, trade};
 /// use stellar_resources::AssetIdentifier;
 /// use std::time::{SystemTime, UNIX_EPOCH};
 ///
@@ -350,7 +350,7 @@ mod all_trades_tests {
 /// let client = Client::horizon_test().unwrap();
 ///
 /// // Grab a trade so that we know aggregations should exist.
-/// let trades = trades::All::default().with_order(Direction::Desc);
+/// let trades = trade::All::default().with_order(Direction::Desc);
 /// let trades = client.request(trades).unwrap();
 /// let trade = &trades.records()[0];
 /// let base = trade.base_asset();
@@ -363,7 +363,7 @@ mod all_trades_tests {
 ///     .as_secs() * 1000;
 ///
 /// // Place the start time in the past so we capture it.
-/// let agg = trades::Aggregations::new(base, counter)
+/// let agg = trade::Aggregations::new(base, counter)
 ///     .with_start_time(now - 3_000_000_000)
 ///     .with_end_time(now)
 ///     .with_resolution(300_000);
@@ -409,14 +409,14 @@ impl Aggregations {
     /// # extern crate stellar_client;
     ///
     /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::trades;
+    /// use stellar_client::endpoint::trade;
     /// use stellar_resources::AssetIdentifier;
     ///
     /// # fn main() {
     /// let base = AssetIdentifier::native();
     /// let counter = AssetIdentifier::native();
     ///
-    /// let endpoint = trades::Aggregations::new(&base, &counter)
+    /// let endpoint = trade::Aggregations::new(&base, &counter)
     ///     .with_resolution(300_000);
     /// # }
     /// ```
@@ -435,14 +435,14 @@ impl Aggregations {
     /// # extern crate stellar_client;
     ///
     /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::trades;
+    /// use stellar_client::endpoint::trade;
     /// use stellar_resources::AssetIdentifier;
     ///
     /// # fn main() {
     /// let base = AssetIdentifier::native();
     /// let counter = AssetIdentifier::native();
     ///
-    /// let endpoint = trades::Aggregations::new(&base, &counter)
+    /// let endpoint = trade::Aggregations::new(&base, &counter)
     ///     .with_start_time(300_000);
     /// # }
     /// ```
@@ -461,14 +461,14 @@ impl Aggregations {
     /// # extern crate stellar_client;
     ///
     /// use stellar_client::sync::Client;
-    /// use stellar_client::endpoint::trades;
+    /// use stellar_client::endpoint::trade;
     /// use stellar_resources::AssetIdentifier;
     ///
     /// # fn main() {
     /// let base = AssetIdentifier::native();
     /// let counter = AssetIdentifier::native();
     ///
-    /// let endpoint = trades::Aggregations::new(&base, &counter)
+    /// let endpoint = trade::Aggregations::new(&base, &counter)
     ///     .with_end_time(300_000);
     /// # }
     /// ```
