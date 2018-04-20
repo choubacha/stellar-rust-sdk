@@ -2,7 +2,7 @@
 use error::Result;
 use http::{Request, Uri};
 use std::str::FromStr;
-use stellar_resources::{Effect, Ledger, Operation, Transaction};
+use resources::{Effect, Ledger, Operation, Transaction};
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use uri::{self, TryFromUri, UriWrap};
 
@@ -22,12 +22,16 @@ use uri::{self, TryFromUri, UriWrap};
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Default, Clone)]
 pub struct All {
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(All);
+impl_limit!(All);
+impl_order!(All);
 
 impl All {
     fn has_query(&self) -> bool {
@@ -200,13 +204,17 @@ mod ledger_details_tests {
 ///
 /// assert!(payments.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Clone)]
 pub struct Payments {
     sequence: u32,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(Payments);
+impl_limit!(Payments);
+impl_order!(Payments);
 
 impl Payments {
     /// Creates a new payments endpoint struct.
@@ -338,13 +346,17 @@ mod ledger_payments_tests {
 ///
 /// assert!(ledger_txns.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Clone)]
 pub struct Transactions {
     sequence: u32,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(Transactions);
+impl_limit!(Transactions);
+impl_order!(Transactions);
 
 impl Transactions {
     /// Creates a new ledger::Transactions endpoint struct.
@@ -478,13 +490,17 @@ mod ledger_transactions_tests {
 ///
 /// assert!(ledger_effects.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Clone)]
 pub struct Effects {
     sequence: u32,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(Effects);
+impl_limit!(Effects);
+impl_order!(Effects);
 
 impl Effects {
     /// Creates a new ledger::Effects endpoint struct.
@@ -618,13 +634,17 @@ mod ledger_effects_tests {
 ///
 /// assert!(ledger_operations.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Clone)]
 pub struct Operations {
     sequence: u32,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(Operations);
+impl_limit!(Operations);
+impl_order!(Operations);
 
 impl Operations {
     /// Creates a new ledger::Operations endpoint struct.

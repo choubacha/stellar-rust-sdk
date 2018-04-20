@@ -2,7 +2,7 @@
 use error::Result;
 use http::{Request, Uri};
 use std::str::FromStr;
-use stellar_resources::{Effect, Operation, Transaction};
+use resources::{Effect, Operation, Transaction};
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use uri::{self, TryFromUri, UriWrap};
 
@@ -26,12 +26,16 @@ pub use super::ledger::Transactions as ForLedger;
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Default, Clone)]
 pub struct All {
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(All);
+impl_limit!(All);
+impl_order!(All);
 
 impl All {
     fn has_query(&self) -> bool {
@@ -193,13 +197,17 @@ mod transaction_details_tests {
 ///
 /// assert!(effects.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Clone)]
 pub struct Effects {
     hash: String,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(Effects);
+impl_limit!(Effects);
+impl_order!(Effects);
 
 impl Effects {
     /// Returns a new endpoint for effects. Hand this to the client in order
@@ -329,13 +337,17 @@ mod effects_tests {
 /// assert!(payments.records().len() > 0);
 /// assert_eq!(payments.records()[0].transaction(), hash);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Clone)]
 pub struct Payments {
     hash: String,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(Payments);
+impl_limit!(Payments);
+impl_order!(Payments);
 
 impl Payments {
     /// Creates a new struct representing a request to the payments endpoint
@@ -461,13 +473,17 @@ mod transaction_payments_test {
 /// assert!(operations.records().len() > 0);
 /// assert_eq!(operations.records()[0].transaction(), hash);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Clone)]
 pub struct Operations {
     hash: String,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(Operations);
+impl_limit!(Operations);
+impl_order!(Operations);
 
 impl Operations {
     /// Creates a new struct representing a request to the payments endpoint

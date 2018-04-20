@@ -21,6 +21,15 @@ use error::Result;
 use serde::de::DeserializeOwned;
 use http;
 
+#[macro_use]
+mod cursor;
+#[macro_use]
+mod limit;
+#[macro_use]
+mod order;
+
+mod records;
+
 pub mod account;
 pub mod asset;
 pub mod effect;
@@ -30,11 +39,6 @@ pub mod orderbook;
 pub mod payment;
 pub mod trade;
 pub mod transaction;
-
-mod cursor;
-mod limit;
-mod records;
-mod order;
 
 pub use self::cursor::Cursor;
 pub use self::limit::Limit;

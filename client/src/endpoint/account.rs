@@ -1,7 +1,7 @@
 //! Contains endpoints for accessing accounts and related information.
 use error::Result;
 use std::str::FromStr;
-use stellar_resources::{Account, Datum, Effect, Offer, Operation, Transaction};
+use resources::{Account, Datum, Effect, Offer, Operation, Transaction};
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use http::{Request, Uri};
 use uri::{self, TryFromUri, UriWrap};
@@ -161,13 +161,17 @@ mod account_tests {
 ///
 /// assert!(acct_txns.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Clone)]
 pub struct Transactions {
     account_id: String,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(Transactions);
+impl_limit!(Transactions);
+impl_order!(Transactions);
 
 impl Transactions {
     /// Creates a new account::Transactions endpoint struct. Hand this to the client in order to
@@ -312,13 +316,17 @@ mod transactions_tests {
 ///
 /// assert!(effects.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Clone)]
 pub struct Effects {
     account_id: String,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(Effects);
+impl_limit!(Effects);
+impl_order!(Effects);
 
 impl Effects {
     /// Creates a new account::Effects endpoint struct. Hand this to the client in order to
@@ -463,13 +471,17 @@ mod effects_tests {
 ///
 /// assert!(account_operations.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Clone)]
 pub struct Operations {
     account_id: String,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(Operations);
+impl_limit!(Operations);
+impl_order!(Operations);
 
 impl Operations {
     /// Creates a new account::Operations endpoint struct.
@@ -586,13 +598,10 @@ mod ledger_operations_tests {
 ///
 /// ## Example
 /// ```
-/// # extern crate stellar_client;
-/// # extern crate stellar_resources;
 /// use stellar_client::sync::Client;
 /// use stellar_client::endpoint::{account, payment, Limit};
-/// use stellar_resources::operation::OperationKind;
+/// use stellar_client::resources::operation::OperationKind;
 ///
-/// # fn main() {
 /// let client = Client::horizon_test().unwrap();
 ///
 /// // Grab payments and associated account to ensure an account with payments
@@ -609,15 +618,18 @@ mod ledger_operations_tests {
 /// let acct_payments = client.request(endpoint).unwrap();
 ///
 /// assert!(acct_payments.records().len() > 0);
-/// # }
 /// ```
-#[derive(Debug, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Clone)]
 pub struct Payments {
     account_id: String,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(Payments);
+impl_limit!(Payments);
+impl_order!(Payments);
 
 impl Payments {
     /// Creates a new account::Payments endpoint struct. Hand this to the client in order to
@@ -752,13 +764,17 @@ mod payments_tests {
 ///
 /// assert!(offers.records().len() > 0);
 /// ```
-#[derive(Debug, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Clone)]
 pub struct Offers {
     account_id: String,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(Offers);
+impl_limit!(Offers);
+impl_order!(Offers);
 
 impl Offers {
     /// Creates a new account::Offers endpoint struct. Hand this to the client in order to

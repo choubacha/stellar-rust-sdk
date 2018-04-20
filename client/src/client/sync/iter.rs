@@ -127,7 +127,7 @@ where
 mod iterator_tests {
     use super::*;
     use endpoint::{account, asset, trade, Limit};
-    use stellar_resources::{AssetIdentifier, Transaction};
+    use resources::{AssetIdentifier, Transaction};
 
     #[test]
     fn it_can_iterate_through_records() {

@@ -1,7 +1,7 @@
 //! Contains the endpoint for fetching the orderbook for a given asset pair
 use error::Result;
 use std::str::FromStr;
-use stellar_resources::{AssetIdentifier, Orderbook};
+use resources::{AssetIdentifier, Orderbook};
 use super::{Body, IntoRequest, Limit};
 use http::{Request, Uri};
 
@@ -28,30 +28,27 @@ use http::{Request, Uri};
 ///
 /// assert_eq!(orderbook.base(), trade.base_asset());
 /// ```
-#[derive(Debug, Limit)]
+#[derive(Debug)]
 pub struct Details {
     base_asset: AssetIdentifier,
     counter_asset: AssetIdentifier,
     limit: Option<u32>,
 }
 
+impl_limit!(Details);
+
 impl Details {
     /// Creates a new orderbook::Details endpoint struct. Hand this to the client in order to request
     /// information about all bids and asks for an asset pair.
     ///
     /// ```
-    /// # extern crate stellar_client;
-    /// # extern crate stellar_resources;
-    ///
     /// use stellar_client::endpoint::orderbook;
-    /// use stellar_resources::AssetIdentifier;
+    /// use stellar_client::resources::AssetIdentifier;
     ///
-    /// # fn main() {
     /// let base = AssetIdentifier::native();
     /// let counter = AssetIdentifier::native();
     ///
     /// let details = orderbook::Details::for_asset_pair(base, counter);
-    /// # }
     /// ```
     pub fn for_asset_pair(base: AssetIdentifier, counter: AssetIdentifier) -> Self {
         Self {

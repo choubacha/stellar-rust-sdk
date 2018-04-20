@@ -21,6 +21,21 @@ pub trait Order {
     fn order(&self) -> Option<Direction>;
 }
 
+macro_rules! impl_order {
+    ($name:path) => {
+        impl Order for $name {
+            fn with_order(mut self, order: Direction) -> $name {
+                self.order = Some(order);
+                self
+            }
+
+            fn order(&self) -> Option<Direction> {
+                self.order
+            }
+        }
+    }
+}
+
 /// The order to return results in.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Direction {
@@ -91,10 +106,10 @@ mod tests {
 
     #[test]
     fn it_can_be_derived() {
-        #[derive(Order)]
         struct Foo {
             order: Option<Direction>,
         }
+        impl_order!(Foo);
 
         let foo = Foo { order: None }.with_order(Direction::Asc);
         assert_eq!(foo.order, Some(Direction::Asc));

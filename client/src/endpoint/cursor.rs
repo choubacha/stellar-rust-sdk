@@ -20,13 +20,31 @@ pub trait Cursor {
     fn cursor(&self) -> Option<&str>;
 }
 
+#[allow(unused_macros)]
+macro_rules! impl_cursor {
+    ($name:path) => {
+        impl Cursor for $name {
+            fn with_cursor(mut self, cursor: &str) -> $name {
+                self.cursor = Some(cursor.to_string());
+                self
+            }
+
+            fn cursor(&self) -> Option<&str> {
+                // Take the cursor as a ref, then map the string to a slice. Needs
+                // two derefs to deref to String then to str then return reference
+                self.cursor.as_ref().map(|s| &**s)
+            }
+        }
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
 
     #[test]
     fn it_can_be_derived() {
-        #[derive(Cursor)]
+        impl_cursor!(Foo);
         struct Foo {
             cursor: Option<String>,
         }

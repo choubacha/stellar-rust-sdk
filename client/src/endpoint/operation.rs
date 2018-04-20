@@ -2,7 +2,7 @@
 use error::Result;
 use http::{Request, Uri};
 use std::str::FromStr;
-use stellar_resources::{Effect, Operation};
+use resources::{Effect, Operation};
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use uri::{self, TryFromUri, UriWrap};
 
@@ -26,12 +26,16 @@ pub use super::transaction::Operations as ForTransaction;
 /// #
 /// # assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug, Default, Clone, Cursor, Limit, Order)]
+#[derive(Debug, Default, Clone)]
 pub struct All {
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(All);
+impl_limit!(All);
+impl_order!(All);
 
 impl All {
     fn has_query(&self) -> bool {
@@ -210,13 +214,17 @@ mod operation_details_tests {
 ///
 /// # assert!(effects.records().len() > 0);
 /// ```
-#[derive(Debug, Cursor, Limit, Order)]
+#[derive(Debug, Clone)]
 pub struct Effects {
     id: i64,
     cursor: Option<String>,
     order: Option<Direction>,
     limit: Option<u32>,
 }
+
+impl_cursor!(Effects);
+impl_limit!(Effects);
+impl_order!(Effects);
 
 impl Effects {
     /// Creates a new endpoint struct for use in requesting the effects for
