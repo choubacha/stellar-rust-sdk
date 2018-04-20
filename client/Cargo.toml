@@ -3,7 +3,7 @@ name = "stellar-client"
 version = "0.1.0"
 authors = ["Kevin Bacha <chewbacha@gmail.com>"]
 
-readme = "README.md"
+readme = "../README.md"
 repository = "https://github.com/kbacha/stellar-sdk"
 homepage = "https://github.com/kbacha/stellar-sdk"
 
