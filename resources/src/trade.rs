@@ -7,7 +7,7 @@ use serde::{de, Deserialize, Deserializer};
 /// A trade represents an offer that was fulfilled between two assets and accounts.
 ///
 /// <https://www.stellar.org/developers/horizon/reference/resources/trade.html>
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Trade {
     id: String,
     offer_id: String,
@@ -190,6 +190,15 @@ impl Trade {
     pub fn seller(&self) -> Seller {
         self.seller
     }
+
+    /// Account of the selling party
+    pub fn selling_account(&self) -> &str {
+        if self.seller().is_base() {
+            self.base_account()
+        } else {
+            self.counter_account()
+        }
+    }
 }
 
 #[cfg(test)]
@@ -222,6 +231,10 @@ mod trade_tests {
         assert_eq!(trade.counter_asset().code(), "SLT");
         assert_eq!(trade.price(), PriceRatio::new(10, 61));
         assert!(trade.seller().is_base());
+        assert_eq!(
+            trade.selling_account(),
+            "GBZXCJIUEPDXGHMS64UBJHUVKV6ETWYOVHADLTBXJNJFUC7A7RU5B3GN"
+        )
     }
 }
 

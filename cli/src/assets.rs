@@ -1,6 +1,7 @@
-use stellar_client::{endpoint::asset, error::Result, sync::{self, Client}};
+use stellar_client::{endpoint::asset, sync::{self, Client}};
 use clap::ArgMatches;
 use super::{cursor, ordering, pager::Pager};
+use error::Result;
 
 /// Using a client and the arguments from the command line, iterates over the results
 /// and displays them to the end user.
@@ -40,7 +41,7 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
             }
             println!();
         }
-        Err(err) => res = Err(err),
+        Err(err) => res = Err(err.into()),
     });
     res
 }

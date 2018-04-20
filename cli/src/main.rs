@@ -5,12 +5,19 @@ extern crate stellar_client;
 extern crate stellar_resources;
 
 use clap::{App, AppSettings, Arg, SubCommand};
-use stellar_client::{error::Error, sync::Client};
-
-mod pager;
-mod ordering;
-mod cursor;
 use pager::Pager;
+use stellar_client::{error::Error, sync::Client};
+use error::CliError;
+
+mod account;
+mod assets;
+mod cursor;
+mod error;
+mod ledgers;
+mod ordering;
+mod pager;
+mod trades;
+mod transactions;
 
 fn build_app<'a, 'b>() -> App<'a, 'b> {
     macro_rules! listable {
@@ -162,6 +169,59 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                     ),
                 ),
         )
+        .subcommand(
+            SubCommand::with_name("trades")
+                .about("Access lists of trades")
+                .setting(AppSettings::SubcommandRequired)
+                .subcommand(
+                    listable!(
+                        SubCommand::with_name("all")
+                            .about("Fetch all trades")
+                            .arg(
+                                Arg::with_name("base_asset_type")
+                                    .long("base_asset_type")
+                                    .takes_value(true)
+                                    .help("Filters trades with a base_asset_type"),
+                            )
+                            .arg(
+                                Arg::with_name("base_asset_code")
+                                    .long("base_asset_code")
+                                    .takes_value(true)
+                                    .help("Filters trades with a base_asset_code.  Not required for XLM"),
+                            )
+                            .arg(
+                                Arg::with_name("base_asset_issuer")
+                                    .long("base_asset_issuer")
+                                    .takes_value(true)
+                                    .help("Filters trades with a base_asset_issuer.  Not required for XLM"),
+                            )
+                            .arg(
+                                Arg::with_name("counter_asset_type")
+                                    .long("counter_asset_type")
+                                    .takes_value(true)
+                                    .help("Filters trades with a counter_asset_type"),
+                            )
+                            .arg(
+                                Arg::with_name("counter_asset_code")
+                                    .long("counter_asset_code")
+                                    .takes_value(true)
+                                    .help("Filters trades with a counter_asset_code.  Not required for XLM"),
+                            )
+                            .arg(
+                                Arg::with_name("counter_asset_issuer")
+                                    .long("counter_asset_issuer")
+                                    .takes_value(true)
+                                    .help("Filters trades with a counter_asset_issuer.  Not required for XLM"),
+                            )
+                            .arg(
+                                Arg::with_name("offer_id")
+                                    .long("offer_id")
+                                    .takes_value(true)
+                                    .help("Filters trades that are a part of a particular offer_id"),
+                            )
+                    ),
+                ),
+        )
 }
 
 fn main() {
@@ -198,12 +258,16 @@ fn main() {
             ("all", Some(m)) => ledgers::all(&client, m),
             _ => return print_help_and_exit(),
         },
+        ("trades", Some(sub_m)) => match sub_m.subcommand() {
+            ("all", Some(m)) => trades::all(&client, m),
+            _ => return print_help_and_exit(),
+        },
         _ => return print_help_and_exit(),
     };
 
     match result {
         Ok(_) => {}
-        Err(Error::BadResponse(err)) => {
+        Err(CliError::ClientError(Error::BadResponse(err))) => {
             eprintln!("{}", err);
             ::std::process::exit(1);
         }
@@ -219,8 +283,3 @@ fn print_help_and_exit() {
     println!();
     ::std::process::exit(1);
 }
-
-mod account;
-mod transactions;
-mod assets;
-mod ledgers;

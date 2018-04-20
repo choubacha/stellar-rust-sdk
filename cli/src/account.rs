@@ -1,6 +1,7 @@
 use clap::ArgMatches;
-use stellar_client::{sync, endpoint::account, error::Result, sync::Client};
+use stellar_client::{sync, endpoint::account, sync::Client};
 use super::{cursor, ordering, pager::Pager};
+use error::Result;
 
 pub fn details(client: &Client, matches: &ArgMatches) -> Result<()> {
     let id = matches.value_of("ID").expect("ID is required");
@@ -32,7 +33,7 @@ pub fn transactions(client: &Client, matches: &ArgMatches) -> Result<()> {
             println!("created at:     {}", txn.created_at());
             println!();
         }
-        Err(err) => res = Err(err),
+        Err(err) => res = Err(err.into()),
     });
     res
 }

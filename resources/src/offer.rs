@@ -1,5 +1,6 @@
 use amount::Amount;
 use asset::AssetIdentifier;
+use std::fmt;
 
 /// The ratio between the asking and selling price
 #[derive(Serialize, Deserialize, Debug, Eq, PartialEq, Copy, Clone)]
@@ -8,6 +9,12 @@ pub struct PriceRatio {
     numerator: u64,
     #[serde(rename = "d")]
     denominator: u64,
+}
+
+impl fmt::Display for PriceRatio {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "n: {}, d: {}", self.numerator(), self.denominator())
+    }
 }
 
 impl PriceRatio {

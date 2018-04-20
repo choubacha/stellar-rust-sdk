@@ -1,5 +1,6 @@
-use stellar_client::{endpoint::ledger, error::Result, sync::{self, Client}};
+use stellar_client::{endpoint::ledger, sync::{self, Client}};
 use clap::ArgMatches;
+use error::Result;
 use super::{cursor, ordering, pager::Pager};
 
 pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
@@ -22,7 +23,7 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
             println!("closed at:         {}", ledger.closed_at());
             println!();
         }
-        Err(err) => res = Err(err),
+        Err(err) => res = Err(err.into()),
     });
     res
 }

@@ -1,7 +1,8 @@
 use stellar_resources::OperationKind;
-use stellar_client::{endpoint::transaction, error::Result, sync::{self, Client}};
+use stellar_client::{endpoint::transaction, sync::{self, Client}};
 use clap::ArgMatches;
 use super::{cursor, ordering, pager::Pager};
+use error::Result;
 
 pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let pager = Pager::from_arg(&matches);
@@ -21,7 +22,7 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
             println!("created at:     {}", txn.created_at());
             println!();
         }
-        Err(err) => res = Err(err),
+        Err(err) => res = Err(err.into()),
     });
     res
 }
@@ -56,7 +57,7 @@ pub fn payments(client: &Client, matches: &ArgMatches) -> Result<()> {
             }
             println!();
         }
-        Err(err) => res = Err(err),
+        Err(err) => res = Err(err.into()),
     });
     res
 }
@@ -100,7 +101,7 @@ pub fn operations(client: &Client, matches: &ArgMatches) -> Result<()> {
             println!("Type: {}", op.kind_name());
             println!();
         }
-        Err(err) => res = Err(err),
+        Err(err) => res = Err(err.into()),
     });
     res
 }
@@ -125,7 +126,7 @@ pub fn effects(client: &Client, matches: &ArgMatches) -> Result<()> {
             println!("Type: {}", effect.kind_name());
             println!();
         }
-        Err(err) => res = Err(err),
+        Err(err) => res = Err(err.into()),
     });
     res
 }
