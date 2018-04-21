@@ -1,7 +1,5 @@
-//! # Resources
-//!
 //! Defines the basic resources of stellar's horizon end points and
-//! implements their serialization.
+//! implements their deserialization from JSON into rust types.
 
 mod account;
 mod amount;

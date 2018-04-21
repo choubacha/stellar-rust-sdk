@@ -113,7 +113,7 @@ impl<'a> QueryParams<'a> {
 
 /// A helper method for spliting the path of a uri along forward slashes.
 fn split_path(uri: &http::Uri) -> Vec<&str> {
-    uri.path().split('/').filter(|v| v.len() > 0).collect()
+    uri.path().split('/').filter(|v| !v.is_empty()).collect()
 }
 
 /// An error that occurs when converting from a uri to Self
