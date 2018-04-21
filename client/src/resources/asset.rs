@@ -314,6 +314,11 @@ impl<'de> Deserialize<'de> for Asset {
 }
 
 impl Asset {
+    /// The identifier of this asset.
+    pub fn identifier(&self) -> &AssetIdentifier {
+        &self.asset_identifier
+    }
+
     /// The type of this asset: “credit_alphanum4”, or “credit_alphanum12”.
     /// Returns a slice that lives as long as the asset does.
     pub fn asset_type(&self) -> &str {
@@ -388,5 +393,12 @@ mod asset_tests {
         assert_eq!(asset.num_accounts(), 91547871);
         assert!(!asset.is_auth_required());
         assert!(asset.is_auth_revocable());
+        assert_eq!(
+            asset.identifier(),
+            &AssetIdentifier::alphanum4(
+                "USD",
+                "GBAUUA74H4XOQYRSOW2RZUA4QL5PB37U3JS5NE3RTB2ELJVMIF5RLMAG"
+            ),
+        );
     }
 }

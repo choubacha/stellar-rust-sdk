@@ -1,7 +1,40 @@
 #![deny(warnings, missing_docs, missing_debug_implementations)]
 //! # Stellar Client
 //!
-//! Client implementation to the stellar horizon api.
+//! A light-weight implementation to the stellar horizon api.
+//!
+//! There are three main aspects to the client library. There is the client itself
+//! found in the client module. There are the various endpoints that can be used to fetch
+//! data. And then there are the resources themselves that are returned from the APIs.
+//!
+//! ## Usage and Examples
+//!
+//! To use, first create a client. For simplicity this example will use the synchronous client
+//! and will use it to fetch a random asset and then ask if there are any trades between that
+//! asset and lumens.
+//!
+//! ```
+//! use stellar_client::{
+//!     sync::Client,
+//!     endpoint::{asset, trade},
+//!     resources::AssetIdentifier,
+//! };
+//!
+//! // Creates a client that's connected to stellar's test net
+//! let client = Client::horizon_test().unwrap();
+//!
+//! // Creates a request-like struct for all assets
+//! let assets = asset::All::default();
+//!
+//! // Issues request for assets and grabs identifier
+//! let assets = client.request(assets).unwrap();
+//! let identifier = assets.records()[0].identifier();
+//!
+//! // Form a request for trades
+//! let trades = trade::All::default()
+//!     .with_asset_pair(AssetIdentifier::native(), identifier.clone());
+//! let trades = client.request(trades).unwrap();
+//! ```
 
 extern crate base64;
 extern crate chrono;
