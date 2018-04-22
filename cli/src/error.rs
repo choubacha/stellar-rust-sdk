@@ -1,6 +1,7 @@
 use stellar_client::error::Error;
 use std::error::Error as StdError;
 use std::fmt;
+use std::num::ParseIntError;
 
 /// A result including client specific errors.
 pub type Result<T> = ::std::result::Result<T, CliError>;
@@ -48,6 +49,13 @@ impl From<String> for InvalidInputError {
     }
 }
 
+impl From<ParseIntError> for CliError {
+    fn from(_: ParseIntError) -> Self {
+        CliError::OperatorError(InvalidInputError {
+            details: "Error parsing integer".to_string(),
+        })
+    }
+}
 impl From<String> for CliError {
     fn from(details: String) -> Self {
         InvalidInputError::from(details).into()

@@ -10,7 +10,9 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
         let mut endpoint = trade::All::default();
 
         if let Some(offer_id) = matches.value_of("offer_id") {
-            let offer_id = offer_id.parse::<u32>().unwrap();
+            let offer_id = offer_id
+                .parse::<u32>()
+                .map_err(|_| String::from("Offer Id should be a valid u32 integer"))?;
             endpoint = endpoint.with_offer_id(offer_id);
         };
         if let (Some(base_asset_type), Some(counter_asset_type)) = (

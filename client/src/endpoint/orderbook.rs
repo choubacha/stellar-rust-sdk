@@ -18,11 +18,11 @@ use http::{Request, Uri};
 /// let client = Client::horizon_test().unwrap();
 ///
 /// // Grab a trade so we can get two valid assets.
-///  let endpoint = trade::All::default().with_limit(1);
-///  let records = client.request(endpoint).unwrap();
-///  let trade = &records.records()[0];
-///  let asset1 = trade.base_asset().clone();
-///  let asset2 = trade.counter_asset().clone();
+/// let endpoint = trade::All::default().with_limit(1);
+/// let records = client.request(endpoint).unwrap();
+/// let trade = &records.records()[0];
+/// let asset1 = trade.base_asset().clone();
+/// let asset2 = trade.counter_asset().clone();
 /// let orderbook_ep = orderbook::Details::for_asset_pair(asset1, asset2);
 /// let orderbook   = client.request(orderbook_ep).unwrap();
 ///
