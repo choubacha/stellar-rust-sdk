@@ -1,6 +1,6 @@
 //! This module contains the various end point definitions for stellar's horizon
-//! API server. An endpoint is a struct that implement the `IntoRequest` trait
-//! and can be given to a client for fetching into a response.
+//! API server. An endpoint is a struct that implements the `IntoRequest`, and `TryFromUri`
+//! traits.  Endpoints can be given to a client for fetching into a response.
 //!
 //! # Example
 //! ```

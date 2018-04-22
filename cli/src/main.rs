@@ -166,7 +166,18 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                         SubCommand::with_name("all")
                             .about("Fetch all ledgers")
                     ),
-                ),
+                )
+                .subcommand(
+                    listable!(
+                        SubCommand::with_name("payments")
+                            .about("Fetch payment operations for a given ledger")
+                            .arg(
+                                Arg::with_name("sequence")
+                                    .required(true)
+                                    .help("The sequence of the ledger for which to fetch payments")
+                            )
+                    )
+                )
         )
         .subcommand(
             SubCommand::with_name("trades")
@@ -250,15 +261,16 @@ fn main() {
             _ => return print_help_and_exit(),
         },
         ("assets", Some(sub_m)) => match sub_m.subcommand() {
-            ("all", Some(m)) => assets::all(&client, m),
+            ("all", Some(sub_m)) => assets::all(&client, sub_m),
             _ => return print_help_and_exit(),
         },
         ("ledgers", Some(sub_m)) => match sub_m.subcommand() {
-            ("all", Some(m)) => ledgers::all(&client, m),
+            ("all", Some(sub_m)) => ledgers::all(&client, sub_m),
+            ("payments", Some(sub_m)) => ledgers::payments(&client, sub_m),
             _ => return print_help_and_exit(),
         },
         ("trades", Some(sub_m)) => match sub_m.subcommand() {
-            ("all", Some(m)) => trades::all(&client, m),
+            ("all", Some(sub_m)) => trades::all(&client, sub_m),
             _ => return print_help_and_exit(),
         },
         _ => return print_help_and_exit(),
