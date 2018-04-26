@@ -2,6 +2,7 @@ use stellar_client::{endpoint::transaction, resources::OperationKind, sync::{sel
 use clap::ArgMatches;
 use super::{cursor, ordering, pager::Pager};
 use error::Result;
+use fmt::{Formatter, Simple};
 
 pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let pager = Pager::from_arg(&matches);
@@ -14,15 +15,12 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let iter = sync::Iter::new(&client, endpoint);
 
     let mut res = Ok(());
+    let mut fmt = Formatter::start_stdout(Simple);
     pager.paginate(iter, |result| match result {
-        Ok(txn) => {
-            println!("ID:             {}", txn.id());
-            println!("source account: {}", txn.source_account());
-            println!("created at:     {}", txn.created_at());
-            println!();
-        }
+        Ok(txn) => fmt.render(&txn),
         Err(err) => res = Err(err.into()),
     });
+    let _ = fmt.stop();
     res
 }
 
