@@ -2,6 +2,7 @@ use stellar_client::{endpoint::asset, sync::{self, Client}};
 use clap::ArgMatches;
 use super::{cursor, ordering, pager::Pager};
 use error::Result;
+use fmt::{Formatter, Simple};
 
 /// Using a client and the arguments from the command line, iterates over the results
 /// and displays them to the end user.
@@ -25,23 +26,11 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let iter = sync::Iter::new(&client, endpoint);
 
     let mut res = Ok(());
+    let mut fmt = Formatter::start_stdout(Simple);
     pager.paginate(iter, |result| match result {
-        Ok(asset) => {
-            println!("Code:           {}", asset.code());
-            println!("Type:           {}", asset.asset_type());
-            println!("Issuer:         {}", asset.issuer());
-            println!("Amount:         {}", asset.amount());
-            println!("Num accounts:   {}", asset.num_accounts());
-            println!("Flags:");
-            if asset.is_auth_required() {
-                println!("  auth is required");
-            }
-            if asset.is_auth_revocable() {
-                println!("  auth is revocable");
-            }
-            println!();
-        }
+        Ok(asset) => fmt.render(&asset),
         Err(err) => res = Err(err.into()),
     });
+    let _ = fmt.stop();
     res
 }
