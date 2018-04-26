@@ -1,6 +1,7 @@
 use clap::ArgMatches;
 use stellar_client::{sync, endpoint::account, sync::Client};
 use super::{cursor, ordering, pager::Pager};
+use fmt::{Formatter, Simple};
 use error::Result;
 
 pub fn details(client: &Client, matches: &ArgMatches) -> Result<()> {
@@ -8,8 +9,7 @@ pub fn details(client: &Client, matches: &ArgMatches) -> Result<()> {
     let endpoint = account::Details::new(id);
     let account = client.request(endpoint)?;
 
-    println!("ID:       {}", account.id());
-    println!("Sequence: {}", account.sequence());
+    Formatter::start_stdout(Simple).render(&account);
 
     Ok(())
 }

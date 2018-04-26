@@ -15,6 +15,7 @@ mod error;
 mod ledgers;
 mod ordering;
 mod pager;
+mod fmt;
 mod trades;
 mod transactions;
 
