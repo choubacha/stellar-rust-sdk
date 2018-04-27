@@ -1,5 +1,6 @@
 #![deny(warnings)]
 //! A basic CLI for interactions with the stellar network.
+extern crate chrono;
 extern crate clap;
 extern crate stellar_client;
 
@@ -12,10 +13,11 @@ mod account;
 mod assets;
 mod cursor;
 mod error;
+mod fmt;
 mod ledgers;
 mod ordering;
 mod pager;
-mod fmt;
+mod resolution;
 mod trades;
 mod transactions;
 
@@ -231,6 +233,69 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                                     .help("Filters trades that are a part of a particular offer_id"),
                             )
                     ),
+                )
+                .subcommand(
+                    SubCommand::with_name("aggregations")
+                        .about("Fetch aggregate statistics over a specified time range.")
+                        .arg(
+                            Arg::with_name("start_time")
+                                .long("start_time")
+                                .takes_value(true)
+                                .required(true)
+                                .help("Lower time boundary in ISO 8601 format, ex: 2017-11-28T12:00:09Z"),
+                        )
+                        .arg(
+                            Arg::with_name("end_time")
+                                .long("end_time")
+                                .takes_value(true)
+                                .required(true)
+                                .help("Upper time boundary in ISO 8601 format, ex: 2017-11-28T12:00:09Z"),
+                        )
+                        .arg(
+                            Arg::with_name("resolution")
+                                .long("resolution")
+                                .takes_value(true)
+                                .required(true)
+                                .help("Segment duration in format <number><unit> where units are s, m, h, d.  ie: 10h == 10 hours"),
+                        )
+                        .arg(
+                            Arg::with_name("base_asset_type")
+                                .long("base_asset_type")
+                                .takes_value(true)
+                                .required(true)
+                                .help("Filters trades with a base_asset_type"),
+                        )
+                        .arg(
+                            Arg::with_name("base_asset_code")
+                                .long("base_asset_code")
+                                .takes_value(true)
+                                .help("Filters trades with a base_asset_code.  Not required for XLM"),
+                        )
+                        .arg(
+                            Arg::with_name("base_asset_issuer")
+                                .long("base_asset_issuer")
+                                .takes_value(true)
+                                .help("Filters trades with a base_asset_issuer.  Not required for XLM"),
+                        )
+                        .arg(
+                            Arg::with_name("counter_asset_type")
+                                .long("counter_asset_type")
+                                .takes_value(true)
+                                .required(true)
+                                .help("Filters trades with a counter_asset_type"),
+                        )
+                        .arg(
+                            Arg::with_name("counter_asset_code")
+                                .long("counter_asset_code")
+                                .takes_value(true)
+                                .help("Filters trades with a counter_asset_code.  Not required for XLM"),
+                        )
+                        .arg(
+                            Arg::with_name("counter_asset_issuer")
+                                .long("counter_asset_issuer")
+                                .takes_value(true)
+                                .help("Filters trades with a counter_asset_issuer.  Not required for XLM"),
+                        )
                 ),
         )
 }
@@ -271,6 +336,7 @@ fn main() {
             _ => return print_help_and_exit(),
         },
         ("trades", Some(sub_m)) => match sub_m.subcommand() {
+            ("aggregations", Some(sub_m)) => trades::aggregations(&client, sub_m),
             ("all", Some(sub_m)) => trades::all(&client, sub_m),
             _ => return print_help_and_exit(),
         },

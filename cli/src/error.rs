@@ -2,6 +2,7 @@ use stellar_client::error::Error;
 use std::error::Error as StdError;
 use std::fmt;
 use std::num::ParseIntError;
+use resolution::ParseResolutionError;
 
 /// A result including client specific errors.
 pub type Result<T> = ::std::result::Result<T, CliError>;
@@ -11,6 +12,7 @@ pub type Result<T> = ::std::result::Result<T, CliError>;
 pub enum CliError {
     ClientError(Error),
     OperatorError(InvalidInputError),
+    ParseResolutionError(ParseResolutionError),
 }
 
 /// Errors resulting from incomplete or invalid user input
@@ -34,6 +36,12 @@ impl StdError for InvalidInputError {
 impl From<InvalidInputError> for CliError {
     fn from(err: InvalidInputError) -> Self {
         CliError::OperatorError(err)
+    }
+}
+
+impl From<ParseResolutionError> for CliError {
+    fn from(err: ParseResolutionError) -> Self {
+        CliError::ParseResolutionError(err)
     }
 }
 
