@@ -8,5 +8,6 @@ name = "stellar"
 path = "src/main.rs"
 
 [dependencies]
+chrono = { version = "0.4" }
 clap = "2.31"
 stellar-client = { path = "../client" }
