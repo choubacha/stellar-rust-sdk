@@ -256,17 +256,33 @@ mod asset_identifier_tests {
 /// Permissions around who can own an asset and whether or
 /// not the asset issuer can freeze the asset.
 #[derive(Deserialize, Debug, Copy, Clone, PartialEq, Eq)]
-pub struct Flag {
+pub struct Flags {
     auth_required: bool,
     auth_revocable: bool,
 }
 
-impl Flag {
-    pub fn new(auth_required: bool, auth_revocable: bool) -> Flag {
-        Flag {
+impl Flags {
+    /// Creates a new set of flags
+    pub fn new(auth_required: bool, auth_revocable: bool) -> Flags {
+        Flags {
             auth_required,
             auth_revocable,
         }
+    }
+
+    /// If this field is true it means the anchor must approve anyone who wants to
+    /// hold its credit, allowing it to control who its customers are
+    pub fn is_auth_required(&self) -> bool {
+        self.auth_required
+    }
+
+    /// If this field is true it means the anchor can freeze credit held by another account. When
+    /// credit is frozen for a particular account, that account can only send the credit back to
+    /// the anchor–it can’t transfer the credit to any other account. This setting allows the
+    /// issuing account to revoke credit that it accidentally issued or that was obtained
+    /// improperly.
+    pub fn is_auth_revocable(&self) -> bool {
+        self.auth_revocable
     }
 }
 
@@ -280,7 +296,7 @@ pub struct Asset {
     asset_identifier: AssetIdentifier,
     amount: Amount,
     num_accounts: u32,
-    flags: Flag,
+    flags: Flags,
 }
 
 #[derive(Deserialize, Debug)]
@@ -292,7 +308,7 @@ pub struct IntermediateAsset {
     asset_issuer: Option<String>,
     amount: Amount,
     num_accounts: u32,
-    flags: Flag,
+    flags: Flags,
 }
 
 impl<'de> Deserialize<'de> for Asset {
@@ -355,7 +371,6 @@ impl Asset {
 
     /// If this field is true it means the anchor must approve anyone who wants to
     /// hold its credit, allowing it to control who its customers are
-    /// Returns a bool.
     pub fn is_auth_required(&self) -> bool {
         self.flags.auth_required
     }
@@ -365,9 +380,13 @@ impl Asset {
     /// the anchor–it can’t transfer the credit to any other account. This setting allows the
     /// issuing account to revoke credit that it accidentally issued or that was obtained
     /// improperly.
-    /// Returns a bool.
     pub fn is_auth_revocable(&self) -> bool {
         self.flags.auth_revocable
+    }
+
+    /// Returns the flags associated with this asset.
+    pub fn flags(&self) -> Flags {
+        self.flags
     }
 }
 
@@ -392,7 +411,9 @@ mod asset_tests {
         assert_eq!(asset.amount(), Amount::new(1000000000));
         assert_eq!(asset.num_accounts(), 91547871);
         assert!(!asset.is_auth_required());
+        assert!(!asset.flags().is_auth_required());
         assert!(asset.is_auth_revocable());
+        assert!(asset.flags().is_auth_revocable());
         assert_eq!(
             asset.identifier(),
             &AssetIdentifier::alphanum4(

@@ -1,10 +1,11 @@
-use resources::{Amount, AssetIdentifier, asset::Flag};
+use resources::{Amount, AssetIdentifier, asset::Flags};
 use serde::{de, Deserialize, Deserializer};
 
 pub mod account;
+pub mod data;
 pub mod signer;
-pub mod trustline;
 pub mod trade;
+pub mod trustline;
 
 #[cfg(test)]
 mod test;
@@ -31,6 +32,8 @@ pub enum EffectKind {
     Trustline(trustline::Kind),
     /// An effect representing a trade being executed
     Trade(trade::Kind),
+    /// An effect representing data being managed.
+    Data(data::Kind),
     // The stellar api docs list other operations for offers, but as of this writing those
     // endpoints do not yet exist in horizon https://github.com/stellar/go/issues/166
 }
@@ -72,6 +75,11 @@ impl Effect {
                 trustline::Kind::Authorized(_) => 23,
                 trustline::Kind::Deauthorized(_) => 24,
             },
+            Kind::Data(ref kind) => match *kind {
+                data::Kind::Created(_) => 40,
+                data::Kind::Removed(_) => 41,
+                data::Kind::Updated(_) => 42,
+            },
             Kind::Trade(_) => 33,
         }
     }
@@ -106,6 +114,11 @@ impl Effect {
                 trustline::Kind::Deauthorized(_) => "Trustline deauthorized",
             },
             Kind::Trade(_) => "Trade",
+            Kind::Data(ref kind) => match *kind {
+                data::Kind::Created(_) => "Data created",
+                data::Kind::Removed(_) => "Data removed",
+                data::Kind::Updated(_) => "Data updated",
+            },
         }
     }
 
@@ -161,6 +174,30 @@ impl Effect {
     pub fn is_account_flags_updated(&self) -> bool {
         match self.kind {
             Kind::Account(account::Kind::FlagsUpdated(_)) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns true if the effect is a data_created effect
+    pub fn is_data_created(&self) -> bool {
+        match self.kind {
+            Kind::Data(data::Kind::Created(_)) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns true if the effect is a data_removed effect
+    pub fn is_data_removed(&self) -> bool {
+        match self.kind {
+            Kind::Data(data::Kind::Removed(_)) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns true if the effect is a data_updated effect
+    pub fn is_data_updated(&self) -> bool {
+        match self.kind {
+            Kind::Data(data::Kind::Updated(_)) => true,
             _ => false,
         }
     }
@@ -398,7 +435,7 @@ impl<'de> Deserialize<'de> for Effect {
                     auth_revokable_flag: Some(auth_revokable_flag),
                     ..
                 } => {
-                    let flags = Flag::new(auth_required_flag, auth_revokable_flag);
+                    let flags = Flags::new(auth_required_flag, auth_revokable_flag);
                     Kind::Account(account::Kind::FlagsUpdated(account::FlagsUpdated::new(
                         account,
                         flags,
@@ -409,6 +446,27 @@ impl<'de> Deserialize<'de> for Effect {
                         "Missing fields for account_flags_updated effect.",
                     ))
                 }
+            },
+            "data_created" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    ..
+                } => Kind::Data(data::Kind::Created(data::Effect::new(account))),
+                _ => return Err(de::Error::custom("Missing fields for data_created effect.")),
+            },
+            "data_removed" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    ..
+                } => Kind::Data(data::Kind::Removed(data::Effect::new(account))),
+                _ => return Err(de::Error::custom("Missing fields for data_removed effect.")),
+            },
+            "data_updated" => match rep {
+                Intermediate {
+                    account: Some(account),
+                    ..
+                } => Kind::Data(data::Kind::Updated(data::Effect::new(account))),
+                _ => return Err(de::Error::custom("Missing fields for data_updated effect.")),
             },
             "signer_created" => match rep {
                 Intermediate {
@@ -609,7 +667,7 @@ impl<'de> Deserialize<'de> for Effect {
                 }
                 _ => return Err(de::Error::custom("Missing fields for trade effect.")),
             },
-            _ => return Err(de::Error::custom("Unknown effect type.")),
+            kind => return Err(de::Error::custom(format!("Unknown effect type: {}", kind))),
         };
 
         Ok(Effect {

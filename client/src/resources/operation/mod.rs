@@ -1,4 +1,4 @@
-use resources::{Amount, AssetIdentifier, asset::Flag, offer::PriceRatio};
+use resources::{Amount, AssetIdentifier, asset::Flags, offer::PriceRatio};
 use super::deserialize;
 use serde::{de, Deserialize, Deserializer};
 mod account_merge;
@@ -452,23 +452,23 @@ impl<'de> Deserialize<'de> for Operation {
                     home_domain: Some(home_domain),
                     ..
                 } => {
-                    let set_flags: Option<Flag> = match set_flags_s {
+                    let set_flags: Option<Flags> = match set_flags_s {
                         Some(vec_strings) => {
                             let auth_required =
                                 vec_strings.iter().any(|e| e == "auth_required_flag");
                             let auth_revocable =
                                 vec_strings.iter().any(|e| e == "auth_revocable_flag");
-                            Some(Flag::new(auth_required, auth_revocable))
+                            Some(Flags::new(auth_required, auth_revocable))
                         }
                         None => None,
                     };
-                    let clear_flags: Option<Flag> = match clear_flags_s {
+                    let clear_flags: Option<Flags> = match clear_flags_s {
                         Some(vec_strings) => {
                             let auth_required =
                                 vec_strings.iter().any(|e| e == "auth_required_flag");
                             let auth_revocable =
                                 vec_strings.iter().any(|e| e == "auth_revocable_flag");
-                            Some(Flag::new(auth_required, auth_revocable))
+                            Some(Flags::new(auth_required, auth_revocable))
                         }
                         None => None,
                     };

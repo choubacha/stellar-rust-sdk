@@ -1,0 +1,18 @@
+{
+  "_links": {
+    "operation": {
+      "href": "https://horizon-testnet.stellar.org/operations/37326362473689125"
+    },
+    "succeeds": {
+      "href": "https://horizon-testnet.stellar.org/effects?order=desc\u0026cursor=37326362473689125-1"
+    },
+    "precedes": {
+      "href": "https://horizon-testnet.stellar.org/effects?order=asc\u0026cursor=37326362473689125-1"
+    }
+  },
+  "id": "0037326362473689125-0000000001",
+  "paging_token": "37326362473689125-1",
+  "account": "GDWGJSTUVRNFTR7STPUUHFWQYAN6KBVWCZT2YN7MY276GCSSXSWPS6JY",
+  "type": "data_updated",
+  "type_i": 42
+}
