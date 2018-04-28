@@ -314,7 +314,6 @@ impl<'de> Deserialize<'de> for Operation {
                     source_asset_code,
                     source_asset_issuer,
                     source_asset_type: Some(source_asset_type),
-                    source_amount: Some(source_amount),
                     source_max: Some(source_max),
                     ..
                 } => {
@@ -332,7 +331,6 @@ impl<'de> Deserialize<'de> for Operation {
                         destination_asset_identifier,
                         amount,
                         source_asset_identifier,
-                        source_amount,
                         source_max,
                     ))
                 }

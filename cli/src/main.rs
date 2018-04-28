@@ -18,6 +18,7 @@ mod ledgers;
 mod ordering;
 mod pager;
 mod resolution;
+mod payments;
 mod trades;
 mod transactions;
 
@@ -182,6 +183,17 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                     )
                 )
         )
+         .subcommand(
+            SubCommand::with_name("payments")
+                .about("Access lists of payments")
+                .setting(AppSettings::SubcommandRequired)
+                .subcommand(
+                    listable!(
+                        SubCommand::with_name("all")
+                            .about("Fetch all payments")
+                    ),
+                )
+        )
         .subcommand(
             SubCommand::with_name("trades")
                 .about("Access lists of trades")
@@ -333,6 +345,10 @@ fn main() {
         ("ledgers", Some(sub_m)) => match sub_m.subcommand() {
             ("all", Some(sub_m)) => ledgers::all(&client, sub_m),
             ("payments", Some(sub_m)) => ledgers::payments(&client, sub_m),
+            _ => return print_help_and_exit(),
+        },
+        ("payments", Some(sub_m)) => match sub_m.subcommand() {
+            ("all", Some(sub_m)) => payments::all(&client, sub_m),
             _ => return print_help_and_exit(),
         },
         ("trades", Some(sub_m)) => match sub_m.subcommand() {
