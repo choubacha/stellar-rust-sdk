@@ -12,6 +12,7 @@ use error::CliError;
 mod account;
 mod assets;
 mod cursor;
+mod effects;
 mod error;
 mod fmt;
 mod ledgers;
@@ -81,6 +82,17 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                     ),
 
                 ),
+        )
+        .subcommand(
+            SubCommand::with_name("effects")
+                .about("Access lists of effects")
+                .setting(AppSettings::SubcommandRequired)
+                .subcommand(
+                    listable!(
+                        SubCommand::with_name("all")
+                            .about("Fetch all effects")
+                    )
+                )
         )
         .subcommand(
             SubCommand::with_name("transactions")
@@ -318,16 +330,12 @@ fn main() {
             ("transactions", Some(sub_m)) => account::transactions(&client, sub_m),
             _ => return print_help_and_exit(),
         },
-        ("transactions", Some(sub_m)) => match sub_m.subcommand() {
-            ("all", Some(sub_m)) => transactions::all(&client, sub_m),
-            ("details", Some(sub_m)) => transactions::details(&client, sub_m),
-            ("operations", Some(sub_m)) => transactions::operations(&client, sub_m),
-            ("payments", Some(sub_m)) => transactions::payments(&client, sub_m),
-            ("effects", Some(sub_m)) => transactions::effects(&client, sub_m),
-            _ => return print_help_and_exit(),
-        },
         ("assets", Some(sub_m)) => match sub_m.subcommand() {
             ("all", Some(sub_m)) => assets::all(&client, sub_m),
+            _ => return print_help_and_exit(),
+        },
+        ("effects", Some(sub_m)) => match sub_m.subcommand() {
+            ("all", Some(sub_m)) => effects::all(&client, sub_m),
             _ => return print_help_and_exit(),
         },
         ("ledgers", Some(sub_m)) => match sub_m.subcommand() {
@@ -338,6 +346,14 @@ fn main() {
         ("trades", Some(sub_m)) => match sub_m.subcommand() {
             ("aggregations", Some(sub_m)) => trades::aggregations(&client, sub_m),
             ("all", Some(sub_m)) => trades::all(&client, sub_m),
+            _ => return print_help_and_exit(),
+        },
+        ("transactions", Some(sub_m)) => match sub_m.subcommand() {
+            ("all", Some(sub_m)) => transactions::all(&client, sub_m),
+            ("details", Some(sub_m)) => transactions::details(&client, sub_m),
+            ("operations", Some(sub_m)) => transactions::operations(&client, sub_m),
+            ("payments", Some(sub_m)) => transactions::payments(&client, sub_m),
+            ("effects", Some(sub_m)) => transactions::effects(&client, sub_m),
             _ => return print_help_and_exit(),
         },
         _ => return print_help_and_exit(),

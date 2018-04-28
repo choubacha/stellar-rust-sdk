@@ -26,7 +26,7 @@ mod transaction;
 /// they can be used with a client. Either for reading or for writing.
 pub use self::account::Account;
 pub use self::amount::Amount;
-pub use self::asset::{Asset, AssetIdentifier};
+pub use self::asset::{Asset, AssetIdentifier, Flags};
 pub use self::datum::Datum;
 pub use self::effect::Effect;
 pub use self::ledger::Ledger;

@@ -1,5 +1,5 @@
 use serde_json;
-use resources::{Amount, Operation, OperationKind, asset::Flag};
+use resources::{Amount, Operation, OperationKind, asset::Flags};
 
 fn account_merge_json() -> &'static str {
     include_str!("../../../fixtures/operations/account_merge.json")
@@ -290,7 +290,10 @@ fn it_parses_a_set_options_from_json() {
         assert_eq!(account_details.high_threshold(), 3);
         assert_eq!(account_details.home_domain(), "stellar.org");
         assert!(account_details.clear_flags().is_none());
-        assert_eq!(account_details.set_flags().unwrap(), Flag::new(true, false));
+        assert_eq!(
+            account_details.set_flags().unwrap(),
+            Flags::new(true, false)
+        );
     } else {
         panic!("Did not generate set options kind");
     }

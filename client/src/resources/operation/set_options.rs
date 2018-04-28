@@ -1,4 +1,4 @@
-use resources::asset::Flag;
+use resources::asset::Flags;
 
 /// Use “Set Options” operation to set following options to your account:
 ///
@@ -17,8 +17,8 @@ pub struct SetOptions {
     master_key_weight: u8,
     thresholds: Thresholds,
     home_domain: String,
-    set_flags: Option<Flag>,
-    clear_flags: Option<Flag>,
+    set_flags: Option<Flags>,
+    clear_flags: Option<Flags>,
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -37,8 +37,8 @@ impl SetOptions {
         master_key_weight: u8,
         (low, med, high): (u32, u32, u32),
         home_domain: String,
-        set_flags: Option<Flag>,
-        clear_flags: Option<Flag>,
+        set_flags: Option<Flags>,
+        clear_flags: Option<Flags>,
     ) -> SetOptions {
         SetOptions {
             signer_key,
@@ -87,12 +87,12 @@ impl SetOptions {
     }
 
     /// The flags that have been set in this operation
-    pub fn set_flags(&self) -> Option<Flag> {
+    pub fn set_flags(&self) -> Option<Flags> {
         self.set_flags
     }
 
     /// The flags that have been cleared in this operation
-    pub fn clear_flags(&self) -> Option<Flag> {
+    pub fn clear_flags(&self) -> Option<Flags> {
         self.clear_flags
     }
 }

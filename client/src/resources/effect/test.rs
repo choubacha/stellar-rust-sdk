@@ -1,7 +1,7 @@
-use resources::{Amount, asset::Flag,
+use resources::{Amount, asset::Flags,
                 effect::{Effect, EffectKind, account::Kind as AccountKind,
-                         signer::Kind as SignerKind, trade::Kind as TradeKind,
-                         trustline::Kind as TrustlineKind}};
+                         data::Kind as DataKind, signer::Kind as SignerKind,
+                         trade::Kind as TradeKind, trustline::Kind as TrustlineKind}};
 use serde_json;
 
 fn account_created_json() -> &'static str {
@@ -140,9 +140,67 @@ fn it_parses_account_flags_updated_from_json() {
             effect_details.account(),
             "GA6U5X6WOPNKKDKQULBR7IDHDBAQKOWPHYEC7WSXHZBFEYFD3XVZAKOO"
         );
-        assert_eq!(effect_details.flags(), Flag::new(false, true));
+        assert_eq!(effect_details.flags(), Flags::new(false, true));
     } else {
         panic!("Did not generate account flags updated kind");
+    }
+}
+
+mod data {
+    use super::*;
+
+    fn data_updated_json() -> &'static str {
+        include_str!("../../../fixtures/effects/data_updated.json")
+    }
+    #[test]
+    fn it_parses_data_updated_from_json() {
+        let effect: Effect = serde_json::from_str(&data_updated_json()).unwrap();
+        assert!(effect.is_data_updated());
+        assert_eq!(effect.type_i(), 42);
+        if let &EffectKind::Data(DataKind::Updated(ref effect_details)) = effect.kind() {
+            assert_eq!(
+                effect_details.account(),
+                "GDWGJSTUVRNFTR7STPUUHFWQYAN6KBVWCZT2YN7MY276GCSSXSWPS6JY"
+            );
+        } else {
+            panic!("Did not generate account flags removed kind: {:?}", effect);
+        }
+    }
+
+    fn data_created_json() -> &'static str {
+        include_str!("../../../fixtures/effects/data_created.json")
+    }
+    #[test]
+    fn it_parses_data_created_from_json() {
+        let effect: Effect = serde_json::from_str(&data_created_json()).unwrap();
+        assert!(effect.is_data_created());
+        assert_eq!(effect.type_i(), 40);
+        if let &EffectKind::Data(DataKind::Created(ref effect_details)) = effect.kind() {
+            assert_eq!(
+                effect_details.account(),
+                "GDWGJSTUVRNFTR7STPUUHFWQYAN6KBVWCZT2YN7MY276GCSSXSWPS6JY"
+            );
+        } else {
+            panic!("Did not generate account flags created kind: {:?}", effect);
+        }
+    }
+
+    fn data_removed_json() -> &'static str {
+        include_str!("../../../fixtures/effects/data_removed.json")
+    }
+    #[test]
+    fn it_parses_data_removed_from_json() {
+        let effect: Effect = serde_json::from_str(&data_removed_json()).unwrap();
+        assert!(effect.is_data_removed());
+        assert_eq!(effect.type_i(), 41);
+        if let &EffectKind::Data(DataKind::Removed(ref effect_details)) = effect.kind() {
+            assert_eq!(
+                effect_details.account(),
+                "GDWGJSTUVRNFTR7STPUUHFWQYAN6KBVWCZT2YN7MY276GCSSXSWPS6JY"
+            );
+        } else {
+            panic!("Did not generate account flags removed kind: {:?}", effect);
+        }
     }
 }
 
@@ -377,4 +435,7 @@ mod errors_on_missing_fields_for_effect_types {
     assert_err_on_missing_fields!(trustline_updated, 22);
     assert_err_on_missing_fields!(trustline_authorized, 23);
     assert_err_on_missing_fields!(trade, 33);
+    assert_err_on_missing_fields!(data_created, 40);
+    assert_err_on_missing_fields!(data_removed, 41);
+    assert_err_on_missing_fields!(data_updated, 42);
 }
