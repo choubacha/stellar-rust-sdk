@@ -73,7 +73,6 @@ pub fn payments(client: &Client, matches: &ArgMatches) -> Result<()> {
                         "Source Asset Issuer:      {}",
                         path_payment.source_asset().issuer()
                     );
-                    println!("Source Amount:            {}", path_payment.source_amount());
                     println!(
                         "Destination Asset Type:   {}",
                         path_payment.destination_asset().asset_type()
