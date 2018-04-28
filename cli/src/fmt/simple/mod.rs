@@ -5,12 +5,14 @@ macro_rules! append_to_buffer {
         $buffer.push_str("\n");
     }
 }
+
 pub struct Simple;
 
 mod account;
 mod asset;
 mod effect;
 mod ledger;
+mod payment;
 mod trade_aggregation;
 mod transaction;
 
