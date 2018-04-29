@@ -9,6 +9,7 @@ pub struct Simple;
 
 mod account;
 mod asset;
+mod ledger;
 mod trade_aggregation;
 mod transaction;
 
