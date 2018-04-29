@@ -3,6 +3,8 @@ A lightweight client SDK for the stellar horizon api. Written in rust.
 
 [![Travis](https://img.shields.io/travis/kbacha/stellar-sdk.svg)](https://travis-ci.org/kbacha/stellar-sdk)
 [![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/stellar-sdk)
+[![Crates.io](https://img.shields.io/crates/v/stellar-client.svg)](https://crates.io/crates/stellar-client)
+[![Docs.rs](https://docs.rs/stellar-client/badge.svg)](https://docs.rs/stellar-client/)
 
 The SDK provides a client and modeled resources to the stellar horizon api. The
 resources are strictly typed and parse directly from the api. It also provides a robust
