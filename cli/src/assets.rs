@@ -26,7 +26,7 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let iter = sync::Iter::new(&client, endpoint);
 
     let mut res = Ok(());
-    let mut fmt = Formatter::start_stdout(Simple);
+    let mut fmt = Formatter::start_stdout(Simple::new());
     pager.paginate(iter, |result| match result {
         Ok(asset) => fmt.render(&asset),
         Err(err) => res = Err(err.into()),

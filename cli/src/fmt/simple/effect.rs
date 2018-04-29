@@ -6,9 +6,9 @@ impl Render<Effect> for Simple {
     fn render(&self, effect: &Effect) -> Option<String> {
         let mut buf = String::new();
 
-        append_to_buffer!(buf, "id:   {}", effect.id());
-        append_to_buffer!(buf, "kind: {}", effect.kind_name());
-        append_to_buffer!(buf, "details:");
+        append!(buf, "id:   {}", effect.id());
+        append!(buf, "kind: {}", effect.kind_name());
+        append!(buf, "details:");
 
         Some(match *effect.kind() {
             Kind::Account(ref kind) => account::render(buf, kind),
@@ -35,40 +35,40 @@ mod account {
     pub fn render(mut buf: String, kind: &Kind) -> String {
         match *kind {
             Kind::Created(ref effect) => {
-                append_to_buffer!(buf, "  account:          {}", effect.account());
-                append_to_buffer!(buf, "  starting_balance: {}", effect.starting_balance());
+                append!(buf, "  account:          {}", effect.account());
+                append!(buf, "  starting_balance: {}", effect.starting_balance());
             }
             Kind::Credited(ref effect) => {
-                append_to_buffer!(buf, "  account: {}", effect.account());
-                append_to_buffer!(buf, "  asset:   {}", render_asset(effect.asset()));
-                append_to_buffer!(buf, "  amount:  {}", effect.amount());
+                append!(buf, "  account: {}", effect.account());
+                append!(buf, "  asset:   {}", render_asset(effect.asset()));
+                append!(buf, "  amount:  {}", effect.amount());
             }
             Kind::Removed(ref effect) => {
-                append_to_buffer!(buf, "  account: {}", effect.account());
+                append!(buf, "  account: {}", effect.account());
             }
             Kind::Debited(ref effect) => {
-                append_to_buffer!(buf, "  account: {}", effect.account());
-                append_to_buffer!(buf, "  asset:   {}", render_asset(effect.asset()));
-                append_to_buffer!(buf, "  amount:  {}", effect.amount());
+                append!(buf, "  account: {}", effect.account());
+                append!(buf, "  asset:   {}", render_asset(effect.asset()));
+                append!(buf, "  amount:  {}", effect.amount());
             }
             Kind::ThresholdsUpdated(ref effect) => {
-                append_to_buffer!(buf, "  account: {}", effect.account());
-                append_to_buffer!(buf, "  low:     {}", effect.low());
-                append_to_buffer!(buf, "  med:     {}", effect.med());
-                append_to_buffer!(buf, "  high:    {}", effect.high());
+                append!(buf, "  account: {}", effect.account());
+                append!(buf, "  low:     {}", effect.low());
+                append!(buf, "  med:     {}", effect.med());
+                append!(buf, "  high:    {}", effect.high());
             }
             Kind::HomeDomainUpdated(ref effect) => {
-                append_to_buffer!(buf, "  account:     {}", effect.account());
-                append_to_buffer!(buf, "  home domain: {}", effect.home_domain());
+                append!(buf, "  account:     {}", effect.account());
+                append!(buf, "  home domain: {}", effect.home_domain());
             }
             Kind::FlagsUpdated(ref effect) => {
-                append_to_buffer!(buf, "  account:     {}", effect.account());
-                append_to_buffer!(buf, "  flags:");
+                append!(buf, "  account:     {}", effect.account());
+                append!(buf, "  flags:");
                 if effect.flags().is_auth_required() {
-                    append_to_buffer!(buf, "    auth is required");
+                    append!(buf, "    auth is required");
                 }
                 if effect.flags().is_auth_revocable() {
-                    append_to_buffer!(buf, "    auth is revocable");
+                    append!(buf, "    auth is revocable");
                 }
             }
         }
@@ -82,19 +82,19 @@ mod signer {
     pub fn render(mut buf: String, kind: &Kind) -> String {
         match *kind {
             Kind::Created(ref effect) => {
-                append_to_buffer!(buf, "  account:    {}", effect.account());
-                append_to_buffer!(buf, "  public key: {}", effect.public_key());
-                append_to_buffer!(buf, "  weight:     {}", effect.weight());
+                append!(buf, "  account:    {}", effect.account());
+                append!(buf, "  public key: {}", effect.public_key());
+                append!(buf, "  weight:     {}", effect.weight());
             }
             Kind::Removed(ref effect) => {
-                append_to_buffer!(buf, "  account:    {}", effect.account());
-                append_to_buffer!(buf, "  public key: {}", effect.public_key());
-                append_to_buffer!(buf, "  weight:     {}", effect.weight());
+                append!(buf, "  account:    {}", effect.account());
+                append!(buf, "  public key: {}", effect.public_key());
+                append!(buf, "  weight:     {}", effect.weight());
             }
             Kind::Updated(ref effect) => {
-                append_to_buffer!(buf, "  account:    {}", effect.account());
-                append_to_buffer!(buf, "  public key: {}", effect.public_key());
-                append_to_buffer!(buf, "  weight:     {}", effect.weight());
+                append!(buf, "  account:    {}", effect.account());
+                append!(buf, "  public key: {}", effect.public_key());
+                append!(buf, "  weight:     {}", effect.weight());
             }
         }
         buf
@@ -108,27 +108,27 @@ mod trustline {
     pub fn render(mut buf: String, kind: &Kind) -> String {
         match *kind {
             Kind::Authorized(ref effect) => {
-                append_to_buffer!(buf, "  account: {}", effect.account());
-                append_to_buffer!(buf, "  asset:   {}", render_asset(effect.asset()));
+                append!(buf, "  account: {}", effect.account());
+                append!(buf, "  asset:   {}", render_asset(effect.asset()));
             }
             Kind::Deauthorized(ref effect) => {
-                append_to_buffer!(buf, "  account: {}", effect.account());
-                append_to_buffer!(buf, "  asset:   {}", render_asset(effect.asset()));
+                append!(buf, "  account: {}", effect.account());
+                append!(buf, "  asset:   {}", render_asset(effect.asset()));
             }
             Kind::Removed(ref effect) => {
-                append_to_buffer!(buf, "  account: {}", effect.account());
-                append_to_buffer!(buf, "  limit:   {}", effect.limit());
-                append_to_buffer!(buf, "  asset:   {}", render_asset(effect.asset()));
+                append!(buf, "  account: {}", effect.account());
+                append!(buf, "  limit:   {}", effect.limit());
+                append!(buf, "  asset:   {}", render_asset(effect.asset()));
             }
             Kind::Updated(ref effect) => {
-                append_to_buffer!(buf, "  account: {}", effect.account());
-                append_to_buffer!(buf, "  limit:   {}", effect.limit());
-                append_to_buffer!(buf, "  asset:   {}", render_asset(effect.asset()));
+                append!(buf, "  account: {}", effect.account());
+                append!(buf, "  limit:   {}", effect.limit());
+                append!(buf, "  asset:   {}", render_asset(effect.asset()));
             }
             Kind::Created(ref effect) => {
-                append_to_buffer!(buf, "  account: {}", effect.account());
-                append_to_buffer!(buf, "  limit:   {}", effect.limit());
-                append_to_buffer!(buf, "  asset:   {}", render_asset(effect.asset()));
+                append!(buf, "  account: {}", effect.account());
+                append!(buf, "  limit:   {}", effect.limit());
+                append!(buf, "  asset:   {}", render_asset(effect.asset()));
             }
         }
         buf
@@ -142,13 +142,13 @@ mod trade {
     pub fn render(mut buf: String, kind: &Kind) -> String {
         match *kind {
             Kind::Trade(ref effect) => {
-                append_to_buffer!(buf, "  account:      {}", effect.account());
-                append_to_buffer!(buf, "  seller:       {}", effect.seller());
-                append_to_buffer!(buf, "  offer id:     {}", effect.offer_id());
-                append_to_buffer!(buf, "  sold amount:  {}", effect.sold_amount());
-                append_to_buffer!(buf, "  sold asset:   {}", render_asset(effect.sold_asset()));
-                append_to_buffer!(buf, "  bough amount: {}", effect.bought_amount());
-                append_to_buffer!(
+                append!(buf, "  account:      {}", effect.account());
+                append!(buf, "  seller:       {}", effect.seller());
+                append!(buf, "  offer id:     {}", effect.offer_id());
+                append!(buf, "  sold amount:  {}", effect.sold_amount());
+                append!(buf, "  sold asset:   {}", render_asset(effect.sold_asset()));
+                append!(buf, "  bough amount: {}", effect.bought_amount());
+                append!(
                     buf,
                     "  bought asset: {}",
                     render_asset(effect.bought_asset())
@@ -165,13 +165,13 @@ mod data {
     pub fn render(mut buf: String, kind: &Kind) -> String {
         match *kind {
             Kind::Created(ref effect) => {
-                append_to_buffer!(buf, "  account:    {}", effect.account());
+                append!(buf, "  account:    {}", effect.account());
             }
             Kind::Removed(ref effect) => {
-                append_to_buffer!(buf, "  account:    {}", effect.account());
+                append!(buf, "  account:    {}", effect.account());
             }
             Kind::Updated(ref effect) => {
-                append_to_buffer!(buf, "  account:    {}", effect.account());
+                append!(buf, "  account:    {}", effect.account());
             }
         }
         buf

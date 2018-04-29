@@ -15,7 +15,7 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let iter = sync::Iter::new(&client, endpoint);
 
     let mut res = Ok(());
-    let mut fmt = Formatter::start_stdout(Simple);
+    let mut fmt = Formatter::start_stdout(Simple::new());
     pager.paginate(iter, |result| match result {
         Ok(txn) => fmt.render(&txn),
         Err(err) => res = Err(err.into()),
@@ -38,7 +38,7 @@ pub fn payments(client: &Client, matches: &ArgMatches) -> Result<()> {
     let iter = sync::Iter::new(&client, endpoint);
 
     let mut res = Ok(());
-    let mut fmt = Formatter::start_stdout(Simple);
+    let mut fmt = Formatter::start_stdout(Simple::new());
     pager.paginate(iter, |result| match result {
         Ok(operation) => fmt.render(&operation),
         Err(err) => res = Err(err.into()),
@@ -52,7 +52,7 @@ pub fn details(client: &Client, matches: &ArgMatches) -> Result<()> {
         .expect("Transaction identifier hash is required");
     let endpoint = transaction::Details::new(&hash);
     let transaction = client.request(endpoint)?;
-    let mut fmt = Formatter::start_stdout(Simple);
+    let mut fmt = Formatter::start_stdout(Simple::new());
     fmt.render(&transaction);
     Ok(())
 }
@@ -71,12 +71,9 @@ pub fn operations(client: &Client, matches: &ArgMatches) -> Result<()> {
     let iter = sync::Iter::new(&client, endpoint);
 
     let mut res = Ok(());
+    let mut fmt = Formatter::start_stdout(Simple::new());
     pager.paginate(iter, |result| match result {
-        Ok(op) => {
-            println!("ID:   {}", op.id());
-            println!("Type: {}", op.kind_name());
-            println!();
-        }
+        Ok(operation) => fmt.render(&operation),
         Err(err) => res = Err(err.into()),
     });
     res
@@ -96,7 +93,7 @@ pub fn effects(client: &Client, matches: &ArgMatches) -> Result<()> {
     let iter = sync::Iter::new(&client, endpoint);
 
     let mut res = Ok(());
-    let mut fmt = Formatter::start_stdout(Simple);
+    let mut fmt = Formatter::start_stdout(Simple::new());
     pager.paginate(iter, |result| match result {
         Ok(txn) => fmt.render(&txn),
         Err(err) => res = Err(err.into()),

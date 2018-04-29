@@ -30,3 +30,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Transaction effects can be seen
   - Transaction operations can be seen
   - Transaction payments can be seen
+  - Account operations can be seen

@@ -15,7 +15,7 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let iter = sync::Iter::new(&client, endpoint);
 
     let mut res = Ok(());
-    let mut fmt = Formatter::start_stdout(Simple);
+    let mut fmt = Formatter::start_stdout(Simple::new());
     pager.paginate(iter, |result| match result {
         Ok(ledger) => fmt.render(&ledger),
         Err(err) => res = Err(err.into()),
@@ -34,7 +34,7 @@ pub fn details(client: &Client, matches: &ArgMatches) -> Result<()> {
     let endpoint = ledger::Details::new(sequence);
     let ledger = client.request(endpoint)?;
 
-    Formatter::start_stdout(Simple).render(&ledger);
+    Formatter::start_stdout(Simple::new()).render(&ledger);
 
     Ok(())
 }
@@ -57,7 +57,7 @@ pub fn effects(client: &Client, matches: &ArgMatches) -> Result<()> {
     let iter = sync::Iter::new(&client, endpoint);
 
     let mut res = Ok(());
-    let mut fmt = Formatter::start_stdout(Simple);
+    let mut fmt = Formatter::start_stdout(Simple::new());
     pager.paginate(iter, |result| match result {
         Ok(effect) => fmt.render(&effect),
         Err(err) => res = Err(err.into()),
@@ -83,7 +83,7 @@ pub fn payments(client: &Client, matches: &ArgMatches) -> Result<()> {
     let iter = sync::Iter::new(&client, endpoint);
 
     let mut res = Ok(());
-    let mut fmt = Formatter::start_stdout(Simple);
+    let mut fmt = Formatter::start_stdout(Simple::new());
     pager.paginate(iter, |result| match result {
         Ok(operation) => fmt.render(&operation),
         Err(err) => res = Err(err.into()),
@@ -108,7 +108,7 @@ pub fn operations(client: &Client, matches: &ArgMatches) -> Result<()> {
     let iter = sync::Iter::new(&client, endpoint);
 
     let mut res = Ok(());
-    let mut fmt = Formatter::start_stdout(Simple);
+    let mut fmt = Formatter::start_stdout(Simple::new());
     pager.paginate(iter, |result| match result {
         Ok(operation) => fmt.render(&operation),
         Err(err) => res = Err(err.into()),
@@ -133,7 +133,7 @@ pub fn transactions(client: &Client, matches: &ArgMatches) -> Result<()> {
     let iter = sync::Iter::new(&client, endpoint);
 
     let mut res = Ok(());
-    let mut fmt = Formatter::start_stdout(Simple);
+    let mut fmt = Formatter::start_stdout(Simple::new());
     pager.paginate(iter, |result| match result {
         Ok(transaction) => fmt.render(&transaction),
         Err(err) => res = Err(err.into()),

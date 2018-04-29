@@ -119,6 +119,18 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                             )
                     ),
 
+                )
+                .subcommand(
+                    listable!(
+                        SubCommand::with_name("operations")
+                            .about("Fetch all operations associated with an account")
+                            .arg(
+                                Arg::with_name("ID")
+                                    .required(true)
+                                    .help("The identifier of the account to look up"),
+                            )
+                    ),
+
                 ),
         )
         .subcommand(
@@ -427,6 +439,7 @@ fn main() {
             ("transactions", Some(sub_m)) => account::transactions(&client, sub_m),
             ("effects", Some(sub_m)) => account::effects(&client, sub_m),
             ("offers", Some(sub_m)) => account::offers(&client, sub_m),
+            ("operations", Some(sub_m)) => account::operations(&client, sub_m),
             _ => return print_help_and_exit(),
         },
         ("assets", Some(sub_m)) => match sub_m.subcommand() {

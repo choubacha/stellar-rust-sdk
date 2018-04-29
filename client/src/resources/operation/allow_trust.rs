@@ -44,7 +44,7 @@ impl AllowTrust {
         &self.asset
     }
 
-    /// The limit for the asset.
+    /// `true` when trust allowed; `false` when revoked
     pub fn authorize(&self) -> bool {
         self.authorize
     }

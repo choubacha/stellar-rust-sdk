@@ -23,6 +23,6 @@ pub fn details(client: &Client, matches: &ArgMatches) -> Result<()> {
     };
 
     let orderbook = client.request(endpoint)?;
-    Formatter::start_stdout(Simple).render(&orderbook);
+    Formatter::start_stdout(Simple::new()).render(&orderbook);
     Ok(())
 }
