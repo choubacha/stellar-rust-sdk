@@ -104,13 +104,11 @@ pub fn effects(client: &Client, matches: &ArgMatches) -> Result<()> {
     let iter = sync::Iter::new(&client, endpoint);
 
     let mut res = Ok(());
+    let mut fmt = Formatter::start_stdout(Simple);
     pager.paginate(iter, |result| match result {
-        Ok(effect) => {
-            println!("ID:   {}", effect.id());
-            println!("Type: {}", effect.kind_name());
-            println!();
-        }
+        Ok(txn) => fmt.render(&txn),
         Err(err) => res = Err(err.into()),
     });
+    let _ = fmt.stop();
     res
 }
