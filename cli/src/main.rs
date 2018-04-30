@@ -82,6 +82,18 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                             )
                     ),
 
+                )
+                .subcommand(
+                    listable!(
+                        SubCommand::with_name("effects")
+                            .about("Fetch all effects for an account")
+                            .arg(
+                                Arg::with_name("ID")
+                                    .required(true)
+                                    .help("The identifier of the account to look up"),
+                            )
+                    ),
+
                 ),
         )
         .subcommand(
@@ -351,6 +363,7 @@ fn main() {
         ("account", Some(sub_m)) => match sub_m.subcommand() {
             ("details", Some(sub_m)) => account::details(&client, sub_m),
             ("transactions", Some(sub_m)) => account::transactions(&client, sub_m),
+            ("effects", Some(sub_m)) => account::effects(&client, sub_m),
             _ => return print_help_and_exit(),
         },
         ("assets", Some(sub_m)) => match sub_m.subcommand() {
