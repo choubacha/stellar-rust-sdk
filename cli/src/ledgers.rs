@@ -48,3 +48,28 @@ pub fn payments(client: &Client, matches: &ArgMatches) -> Result<()> {
     });
     res
 }
+
+pub fn transactions(client: &Client, matches: &ArgMatches) -> Result<()> {
+    let pager = Pager::from_arg(&matches);
+    let sequence = matches
+        .value_of("sequence")
+        .expect("Ledger sequence is required");
+
+    let sequence = sequence
+        .parse::<u32>()
+        .map_err(|_| String::from("Payment sequence should be a valid u32 integer"))?;
+    let endpoint = ledger::Transactions::new(sequence);
+    let endpoint = pager.assign(endpoint);
+    let endpoint = cursor::assign_from_arg(matches, endpoint);
+    let endpoint = ordering::assign_from_arg(matches, endpoint);
+
+    let iter = sync::Iter::new(&client, endpoint);
+
+    let mut res = Ok(());
+    let mut fmt = Formatter::start_stdout(Simple);
+    pager.paginate(iter, |result| match result {
+        Ok(transaction) => fmt.render(&transaction),
+        Err(err) => res = Err(err.into()),
+    });
+    res
+}

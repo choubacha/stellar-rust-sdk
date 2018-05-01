@@ -11,11 +11,12 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Initial CLI is built and usable in it's most basic form. Listed endpoints can be scrolled.
 - Transaction payments can be seen
 - Transaction details can be seen
-- All ledgers can be seen
 - Transaction operations can be seen
 - Transaction effects can be seen
 - All trades can be seen
+- All ledgers can be seen
 - Ledger payments can be seen
+- Ledger Transactions can be seen
 - Trade aggregations can be seen
 - All effects can be seen
 - All payments can be seen

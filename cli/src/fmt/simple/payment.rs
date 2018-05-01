@@ -6,8 +6,8 @@ impl Render<Operation> for Simple {
     fn render(&self, operation: &Operation) -> Option<String> {
         let mut buf = String::new();
         append_to_buffer!(buf, "ID:             {}", operation.id());
-        match operation.kind() {
-            &OperationKind::CreateAccount(ref create_account) => {
+        match *operation.kind() {
+            OperationKind::CreateAccount(ref create_account) => {
                 append_to_buffer!(buf, "Operation Kind:   Create Account");
                 append_to_buffer!(buf, "Account:          {}", create_account.account());
                 append_to_buffer!(buf, "Funder:           {}", create_account.funder());
@@ -17,7 +17,7 @@ impl Render<Operation> for Simple {
                     create_account.starting_balance()
                 );
             }
-            &OperationKind::Payment(ref payment) => {
+            OperationKind::Payment(ref payment) => {
                 append_to_buffer!(buf, "Operation Kind: Payment");
                 append_to_buffer!(buf, "To account:     {}", payment.to());
                 append_to_buffer!(buf, "From account:   {}", payment.from());
@@ -26,7 +26,7 @@ impl Render<Operation> for Simple {
                 append_to_buffer!(buf, "Asset Issuer:   {}", payment.asset().issuer());
                 append_to_buffer!(buf, "Amount:         {}", payment.amount());
             }
-            &OperationKind::PathPayment(ref path_payment) => {
+            OperationKind::PathPayment(ref path_payment) => {
                 append_to_buffer!(buf, "Operation Kind:           Path Payment");
                 append_to_buffer!(buf, "To account:               {}", path_payment.to());
                 append_to_buffer!(buf, "From account:             {}", path_payment.from());
@@ -44,11 +44,6 @@ impl Render<Operation> for Simple {
                     buf,
                     "Source Asset Issuer:      {}",
                     path_payment.source_asset().issuer()
-                );
-                append_to_buffer!(
-                    buf,
-                    "Source Amount:            {}",
-                    path_payment.source_amount()
                 );
                 append_to_buffer!(
                     buf,
