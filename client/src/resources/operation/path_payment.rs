@@ -11,7 +11,6 @@ pub struct PathPayment {
     destination_amount: Amount,
     source_asset: AssetIdentifier,
     source_max: Amount,
-    source_amount: Amount,
 }
 
 impl PathPayment {
@@ -23,7 +22,6 @@ impl PathPayment {
         destination_amount: Amount,
         source_asset: AssetIdentifier,
         source_max: Amount,
-        source_amount: Amount,
     ) -> PathPayment {
         PathPayment {
             from,
@@ -31,7 +29,6 @@ impl PathPayment {
             destination_asset,
             destination_amount,
             source_asset,
-            source_amount,
             source_max,
         }
     }
@@ -58,11 +55,6 @@ impl PathPayment {
     /// Asset at the source of payment path.
     pub fn source_asset(&self) -> &AssetIdentifier {
         &self.source_asset
-    }
-
-    /// Amount sent.
-    pub fn source_amount(&self) -> Amount {
-        self.source_amount
     }
 
     /// Max send amount.

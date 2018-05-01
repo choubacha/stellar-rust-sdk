@@ -237,7 +237,6 @@ fn it_parses_a_path_payment_from_json() {
             Amount::new(100_000_000)
         );
         assert_eq!(account_details.source_asset().code(), "USD");
-        assert_eq!(account_details.source_amount(), Amount::new(100_000_000));
         assert_eq!(account_details.source_max(), Amount::new(100_000_000));
     } else {
         panic!("Did not generate path payment kind");
