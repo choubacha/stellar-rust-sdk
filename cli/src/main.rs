@@ -16,6 +16,7 @@ mod effects;
 mod error;
 mod fmt;
 mod ledgers;
+mod operations;
 mod ordering;
 mod pager;
 mod payments;
@@ -117,6 +118,28 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                             .about("Fetch all payments")
                     )
                 ),
+        )
+        .subcommand(
+            SubCommand::with_name("operations")
+                .about("Access lists of operations")
+                .setting(AppSettings::SubcommandRequired)
+                .subcommand(
+                    listable!(
+                        SubCommand::with_name("all")
+                            .about("Fetch all operations")
+                    )
+                )
+                .subcommand(
+                    listable!(
+                        SubCommand::with_name("effects")
+                            .about("Fetch the effects from a specific operation.")
+                            .arg(
+                                Arg::with_name("ID")
+                                    .required(true)
+                                    .help("The ID of the operation")
+                            )
+                    )
+                )
         )
         .subcommand(
             SubCommand::with_name("transactions")
@@ -390,6 +413,11 @@ fn main() {
             ("effects", Some(sub_m)) => ledgers::effects(&client, sub_m),
             ("payments", Some(sub_m)) => ledgers::payments(&client, sub_m),
             ("transactions", Some(sub_m)) => ledgers::transactions(&client, sub_m),
+            _ => return print_help_and_exit(),
+        },
+        ("operations", Some(sub_m)) => match sub_m.subcommand() {
+            ("all", Some(sub_m)) => operations::all(&client, sub_m),
+            ("effects", Some(sub_m)) => operations::effects(&client, sub_m),
             _ => return print_help_and_exit(),
         },
         ("payments", Some(sub_m)) => match sub_m.subcommand() {
