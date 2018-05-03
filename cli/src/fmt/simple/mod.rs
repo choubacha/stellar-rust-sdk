@@ -12,6 +12,7 @@ mod account;
 mod asset;
 mod effect;
 mod ledger;
+mod orderbook;
 mod payment;
 mod trade_aggregation;
 mod transaction;

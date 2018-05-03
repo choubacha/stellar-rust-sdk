@@ -17,6 +17,7 @@ mod error;
 mod fmt;
 mod ledgers;
 mod operations;
+mod orderbook;
 mod ordering;
 mod pager;
 mod payments;
@@ -139,6 +140,59 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                                     .help("The ID of the operation")
                             )
                     )
+                )
+        )
+        .subcommand(
+            SubCommand::with_name("orderbook")
+                .about("Access information about a collection of offers for a asset pair")
+                .setting(AppSettings::SubcommandRequired)
+                .subcommand(
+                    SubCommand::with_name("details")
+                        .about("Fetch details about bids and asks for a given asset pair")
+                        .arg(
+                            Arg::with_name("base_asset_type")
+                                .long("base_asset_type")
+                                .takes_value(true)
+                                .required(true)
+                                .help("Specifies base_asset_type for orderbook to return"),
+                        )
+                        .arg(
+                            Arg::with_name("base_asset_code")
+                                .long("base_asset_code")
+                                .takes_value(true)
+                                .help("Not required for XLM"),
+                        )
+                        .arg(
+                            Arg::with_name("base_asset_issuer")
+                                .long("base_asset_issuer")
+                                .takes_value(true)
+                                .help("Not required for XLM"),
+                        )
+                        .arg(
+                            Arg::with_name("counter_asset_type")
+                                .long("counter_asset_type")
+                                .takes_value(true)
+                                .required(true)
+                                .help("Specifies counter_asset_type for orderbook to return"),
+                        )
+                        .arg(
+                            Arg::with_name("counter_asset_code")
+                                .long("counter_asset_code")
+                                .takes_value(true)
+                                .help("Not required for XLM"),
+                        )
+                        .arg(
+                            Arg::with_name("counter_asset_issuer")
+                                .long("counter_asset_issuer")
+                                .takes_value(true)
+                                .help("Not required for XLM"),
+                        )
+                        .arg(
+                            Arg::with_name("limit")
+                                .long("limit")
+                                .takes_value(true)
+                                .help("Maximum number of bids and asks to return, defaults to 20"),
+                        )
                 )
         )
         .subcommand(
@@ -430,6 +484,10 @@ fn main() {
         ("operations", Some(sub_m)) => match sub_m.subcommand() {
             ("all", Some(sub_m)) => operations::all(&client, sub_m),
             ("effects", Some(sub_m)) => operations::effects(&client, sub_m),
+            _ => return print_help_and_exit(),
+        },
+        ("orderbook", Some(sub_m)) => match sub_m.subcommand() {
+            ("details", Some(sub_m)) => orderbook::details(&client, sub_m),
             _ => return print_help_and_exit(),
         },
         ("payments", Some(sub_m)) => match sub_m.subcommand() {
