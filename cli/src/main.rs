@@ -253,6 +253,17 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                 )
                 .subcommand(
                     listable!(
+                        SubCommand::with_name("operations")
+                            .about("Fetch operations for a given ledger")
+                            .arg(
+                                Arg::with_name("sequence")
+                                    .required(true)
+                                    .help("The sequence of the ledger for which to fetch operations")
+                            )
+                    )
+                )
+                .subcommand(
+                    listable!(
                         SubCommand::with_name("transactions")
                             .about("Fetch transactions for a given ledger")
                             .arg(
@@ -412,6 +423,7 @@ fn main() {
             ("all", Some(sub_m)) => ledgers::all(&client, sub_m),
             ("effects", Some(sub_m)) => ledgers::effects(&client, sub_m),
             ("payments", Some(sub_m)) => ledgers::payments(&client, sub_m),
+            ("operations", Some(sub_m)) => ledgers::operations(&client, sub_m),
             ("transactions", Some(sub_m)) => ledgers::transactions(&client, sub_m),
             _ => return print_help_and_exit(),
         },
