@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - All trades can be seen
   - Ledger effects can be seen
   - Ledger transactions can be seen
+  - Ledger operations can be seen
   - Ledger payments can be seen
   - Operation effects can be seen
   - Trade aggregations can be seen

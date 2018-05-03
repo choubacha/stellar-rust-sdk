@@ -59,8 +59,33 @@ pub fn payments(client: &Client, matches: &ArgMatches) -> Result<()> {
 
     let sequence = sequence
         .parse::<u32>()
-        .map_err(|_| String::from("Payment sequence should be a valid u32 integer"))?;
+        .map_err(|_| String::from("Ledger sequence should be a valid u32 integer"))?;
     let endpoint = ledger::Payments::new(sequence);
+    let endpoint = pager.assign(endpoint);
+    let endpoint = cursor::assign_from_arg(matches, endpoint);
+    let endpoint = ordering::assign_from_arg(matches, endpoint);
+
+    let iter = sync::Iter::new(&client, endpoint);
+
+    let mut res = Ok(());
+    let mut fmt = Formatter::start_stdout(Simple);
+    pager.paginate(iter, |result| match result {
+        Ok(operation) => fmt.render(&operation),
+        Err(err) => res = Err(err.into()),
+    });
+    res
+}
+
+pub fn operations(client: &Client, matches: &ArgMatches) -> Result<()> {
+    let pager = Pager::from_arg(&matches);
+    let sequence = matches
+        .value_of("sequence")
+        .expect("Ledger sequence is required");
+
+    let sequence = sequence
+        .parse::<u32>()
+        .map_err(|_| String::from("Ledger sequence should be a valid u32 integer"))?;
+    let endpoint = ledger::Operations::new(sequence);
     let endpoint = pager.assign(endpoint);
     let endpoint = cursor::assign_from_arg(matches, endpoint);
     let endpoint = ordering::assign_from_arg(matches, endpoint);
