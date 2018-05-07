@@ -1,11 +1,31 @@
 use chrono::prelude::*;
 use super::{deserialize, amount::Amount};
 
+/// Memos are a useful source for adding meta data to a transaction.
+/// A consists of a type and content (unless memo type is none).
+///
+/// To learn more about the concept of memos in the Stellar network, take a look at the Stellar memo description here:
+/// <https://www.stellar.org/developers/guides/concepts/transactions.html#memo>
+#[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
+#[serde(rename_all = "lowercase", tag = "memo_type", content = "memo")]
+pub enum Memo {
+    ///  A string encoded using either ASCII or UTF-8, up to 28-bytes long.
+    Text(String),
+    /// A 64 bit unsigned integer.
+    Id(i64),
+    /// A 32 byte hash.
+    Hash(String),
+    /// A 32 byte hash intended to be interpreted as the hash of the transaction the sender is refunding.
+    Return(String),
+    /// The most common scenario where there is no memo included on the transaction.
+    None,
+}
+
 /// Transactions are the basic unit of change in the Stellar Network.
 /// A transaction is a grouping of operations.
 ///
 /// To learn more about the concept of transactions in the Stellar network, take a look at the Stellar transactions concept guide.
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct Transaction {
     id: String,
     paging_token: String,
@@ -21,6 +41,8 @@ pub struct Transaction {
     result_xdr: String,
     result_meta_xdr: String,
     fee_meta_xdr: String,
+    #[serde(flatten)]
+    memo: Memo,
 }
 
 impl Transaction {
@@ -99,6 +121,11 @@ impl Transaction {
     pub fn fee_meta_xdr(&self) -> &String {
         &self.fee_meta_xdr
     }
+
+    /// The value/contents of the memo for this transaction
+    pub fn memo(&self) -> &Memo {
+        &self.memo
+    }
 }
 
 #[cfg(test)]
@@ -107,7 +134,27 @@ mod transaction_tests {
     use serde_json;
 
     fn transaction_json() -> &'static str {
-        include_str!("../../fixtures/transaction.json")
+        include_str!("../../fixtures/transactions/transaction_memo_text.json")
+    }
+
+    fn transaction_json_memo_text() -> &'static str {
+        include_str!("../../fixtures/transactions/transaction_memo_text.json")
+    }
+
+    fn transaction_json_memo_hash() -> &'static str {
+        include_str!("../../fixtures/transactions/transaction_memo_hash.json")
+    }
+
+    fn transaction_json_memo_id() -> &'static str {
+        include_str!("../../fixtures/transactions/transaction_memo_id.json")
+    }
+
+    fn transaction_json_memo_return() -> &'static str {
+        include_str!("../../fixtures/transactions/transaction_memo_return.json")
+    }
+
+    fn transaction_json_memo_none() -> &'static str {
+        include_str!("../../fixtures/transactions/transaction_memo_none.json")
     }
 
     #[test]
@@ -162,6 +209,65 @@ mod transaction_tests {
              gAC1GEAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAEA/5qzAAAAAAAAAAB9h5rdSVjH6gHVJQ3\
              slLTvVfMz6idGixvCq2cl7+/EBgAqs9CXAFM+AAiBvgAC1GIAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA\
              AAAAA=="
-        )
+        );
+        if let &Memo::Text(ref value) = transaction.memo() {
+            assert_eq!(value, "hello");
+        } else {
+            panic!("Can't parse memo text.");
+        }
+    }
+
+    #[test]
+    fn it_parses_memo_text() {
+        let transaction: Transaction = serde_json::from_str(&transaction_json_memo_text()).unwrap();
+        if let &Memo::Text(ref value) = transaction.memo() {
+            assert_eq!(value, "hello");
+        } else {
+            panic!("Can't parse memo tesxt.");
+        }
+    }
+
+    #[test]
+    fn it_parses_memo_hash() {
+        let transaction: Transaction = serde_json::from_str(&transaction_json_memo_hash()).unwrap();
+        if let &Memo::Hash(ref value) = transaction.memo() {
+            assert_eq!(
+                value,
+                "2CF24DBA5FB0A30E26E83B2AC5B9E29E1B161E5C1FA7425E73043362938B9824"
+            );
+        } else {
+            panic!("Can't parse memo hash.");
+        }
+    }
+
+    #[test]
+    fn it_parses_memo_id() {
+        let transaction: Transaction = serde_json::from_str(&transaction_json_memo_id()).unwrap();
+        if let &Memo::Id(value) = transaction.memo() {
+            assert_eq!(value, 19292920);
+        } else {
+            panic!("Can't parse memo id.");
+        }
+    }
+
+    #[test]
+    fn it_parses_memo_return() {
+        let transaction: Transaction =
+            serde_json::from_str(&transaction_json_memo_return()).unwrap();
+
+        if let &Memo::Return(ref value) = transaction.memo() {
+            assert_eq!(
+                value,
+                "2CF24DBA5FB0A30E26E83B2AC5B9E29E1B161E5C1FA7425E73043362938B9824"
+            );
+        } else {
+            panic!("Can't parse memo return.");
+        }
+    }
+
+    #[test]
+    fn it_parses_memo_none() {
+        let transaction: Transaction = serde_json::from_str(&transaction_json_memo_none()).unwrap();
+        assert_eq!(transaction.memo(), &Memo::None);
     }
 }
