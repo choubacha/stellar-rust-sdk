@@ -36,3 +36,4 @@ pub use self::operation::{Operation, OperationKind};
 pub use self::orderbook::Orderbook;
 pub use self::trade::{Seller as TradeSeller, Trade, TradeAggregation};
 pub use self::transaction::Transaction;
+pub use self::transaction::Memo;

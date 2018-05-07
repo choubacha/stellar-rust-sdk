@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Updated Flags to be public (and plural) so that it's accessible in the effects.
 - Added data effects to the resources module. These are undocumented in the stellar resource online but appear in the all effects endpoint.
+- Added missing memo field to the transaction resource.
 
 ### Fixed
 - Removed source_amount from payment operations as it's not in use.
