@@ -81,7 +81,7 @@ mod offer_summary_tests {
 }
 
 /// An offer being made for particular assets at a particular exchange rate.
-#[derive(Deserialize, Debug)]
+#[derive(Deserialize, Debug, Clone)]
 pub struct Offer {
     id: i64,
     paging_token: String,
