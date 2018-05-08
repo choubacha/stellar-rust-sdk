@@ -24,6 +24,21 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     res
 }
 
+pub fn details(client: &Client, matches: &ArgMatches) -> Result<()> {
+    let sequence = matches
+        .value_of("sequence")
+        .expect("Ledger sequence is required")
+        .parse::<u32>()
+        .map_err(|_| String::from("Payment sequence should be a valid u32 integer"))?;
+
+    let endpoint = ledger::Details::new(sequence);
+    let ledger = client.request(endpoint)?;
+
+    Formatter::start_stdout(Simple).render(&ledger);
+
+    Ok(())
+}
+
 pub fn effects(client: &Client, matches: &ArgMatches) -> Result<()> {
     let pager = Pager::from_arg(&matches);
 
