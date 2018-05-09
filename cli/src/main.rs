@@ -11,6 +11,7 @@ use error::CliError;
 
 mod account;
 mod assets;
+mod asset_identifier;
 mod cursor;
 mod effects;
 mod error;
@@ -150,42 +151,18 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                     SubCommand::with_name("details")
                         .about("Fetch details about bids and asks for a given asset pair")
                         .arg(
-                            Arg::with_name("base_asset_type")
-                                .long("base_asset_type")
+                            Arg::with_name("base")
+                                .long("base")
                                 .takes_value(true)
                                 .required(true)
-                                .help("Specifies base_asset_type for orderbook to return"),
+                                .help("Specifies base_asset for orderbook to return. format:  <asset_code>-<asset_issuer>, or xlm if lumens"),
                         )
                         .arg(
-                            Arg::with_name("base_asset_code")
-                                .long("base_asset_code")
-                                .takes_value(true)
-                                .help("Not required for XLM"),
-                        )
-                        .arg(
-                            Arg::with_name("base_asset_issuer")
-                                .long("base_asset_issuer")
-                                .takes_value(true)
-                                .help("Not required for XLM"),
-                        )
-                        .arg(
-                            Arg::with_name("counter_asset_type")
-                                .long("counter_asset_type")
+                            Arg::with_name("counter")
+                                .long("counter")
                                 .takes_value(true)
                                 .required(true)
-                                .help("Specifies counter_asset_type for orderbook to return"),
-                        )
-                        .arg(
-                            Arg::with_name("counter_asset_code")
-                                .long("counter_asset_code")
-                                .takes_value(true)
-                                .help("Not required for XLM"),
-                        )
-                        .arg(
-                            Arg::with_name("counter_asset_issuer")
-                                .long("counter_asset_issuer")
-                                .takes_value(true)
-                                .help("Not required for XLM"),
+                                .help("Specifies counter_asset for orderbook to return. format:  <asset_code>-<asset_issuer>, or xlm if lumens"),
                         )
                         .arg(
                             Arg::with_name("limit")
@@ -337,40 +314,18 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                         SubCommand::with_name("all")
                             .about("Fetch all trades")
                             .arg(
-                                Arg::with_name("base_asset_type")
-                                    .long("base_asset_type")
+                                Arg::with_name("base")
+                                    .long("base")
                                     .takes_value(true)
-                                    .help("Filters trades with a base_asset_type"),
+                                    .required(true)
+                                    .help("Filters trades with a given base_asset. format:  <asset_code>-<asset_issuer>, or xlm if lumens"),
                             )
                             .arg(
-                                Arg::with_name("base_asset_code")
-                                    .long("base_asset_code")
+                                Arg::with_name("counter")
+                                    .long("counter")
                                     .takes_value(true)
-                                    .help("Filters trades with a base_asset_code.  Not required for XLM"),
-                            )
-                            .arg(
-                                Arg::with_name("base_asset_issuer")
-                                    .long("base_asset_issuer")
-                                    .takes_value(true)
-                                    .help("Filters trades with a base_asset_issuer.  Not required for XLM"),
-                            )
-                            .arg(
-                                Arg::with_name("counter_asset_type")
-                                    .long("counter_asset_type")
-                                    .takes_value(true)
-                                    .help("Filters trades with a counter_asset_type"),
-                            )
-                            .arg(
-                                Arg::with_name("counter_asset_code")
-                                    .long("counter_asset_code")
-                                    .takes_value(true)
-                                    .help("Filters trades with a counter_asset_code.  Not required for XLM"),
-                            )
-                            .arg(
-                                Arg::with_name("counter_asset_issuer")
-                                    .long("counter_asset_issuer")
-                                    .takes_value(true)
-                                    .help("Filters trades with a counter_asset_issuer.  Not required for XLM"),
+                                    .required(true)
+                                    .help("Filters trades with a given counter_asset. format:  <asset_code>-<asset_issuer>, or xlm if lumens"),
                             )
                             .arg(
                                 Arg::with_name("offer_id")
@@ -405,42 +360,18 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                                 .help("Segment duration in format <number><unit> where units are s, m, h, d.  ie: 10h == 10 hours"),
                         )
                         .arg(
-                            Arg::with_name("base_asset_type")
-                                .long("base_asset_type")
+                            Arg::with_name("base")
+                                .long("base")
                                 .takes_value(true)
                                 .required(true)
-                                .help("Filters trades with a base_asset_type"),
+                                .help("Filters trades with a given base_asset. format:  <asset_code>-<asset_issuer>, or xlm if lumens"),
                         )
                         .arg(
-                            Arg::with_name("base_asset_code")
-                                .long("base_asset_code")
-                                .takes_value(true)
-                                .help("Filters trades with a base_asset_code.  Not required for XLM"),
-                        )
-                        .arg(
-                            Arg::with_name("base_asset_issuer")
-                                .long("base_asset_issuer")
-                                .takes_value(true)
-                                .help("Filters trades with a base_asset_issuer.  Not required for XLM"),
-                        )
-                        .arg(
-                            Arg::with_name("counter_asset_type")
-                                .long("counter_asset_type")
+                            Arg::with_name("counter")
+                                .long("counter")
                                 .takes_value(true)
                                 .required(true)
-                                .help("Filters trades with a counter_asset_type"),
-                        )
-                        .arg(
-                            Arg::with_name("counter_asset_code")
-                                .long("counter_asset_code")
-                                .takes_value(true)
-                                .help("Filters trades with a counter_asset_code.  Not required for XLM"),
-                        )
-                        .arg(
-                            Arg::with_name("counter_asset_issuer")
-                                .long("counter_asset_issuer")
-                                .takes_value(true)
-                                .help("Filters trades with a counter_asset_issuer.  Not required for XLM"),
+                                .help("Filters trades with a given counter_asset. format:  <asset_code>-<asset_issuer>, or xlm if lumens"),
                         )
                 ),
         )
