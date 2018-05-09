@@ -1,9 +1,10 @@
+use asset_identifier;
 use chrono::{DateTime, Utc};
 use clap::ArgMatches;
 use error::Result;
 use fmt::{Formatter, Simple};
 use resolution::Resolution;
-use stellar_client::{endpoint::trade, resources::AssetIdentifier, sync::{self, Client}};
+use stellar_client::{endpoint::trade, sync::{self, Client}};
 use super::{cursor, ordering, pager::Pager};
 
 pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
@@ -18,27 +19,12 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
                 .map_err(|_| String::from("Offer Id should be a valid u32 integer"))?;
             endpoint = endpoint.with_offer_id(offer_id);
         };
-        if let (Some(base_asset_type), Some(counter_asset_type)) = (
-            matches.value_of("base_asset_type"),
-            matches.value_of("counter_asset_type"),
-        ) {
-            let base_asset_code = matches
-                .value_of("base_asset_code")
-                .map(|code| code.to_string());
-            let base_asset_issuer = matches
-                .value_of("base_asset_issuer")
-                .map(|issuer| issuer.to_string());
-            let counter_asset_code = matches
-                .value_of("counter_asset_code")
-                .map(|code| code.to_string());
-            let counter_asset_issuer = matches
-                .value_of("counter_asset_issuer")
-                .map(|issuer| issuer.to_string());
-            let base_asset =
-                AssetIdentifier::new(base_asset_type, base_asset_code, base_asset_issuer)?;
-            let counter_asset =
-                AssetIdentifier::new(counter_asset_type, counter_asset_code, counter_asset_issuer)?;
-            endpoint = endpoint.with_asset_pair(base_asset, counter_asset);
+        if let (Some(base_str), Some(counter_str)) =
+            (matches.value_of("base"), matches.value_of("counter"))
+        {
+            let base = asset_identifier::from_str(base_str)?;
+            let counter = asset_identifier::from_str(counter_str)?;
+            endpoint = endpoint.with_asset_pair(base, counter);
         }
         endpoint = pager.assign(endpoint);
         endpoint = cursor::assign_from_arg(matches, endpoint);
@@ -75,28 +61,15 @@ pub fn aggregations(client: &Client, matches: &ArgMatches) -> Result<()> {
     let pager = Pager::from_arg(&matches);
 
     let endpoint = {
-        let base_asset_type = matches
-            .value_of("base_asset_type")
-            .expect("Base asset type is a required field");
-        let counter_asset_type = matches
-            .value_of("counter_asset_type")
-            .expect("Counter asset type is a required field");
-        let base_asset_code = matches
-            .value_of("base_asset_code")
-            .map(|code| code.to_string());
-        let base_asset_issuer = matches
-            .value_of("base_asset_issuer")
-            .map(|issuer| issuer.to_string());
-        let counter_asset_code = matches
-            .value_of("counter_asset_code")
-            .map(|code| code.to_string());
-        let counter_asset_issuer = matches
-            .value_of("counter_asset_issuer")
-            .map(|issuer| issuer.to_string());
-        let base_asset = AssetIdentifier::new(base_asset_type, base_asset_code, base_asset_issuer)?;
-        let counter_asset =
-            AssetIdentifier::new(counter_asset_type, counter_asset_code, counter_asset_issuer)?;
-        let mut endpoint = trade::Aggregations::new(&base_asset, &counter_asset);
+        let base_str = matches
+            .value_of("base")
+            .expect("Base asset is a required field");
+        let counter_str = matches
+            .value_of("counter")
+            .expect("Counter asset is a required field");
+        let base = asset_identifier::from_str(base_str)?;
+        let counter = asset_identifier::from_str(counter_str)?;
+        let mut endpoint = trade::Aggregations::new(&base, &counter);
         let resolution = matches
             .value_of("resolution")
             .expect("Resolution is a required field");
