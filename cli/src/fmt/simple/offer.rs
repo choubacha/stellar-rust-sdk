@@ -1,5 +1,5 @@
-use fmt::Render;
 use super::Simple;
+use fmt::Render;
 use stellar_client::resources::{AssetIdentifier, Offer};
 
 fn render_asset(id: &AssetIdentifier) -> String {

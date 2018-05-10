@@ -1,11 +1,11 @@
 //! This module contains the client for asynchronous communcation.
 
+use super::{Host, HORIZON_TEST_URI, HORIZON_URI};
+use error::{Error, Result};
+use http;
 use hyper;
 use hyper_tls::HttpsConnector;
-use http;
 use tokio_core::reactor::Handle;
-use error::{Error, Result};
-use super::{Host, HORIZON_TEST_URI, HORIZON_URI};
 
 /// A client that can issue requests to a horizon api.
 #[derive(Debug, Clone)]

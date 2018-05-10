@@ -1,5 +1,5 @@
-use chrono::prelude::*;
 use super::{amount::Amount, asset::AssetIdentifier, offer::PriceRatio};
+use chrono::prelude::*;
 use serde::{de, Deserialize, Deserializer};
 
 /// A trade represents an offer that was fulfilled between two assets and accounts.

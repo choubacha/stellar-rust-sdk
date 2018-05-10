@@ -622,9 +622,10 @@ impl<'de> Deserialize<'de> for Effect {
                 } => {
                     let asset_identifier = AssetIdentifier::new(&asset_type, asset_code, trustor)
                         .map_err(de::Error::custom)?;
-                    Kind::Trustline(trustline::Kind::Deauthorized(
-                        trustline::Deauthorized::new(account, asset_identifier),
-                    ))
+                    Kind::Trustline(trustline::Kind::Deauthorized(trustline::Deauthorized::new(
+                        account,
+                        asset_identifier,
+                    )))
                 }
                 _ => {
                     return Err(de::Error::custom(

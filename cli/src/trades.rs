@@ -1,3 +1,4 @@
+use super::{cursor, ordering, pager::Pager};
 use asset_identifier;
 use chrono::{DateTime, Utc};
 use clap::ArgMatches;
@@ -5,7 +6,6 @@ use error::Result;
 use fmt::{Formatter, Simple};
 use resolution::Resolution;
 use stellar_client::{endpoint::trade, sync::{self, Client}};
-use super::{cursor, ordering, pager::Pager};
 
 pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let pager = Pager::from_arg(&matches);

@@ -1,6 +1,6 @@
 use super::deserialize;
-use std::collections::HashMap;
 use resources::base64string::Base64String;
+use std::collections::HashMap;
 
 /// In the Stellar network, users interact using accounts which can be controlled by a
 /// corresponding keypair that can authorize transactions.

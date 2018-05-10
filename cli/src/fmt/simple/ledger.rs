@@ -1,5 +1,5 @@
-use fmt::Render;
 use super::Simple;
+use fmt::Render;
 use stellar_client::resources::Ledger;
 
 impl Render<Ledger> for Simple {

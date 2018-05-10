@@ -1,9 +1,9 @@
 //! Contains endpoints for assets and related information to specific assets.
-use error::Result;
-use std::str::FromStr;
-use resources::Asset;
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
+use error::Result;
 use http::{Request, Uri};
+use resources::Asset;
+use std::str::FromStr;
 use uri::{self, TryFromUri, UriWrap};
 
 /// Represents the all assets end point for the stellar horizon server. The endpoint

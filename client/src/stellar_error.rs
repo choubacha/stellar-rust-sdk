@@ -1,5 +1,5 @@
-use std::error::Error;
 use serde::{de, Deserialize, Deserializer};
+use std::error::Error;
 use std::{fmt, str::FromStr};
 
 /// A resource for the stellar horizon API specific error codes.

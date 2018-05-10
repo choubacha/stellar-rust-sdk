@@ -1,5 +1,5 @@
-use chrono::prelude::*;
 use super::{deserialize, amount::Amount};
+use chrono::prelude::*;
 
 /// Memos are a useful source for adding meta data to a transaction.
 /// A consists of a type and content (unless memo type is none).

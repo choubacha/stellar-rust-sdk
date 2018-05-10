@@ -1,7 +1,7 @@
-use http;
-use std::{self, fmt};
-use std::str::FromStr;
 use endpoint::ParseDirectionError;
+use http;
+use std::str::FromStr;
+use std::{self, fmt};
 
 /// A trait that, if implemented, can convert to itself from a URi
 /// and returns errors when needed.

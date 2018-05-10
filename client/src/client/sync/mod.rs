@@ -13,12 +13,12 @@
 //! let client = Client::new("https://horizon-testnet.stellar.org").unwrap();
 //! ```
 
-use reqwest;
-use http::{self, Uri};
-use error::{Error, Result};
-use endpoint::IntoRequest;
 use super::{Host, HORIZON_TEST_URI, HORIZON_URI};
 use StellarError;
+use endpoint::IntoRequest;
+use error::{Error, Result};
+use http::{self, Uri};
+use reqwest;
 use serde_json;
 
 mod iter;

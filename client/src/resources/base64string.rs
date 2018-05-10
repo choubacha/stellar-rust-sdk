@@ -1,6 +1,6 @@
-use std::fmt;
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use base64::{decode, encode};
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use std::fmt;
 
 /// Base64 encoded Strings are used in several resources in the stellar ecosystem. There
 /// are encoding and decoding conversions that must take place to display data to users
@@ -96,8 +96,8 @@ impl<'de> Deserialize<'de> for Base64String {
 
 #[cfg(test)]
 mod deserialize_base64string_tests {
-    use serde_json;
     use super::*;
+    use serde_json;
 
     #[test]
     fn it_decodes_base64() {

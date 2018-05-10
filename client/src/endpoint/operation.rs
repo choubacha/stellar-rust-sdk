@@ -1,9 +1,9 @@
 //! Contains the endpoint for all operations.
+use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use error::Result;
 use http::{Request, Uri};
-use std::str::FromStr;
 use resources::{Effect, Operation};
-use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
+use std::str::FromStr;
 use uri::{self, TryFromUri, UriWrap};
 
 pub use super::account::Operations as ForAccount;

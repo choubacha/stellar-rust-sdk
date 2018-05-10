@@ -1,8 +1,8 @@
-use stellar_client::{endpoint::effect, sync::{self, Client}};
-use clap::ArgMatches;
 use super::{cursor, ordering, pager::Pager};
+use clap::ArgMatches;
 use error::Result;
 use fmt::{Formatter, Simple};
+use stellar_client::{endpoint::effect, sync::{self, Client}};
 
 /// Using a client and the arguments from the command line, iterates over the results
 /// and displays them to the end user.

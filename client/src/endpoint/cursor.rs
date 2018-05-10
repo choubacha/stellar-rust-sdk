@@ -35,7 +35,7 @@ macro_rules! impl_cursor {
                 self.cursor.as_ref().map(|s| &**s)
             }
         }
-    }
+    };
 }
 
 #[cfg(test)]

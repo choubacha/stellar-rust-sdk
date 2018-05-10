@@ -1,5 +1,5 @@
-use std::str::FromStr;
 use self::Resolution::{Day, Hour, Min, Sec};
+use std::str::FromStr;
 
 /// Represents durations of time for the trade aggregations endpoint.
 pub enum Resolution {

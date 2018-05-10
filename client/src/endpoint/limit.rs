@@ -27,7 +27,7 @@ macro_rules! impl_limit {
                 self.limit
             }
         }
-    }
+    };
 }
 
 #[cfg(test)]

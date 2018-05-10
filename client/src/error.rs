@@ -1,12 +1,12 @@
 //! Error and result module
+use super::StellarError;
 use http;
-use hyper::error::UriError;
 use hyper;
+use hyper::error::UriError;
 use reqwest;
 use serde_json;
 use std::error::Error as StdError;
 use std::fmt;
-use super::StellarError;
 use uri;
 
 /// A set of errors for use in the client

@@ -1,9 +1,9 @@
 //! Contains endpoints for transactions and related information.
+use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use error::Result;
 use http::{Request, Uri};
-use std::str::FromStr;
 use resources::{Effect, Operation, Transaction};
-use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
+use std::str::FromStr;
 use uri::{self, TryFromUri, UriWrap};
 
 pub use super::account::Transactions as ForAccount;

@@ -18,8 +18,8 @@
 //! let all_txns = client.request(txns).unwrap();
 //! ```
 use error::Result;
-use serde::de::DeserializeOwned;
 use http;
+use serde::de::DeserializeOwned;
 
 #[macro_use]
 mod cursor;
@@ -42,8 +42,8 @@ pub mod transaction;
 
 pub use self::cursor::Cursor;
 pub use self::limit::Limit;
-pub use self::records::Records;
 pub use self::order::{Direction, Order, ParseDirectionError};
+pub use self::records::Records;
 
 /// Represents the body of a request to an IntoRequest.
 #[derive(Debug)]

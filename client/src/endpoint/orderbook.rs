@@ -1,9 +1,9 @@
 //! Contains the endpoint for fetching the orderbook for a given asset pair
-use error::Result;
-use std::str::FromStr;
-use resources::{AssetIdentifier, Orderbook};
 use super::{Body, IntoRequest, Limit};
+use error::Result;
 use http::{Request, Uri};
+use resources::{AssetIdentifier, Orderbook};
+use std::str::FromStr;
 
 /// Given an asset pair, the endpoint will return all bids and asks with an optional
 /// limit parameter to cap the number of records returned.

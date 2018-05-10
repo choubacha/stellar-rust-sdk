@@ -1,5 +1,5 @@
-use serde::{Deserialize, Deserializer};
 use serde::de;
+use serde::{Deserialize, Deserializer};
 use std::str::FromStr;
 
 /// Some fields in the json are represented as "strings" but are actually
