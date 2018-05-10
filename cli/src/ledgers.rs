@@ -1,8 +1,8 @@
-use stellar_client::{endpoint::ledger, sync::{self, Client}};
+use super::{cursor, ordering, pager::Pager};
 use clap::ArgMatches;
 use error::Result;
 use fmt::{Formatter, Simple};
-use super::{cursor, ordering, pager::Pager};
+use stellar_client::{endpoint::ledger, sync::{self, Client}};
 
 pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let pager = Pager::from_arg(&matches);

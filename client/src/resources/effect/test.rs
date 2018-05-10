@@ -418,7 +418,7 @@ mod errors_on_missing_fields_for_effect_types {
                     format!("Missing fields for {} effect.", stringify!($type_to_check))
                 );
             }
-        }
+        };
     }
 
     assert_err_on_missing_fields!(account_created, 0);

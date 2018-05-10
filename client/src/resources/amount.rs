@@ -1,7 +1,7 @@
+use serde::de;
+use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt;
 use std::ops::{Add, Sub};
-use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use serde::de;
 use std::str::FromStr;
 
 /// Amounts are used in several resources in the stellar ecosystem. There
@@ -170,8 +170,8 @@ impl<'de> Deserialize<'de> for Amount {
 
 #[cfg(test)]
 mod deserialize_amount_tests {
-    use serde_json;
     use super::*;
+    use serde_json;
 
     #[test]
     fn it_raises_amount_by_ten_million() {

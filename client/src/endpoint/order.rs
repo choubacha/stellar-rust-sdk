@@ -33,7 +33,7 @@ macro_rules! impl_order {
                 self.order
             }
         }
-    }
+    };
 }
 
 /// The order to return results in.

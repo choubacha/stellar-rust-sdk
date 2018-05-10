@@ -1,9 +1,9 @@
 //! Contains the endpoint for all trades.
-use error::Result;
-use std::str::FromStr;
-use resources::{AssetIdentifier, Trade, TradeAggregation};
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
+use error::Result;
 use http::{Request, Uri};
+use resources::{AssetIdentifier, Trade, TradeAggregation};
+use std::str::FromStr;
 use uri::{self, TryFromUri, UriWrap};
 
 /// Private struct used to define a trade pair.

@@ -1,8 +1,8 @@
-use stellar_client::error::Error;
+use resolution::ParseResolutionError;
 use std::error::Error as StdError;
 use std::fmt;
 use std::num::ParseIntError;
-use resolution::ParseResolutionError;
+use stellar_client::error::Error;
 
 /// A result including client specific errors.
 pub type Result<T> = ::std::result::Result<T, CliError>;

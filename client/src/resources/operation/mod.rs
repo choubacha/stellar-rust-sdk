@@ -1,5 +1,5 @@
-use resources::{Amount, AssetIdentifier, asset::Flags, offer::PriceRatio};
 use super::deserialize;
+use resources::{Amount, AssetIdentifier, asset::Flags, offer::PriceRatio};
 use serde::{de, Deserialize, Deserializer};
 mod account_merge;
 mod allow_trust;
@@ -8,8 +8,8 @@ mod create_account;
 mod create_passive_offer;
 mod manage_data;
 mod manage_offer;
-mod payment;
 mod path_payment;
+mod payment;
 mod set_options;
 
 pub use self::account_merge::AccountMerge;
@@ -19,8 +19,8 @@ pub use self::create_account::CreateAccount;
 pub use self::create_passive_offer::CreatePassiveOffer;
 pub use self::manage_data::ManageData;
 pub use self::manage_offer::ManageOffer;
-pub use self::payment::Payment;
 pub use self::path_payment::PathPayment;
+pub use self::payment::Payment;
 pub use self::set_options::SetOptions;
 
 #[cfg(test)]

@@ -5,13 +5,13 @@ extern crate clap;
 extern crate stellar_client;
 
 use clap::{App, AppSettings, Arg, SubCommand};
+use error::CliError;
 use pager::Pager;
 use stellar_client::{error::Error, sync::Client};
-use error::CliError;
 
 mod account;
-mod assets;
 mod asset_identifier;
+mod assets;
 mod cursor;
 mod effects;
 mod error;
@@ -29,12 +29,8 @@ mod transactions;
 fn build_app<'a, 'b>() -> App<'a, 'b> {
     macro_rules! listable {
         ($e:expr) => {
-            Pager::add(
-                ordering::add(
-                    cursor::add($e)
-                )
-            )
-        }
+            Pager::add(ordering::add(cursor::add($e)))
+        };
     }
 
     App::new("Stellar CLI")

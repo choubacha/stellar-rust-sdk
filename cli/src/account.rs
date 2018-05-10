@@ -1,8 +1,8 @@
-use clap::ArgMatches;
-use stellar_client::{sync, endpoint::account, sync::Client};
 use super::{cursor, ordering, pager::Pager};
-use fmt::{Formatter, Simple};
+use clap::ArgMatches;
 use error::Result;
+use fmt::{Formatter, Simple};
+use stellar_client::{sync, endpoint::account, sync::Client};
 
 pub fn details(client: &Client, matches: &ArgMatches) -> Result<()> {
     let id = matches.value_of("ID").expect("ID is required");

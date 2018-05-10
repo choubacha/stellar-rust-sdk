@@ -1,8 +1,8 @@
-use endpoint::{IntoRequest, Records};
-use uri::TryFromUri;
-use serde::de::DeserializeOwned;
 use super::Client;
+use endpoint::{IntoRequest, Records};
 use error::Result;
+use serde::de::DeserializeOwned;
+use uri::TryFromUri;
 
 /// An iterator for records. Provides the ability to use the iterator
 /// in rust against records that are returned from the api.

@@ -1,14 +1,14 @@
 //! Contains the endpoint for all payment operations.
+use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use error::Result;
 use http::{Request, Uri};
-use std::str::FromStr;
 use resources::{Amount, AssetIdentifier, Operation, PaymentPath};
-use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
+use std::str::FromStr;
 use uri::{self, TryFromUri, UriWrap};
 
-pub use super::transaction::Payments as ForTransaction;
-pub use super::ledger::Payments as ForLedger;
 pub use super::account::Payments as ForAccount;
+pub use super::ledger::Payments as ForLedger;
+pub use super::transaction::Payments as ForTransaction;
 
 /// This endpoint represents all payment operations that are part of validated transactions.
 /// The endpoint will return all payments and accepts query params for a cursor, order, and limit.

@@ -1,9 +1,9 @@
 //! Contains endpoints for accessing accounts and related information.
-use error::Result;
-use std::str::FromStr;
-use resources::{Account, Datum, Effect, Offer, Operation, Transaction};
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
+use error::Result;
 use http::{Request, Uri};
+use resources::{Account, Datum, Effect, Offer, Operation, Transaction};
+use std::str::FromStr;
 use uri::{self, TryFromUri, UriWrap};
 
 /// Represents the account details on the stellar horizon server.

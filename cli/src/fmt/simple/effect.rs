@@ -1,5 +1,5 @@
-use fmt::Render;
 use super::Simple;
+use fmt::Render;
 use stellar_client::resources::{AssetIdentifier, effect::{Effect, EffectKind as Kind}};
 
 impl Render<Effect> for Simple {

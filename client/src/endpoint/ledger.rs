@@ -1,9 +1,9 @@
 //! Contains the endpoint for all ledgers.
+use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use error::Result;
 use http::{Request, Uri};
-use std::str::FromStr;
 use resources::{Effect, Ledger, Operation, Transaction};
-use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
+use std::str::FromStr;
 use uri::{self, TryFromUri, UriWrap};
 
 /// Represents the all ledgers end point for the stellar horizon server. The endpoint
