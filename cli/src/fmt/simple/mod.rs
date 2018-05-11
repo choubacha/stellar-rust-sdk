@@ -10,6 +10,7 @@ pub struct Simple;
 
 mod account;
 mod asset;
+mod datum;
 mod effect;
 mod ledger;
 mod offer;

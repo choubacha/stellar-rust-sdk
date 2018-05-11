@@ -62,6 +62,20 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                 .about("Access information about accounts or related to them")
                 .setting(AppSettings::SubcommandRequired)
                 .subcommand(
+                    SubCommand::with_name("data")
+                        .about("Fetch and account's metadata for a particular key")
+                        .arg(
+                            Arg::with_name("ID")
+                                .required(true)
+                                .help("The identifier of the account to look up"),
+                        )
+                        .arg(
+                            Arg::with_name("key")
+                                .required(true)
+                                .help("The key for the metadata you wish to fetch"),
+                        ),
+                )
+                .subcommand(
                     SubCommand::with_name("details")
                         .about("Fetch details about a specific account")
                         .arg(
@@ -399,6 +413,7 @@ fn main() {
     // Master match block. All subcommands need to be captured here.
     let result = match matches.subcommand() {
         ("account", Some(sub_m)) => match sub_m.subcommand() {
+            ("data", Some(sub_m)) => account::data(&client, sub_m),
             ("details", Some(sub_m)) => account::details(&client, sub_m),
             ("transactions", Some(sub_m)) => account::transactions(&client, sub_m),
             ("effects", Some(sub_m)) => account::effects(&client, sub_m),

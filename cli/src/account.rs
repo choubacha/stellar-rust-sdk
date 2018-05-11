@@ -4,6 +4,17 @@ use error::Result;
 use fmt::{Formatter, Simple};
 use stellar_client::{sync, endpoint::account, sync::Client};
 
+pub fn data(client: &Client, matches: &ArgMatches) -> Result<()> {
+    let id = matches.value_of("ID").expect("ID is required");
+    let key = matches.value_of("key").expect("Key is required");
+    let endpoint = account::Data::new(id, key);
+    let account = client.request(endpoint)?;
+
+    Formatter::start_stdout(Simple).render(&account);
+
+    Ok(())
+}
+
 pub fn details(client: &Client, matches: &ArgMatches) -> Result<()> {
     let id = matches.value_of("ID").expect("ID is required");
     let endpoint = account::Details::new(id);
