@@ -268,9 +268,8 @@ impl IntoRequest for Payments {
 
 impl TryFromUri for Payments {
     fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
-        let path = wrap.path();
-        match (path.get(0), path.get(1), path.get(2)) {
-            (Some(&"ledgers"), Some(sequence), Some(&"payments")) => {
+        match wrap.path() {
+            ["ledgers", sequence, "payments"] => {
                 let params = wrap.params();
                 Ok(Self {
                     sequence: sequence.parse()?,
@@ -410,9 +409,8 @@ impl IntoRequest for Transactions {
 
 impl TryFromUri for Transactions {
     fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
-        let path = wrap.path();
-        match (path.get(0), path.get(1), path.get(2)) {
-            (Some(&"ledgers"), Some(sequence), Some(&"transactions")) => {
+        match wrap.path() {
+            ["ledgers", sequence, "transactions"] => {
                 let params = wrap.params();
                 Ok(Self {
                     sequence: sequence.parse()?,
@@ -554,9 +552,8 @@ impl IntoRequest for Effects {
 
 impl TryFromUri for Effects {
     fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
-        let path = wrap.path();
-        match (path.get(0), path.get(1), path.get(2)) {
-            (Some(&"ledgers"), Some(sequence), Some(&"effects")) => {
+        match wrap.path() {
+            ["ledgers", sequence, "effects"] => {
                 let params = wrap.params();
                 Ok(Self {
                     sequence: sequence.parse()?,
@@ -698,9 +695,8 @@ impl IntoRequest for Operations {
 
 impl TryFromUri for Operations {
     fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
-        let path = wrap.path();
-        match (path.get(0), path.get(1), path.get(2)) {
-            (Some(&"ledgers"), Some(sequence), Some(&"operations")) => {
+        match wrap.path() {
+            ["ledgers", sequence, "operations"] => {
                 let params = wrap.params();
                 Ok(Self {
                     sequence: sequence.parse()?,

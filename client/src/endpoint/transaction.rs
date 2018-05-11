@@ -255,9 +255,8 @@ impl IntoRequest for Effects {
 
 impl TryFromUri for Effects {
     fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
-        let path = wrap.path();
-        match (path.get(0), path.get(1), path.get(2)) {
-            (Some(&"transactions"), Some(hash), Some(&"effects")) => {
+        match wrap.path() {
+            ["transactions", hash, "effects"] => {
                 let params = wrap.params();
                 Ok(Self {
                     hash: hash.to_string(),
@@ -394,9 +393,8 @@ impl IntoRequest for Payments {
 
 impl TryFromUri for Payments {
     fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
-        let path = wrap.path();
-        match (path.get(0), path.get(1), path.get(2)) {
-            (Some(&"transactions"), Some(hash), Some(&"payments")) => {
+        match wrap.path() {
+            ["transactions", hash, "payments"] => {
                 let params = wrap.params();
                 Ok(Self {
                     hash: hash.to_string(),
@@ -530,9 +528,8 @@ impl IntoRequest for Operations {
 
 impl TryFromUri for Operations {
     fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
-        let path = wrap.path();
-        match (path.get(0), path.get(1), path.get(2)) {
-            (Some(&"transactions"), Some(hash), Some(&"operations")) => {
+        match wrap.path() {
+            ["transactions", hash, "operations"] => {
                 let params = wrap.params();
                 Ok(Self {
                     hash: hash.to_string(),
