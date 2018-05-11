@@ -280,9 +280,8 @@ impl IntoRequest for Effects {
 
 impl TryFromUri for Effects {
     fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
-        let path = wrap.path();
-        match (path.get(0), path.get(1), path.get(2)) {
-            (Some(&"operations"), Some(id), Some(&"effects")) => {
+        match wrap.path() {
+            ["operations", id, "effects"] => {
                 let params = wrap.params();
                 Ok(Self {
                     id: id.parse()?,

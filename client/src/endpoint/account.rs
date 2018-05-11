@@ -225,9 +225,8 @@ impl IntoRequest for Transactions {
 
 impl TryFromUri for Transactions {
     fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
-        let path = wrap.path();
-        match (path.get(0), path.get(1), path.get(2)) {
-            (Some(&"accounts"), Some(account_id), Some(&"transactions")) => {
+        match wrap.path() {
+            ["accounts", account_id, "transactions"] => {
                 let params = wrap.params();
                 Ok(Self {
                     account_id: account_id.to_string(),
@@ -380,9 +379,8 @@ impl IntoRequest for Effects {
 
 impl TryFromUri for Effects {
     fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
-        let path = wrap.path();
-        match (path.get(0), path.get(1), path.get(2)) {
-            (Some(&"accounts"), Some(account_id), Some(&"effects")) => {
+        match wrap.path() {
+            ["accounts", account_id, "effects"] => {
                 let params = wrap.params();
                 Ok(Self {
                     account_id: account_id.to_string(),
@@ -535,9 +533,8 @@ impl IntoRequest for Operations {
 
 impl TryFromUri for Operations {
     fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
-        let path = wrap.path();
-        match (path.get(0), path.get(1), path.get(2)) {
-            (Some(&"accounts"), Some(account_id), Some(&"operations")) => {
+        match wrap.path() {
+            ["accounts", account_id, "operations"] => {
                 let params = wrap.params();
                 Ok(Self {
                     account_id: account_id.to_string(),
@@ -683,9 +680,8 @@ impl IntoRequest for Payments {
 
 impl TryFromUri for Payments {
     fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
-        let path = wrap.path();
-        match (path.get(0), path.get(1), path.get(2)) {
-            (Some(&"accounts"), Some(account_id), Some(&"payments")) => {
+        match wrap.path() {
+            ["accounts", account_id, "payments"] => {
                 let params = wrap.params();
                 Ok(Self {
                     account_id: account_id.to_string(),
@@ -828,9 +824,8 @@ impl IntoRequest for Offers {
 
 impl TryFromUri for Offers {
     fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
-        let path = wrap.path();
-        match (path.get(0), path.get(1), path.get(2)) {
-            (Some(&"accounts"), Some(account_id), Some(&"offers")) => {
+        match wrap.path() {
+            ["accounts", account_id, "offers"] => {
                 let params = wrap.params();
                 Ok(Self {
                     account_id: account_id.to_string(),
