@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 ### Added
 - Initial CLI is built and usable in it's most basic form. Listed endpoints can be scrolled.
 - Available data:
+  - Account data can be seen
   - Account effects can be seen
   - Account offers can be seen
   - All effects can be seen
