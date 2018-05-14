@@ -5,7 +5,7 @@ pub fn from_str(s: &str) -> Result<AssetIdentifier, InvalidInputError> {
     let tokens: Vec<&str> = s.split('-').collect();
 
     match &tokens[..] {
-        ["XLM"] => Ok(AssetIdentifier::Native),
+        ["XLM"] | ["xlm"] | ["lumen"] => Ok(AssetIdentifier::Native),
         [code, issuer] if code.len() <= 4 => Ok(AssetIdentifier::alphanum4(code, issuer)),
         [code, issuer] if code.len() <= 12 => Ok(AssetIdentifier::alphanum12(code, issuer)),
         _ => Err(InvalidInputError::from_str(
@@ -19,8 +19,16 @@ mod tests {
     use super::*;
 
     #[test]
+    fn it_knows_some_lumen_aliases() {
+        assert_eq!(from_str("XLM").unwrap(), AssetIdentifier::Native);
+        assert_eq!(from_str("xlm").unwrap(), AssetIdentifier::Native);
+        assert_eq!(from_str("lumen").unwrap(), AssetIdentifier::Native);
+    }
+
+    #[test]
     fn it_can_parse_asset_identifiers() {
         assert_eq!(from_str("XLM").unwrap(), AssetIdentifier::Native);
+        assert_eq!(from_str("xlm").unwrap(), AssetIdentifier::Native);
         assert_eq!(
             from_str("fox-123ABC").unwrap(),
             AssetIdentifier::alphanum4("fox", "123ABC")
