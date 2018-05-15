@@ -73,6 +73,7 @@ mod ledger;
 mod offer;
 mod operation;
 mod orderbook;
+mod payment_path;
 mod trade;
 mod trade_aggregation;
 mod transaction;

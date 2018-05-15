@@ -162,7 +162,7 @@ mod all_payments_tests {
 ///
 /// assert!(records.records().len() > 0);
 /// ```
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct FindPath {
     source_account: String,
     destination_account: String,
@@ -232,6 +232,18 @@ impl IntoRequest for FindPath {
         let uri = Uri::from_str(&uri)?;
         let request = Request::get(uri).body(Body::None)?;
         Ok(request)
+    }
+}
+
+impl TryFromUri for FindPath {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<FindPath, uri::Error> {
+        let params = wrap.params();
+        Ok(FindPath {
+            source_account: params.get_parse("from")?,
+            destination_account: params.get_parse("to")?,
+            destination_asset: params.get_parse("asset")?,
+            destination_amount: params.get_parse("amount")?,
+        })
     }
 }
 

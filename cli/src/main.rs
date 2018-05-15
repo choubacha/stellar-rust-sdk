@@ -15,6 +15,7 @@ mod assets;
 mod cursor;
 mod effects;
 mod error;
+mod find_path;
 mod fmt;
 mod ledgers;
 mod operations;
@@ -177,6 +178,38 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                             .about("Fetch all payments")
                     )
                 ),
+        )
+        .subcommand(
+            SubCommand::with_name("find-path")
+                .about("Fetch possible payment paths")
+                .arg(
+                    Arg::with_name("to")
+                        .long("to")
+                        .takes_value(true)
+                        .required(true)
+                        .help("The destination account id of the payment path to query"),
+                )
+                .arg(
+                    Arg::with_name("from")
+                        .long("from")
+                        .takes_value(true)
+                        .required(true)
+                        .help("The source account id of the payment path to query"),
+                )
+                .arg(
+                    Arg::with_name("asset")
+                        .long("asset")
+                        .takes_value(true)
+                        .required(true)
+                        .help("Specifies destination asset for orderbook to return. format:  <asset_code>-<asset_issuer>, or xlm if lumens"),
+                )
+                .arg(
+                    Arg::with_name("amount")
+                        .long("amount")
+                        .takes_value(true)
+                        .required(true)
+                        .help("The amount of the destination asset resulting from the payment path"),
+                )
         )
         .subcommand(
             SubCommand::with_name("operations")
@@ -493,6 +526,7 @@ fn main() {
             ("details", Some(sub_m)) => orderbook::details(&client, sub_m),
             _ => return print_help_and_exit(),
         },
+        ("find-path", Some(sub_m)) => find_path::find_path(&client, sub_m),
         ("payments", Some(sub_m)) => match sub_m.subcommand() {
             ("all", Some(sub_m)) => payments::all(&client, sub_m),
             _ => return print_help_and_exit(),
