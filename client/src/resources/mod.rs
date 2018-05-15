@@ -15,7 +15,8 @@ mod offer;
 /// An operation is an individual command that mutates the ledger.
 pub mod operation;
 mod orderbook;
-mod payment_path;
+/// A payment path is a payment route from a source asset to a destination asset.
+pub mod payment_path;
 mod trade;
 mod transaction;
 
@@ -25,8 +26,8 @@ mod transaction;
 /// All the derives for XDR and JSON are implemented for the resources so that
 /// they can be used with a client. Either for reading or for writing.
 pub use self::account::Account;
-pub use self::amount::Amount;
-pub use self::asset::{Asset, AssetIdentifier, Flags};
+pub use self::amount::{Amount, ParseAmountError};
+pub use self::asset::{Asset, AssetIdentifier, Flags, ParseAssetIdentifierError};
 pub use self::datum::Datum;
 pub use self::effect::Effect;
 pub use self::ledger::Ledger;

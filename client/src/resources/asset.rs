@@ -1,5 +1,7 @@
 use resources::Amount;
 use serde::{de, Deserialize, Deserializer, Serialize, Serializer};
+use std::fmt;
+use std::str::FromStr;
 
 /// Assets are the units that are traded on the Stellar Network.
 /// An asset consists of an type, code, and issuer.
@@ -250,6 +252,82 @@ mod asset_identifier_tests {
         assert_eq!(asset.code(), "ABCD");
         assert_eq!(asset.issuer(), "ISSUER");
         assert!(!asset.is_native());
+    }
+}
+
+/// When a bad token or string is provided to parsing into an asset
+/// you get an error.
+#[derive(Debug)]
+pub enum ParseAssetIdentifierError {
+    /// Asset identifier not of the form <asset_code>-<asset_issuer>
+    FormattedIncorrectly,
+}
+
+impl fmt::Display for ParseAssetIdentifierError {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}", self)
+    }
+}
+
+impl FromStr for AssetIdentifier {
+    type Err = ParseAssetIdentifierError;
+
+    fn from_str(s: &str) -> Result<AssetIdentifier, ParseAssetIdentifierError> {
+        let tokens: Vec<&str> = s.split('-').collect();
+
+        match &tokens[..] {
+            ["XLM"] | ["xlm"] | ["lumen"] => Ok(AssetIdentifier::Native),
+            [code, issuer] if code.len() <= 4 => Ok(AssetIdentifier::alphanum4(code, issuer)),
+            [code, issuer] if code.len() <= 12 => Ok(AssetIdentifier::alphanum12(code, issuer)),
+            _ => Err(ParseAssetIdentifierError::FormattedIncorrectly),
+        }
+    }
+}
+
+#[cfg(test)]
+mod from_str_asset_identifier_tests {
+    use super::*;
+
+    #[test]
+    fn it_knows_some_lumen_aliases() {
+        assert_eq!(
+            AssetIdentifier::from_str("XLM").unwrap(),
+            AssetIdentifier::Native
+        );
+        assert_eq!(
+            AssetIdentifier::from_str("xlm").unwrap(),
+            AssetIdentifier::Native
+        );
+        assert_eq!(
+            AssetIdentifier::from_str("lumen").unwrap(),
+            AssetIdentifier::Native
+        );
+    }
+
+    #[test]
+    fn it_can_parse_asset_identifiers() {
+        assert_eq!(
+            AssetIdentifier::from_str("XLM").unwrap(),
+            AssetIdentifier::Native
+        );
+        assert_eq!(
+            AssetIdentifier::from_str("xlm").unwrap(),
+            AssetIdentifier::Native
+        );
+        assert_eq!(
+            AssetIdentifier::from_str("fox-123ABC").unwrap(),
+            AssetIdentifier::alphanum4("fox", "123ABC")
+        );
+        assert_eq!(
+            AssetIdentifier::from_str("starfox-123ABC").unwrap(),
+            AssetIdentifier::alphanum12("starfox", "123ABC")
+        );
+    }
+
+    #[test]
+    fn it_returns_appropriate_errors() {
+        assert!(AssetIdentifier::from_str("fox-123-abs").is_err());
+        assert!(AssetIdentifier::from_str("foxisareallycoolanimal-123").is_err());
     }
 }
 

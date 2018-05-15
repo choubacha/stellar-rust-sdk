@@ -1,9 +1,10 @@
 use endpoint::ParseDirectionError;
 use http;
+use resources::{ParseAmountError, ParseAssetIdentifierError};
 use std::str::FromStr;
 use std::{self, fmt};
 
-/// A trait that, if implemented, can convert to itself from a URi
+/// A trait that, if implemented, can convert to itself from a URI
 /// and returns errors when needed.
 pub trait TryFromUri
 where
@@ -147,6 +148,8 @@ pub enum ErrorKind {
     ParseError(std::string::ParseError),
     ParseIntError(std::num::ParseIntError),
     ParseDirectionError(ParseDirectionError),
+    ParseAmountError(ParseAmountError),
+    ParseAssetIdentifierError(ParseAssetIdentifierError),
     InvalidPath,
 }
 
@@ -154,6 +157,22 @@ impl From<std::string::ParseError> for Error {
     fn from(inner: std::string::ParseError) -> Error {
         Error {
             kind: ErrorKind::ParseError(inner),
+        }
+    }
+}
+
+impl From<ParseAmountError> for Error {
+    fn from(inner: ParseAmountError) -> Error {
+        Error {
+            kind: ErrorKind::ParseAmountError(inner),
+        }
+    }
+}
+
+impl From<ParseAssetIdentifierError> for Error {
+    fn from(inner: ParseAssetIdentifierError) -> Error {
+        Error {
+            kind: ErrorKind::ParseAssetIdentifierError(inner),
         }
     }
 }
@@ -196,6 +215,8 @@ impl ::std::error::Error for Error {
             ErrorKind::ParseError(ref inner) => inner.description(),
             ErrorKind::ParseIntError(ref inner) => inner.description(),
             ErrorKind::ParseDirectionError(ref inner) => inner.description(),
+            ErrorKind::ParseAmountError(_) => "An error occured while parsing amount",
+            ErrorKind::ParseAssetIdentifierError(_) => "An error occured while parsing asset",
             ErrorKind::InvalidPath => "The path of the uri is invalid in some way",
         }
     }
@@ -213,6 +234,8 @@ impl fmt::Display for Error {
             ErrorKind::InvalidPath => "The path of the uri is invalid in some way".to_string(),
             ErrorKind::ParseError(ref inner) => format!("{}", inner),
             ErrorKind::ParseIntError(ref inner) => format!("{}", inner),
+            ErrorKind::ParseAmountError(ref inner) => format!("{:?}", inner),
+            ErrorKind::ParseAssetIdentifierError(ref inner) => format!("{}", inner),
             ErrorKind::ParseDirectionError(ref inner) => format!("{}", inner),
         };
         f.write_str(&text)

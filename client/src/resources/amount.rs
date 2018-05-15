@@ -1,6 +1,7 @@
 use serde::de;
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use std::fmt;
+use std::num;
 use std::ops::{Add, Sub};
 use std::str::FromStr;
 
@@ -141,30 +142,13 @@ impl<'de> Deserialize<'de> for Amount {
         D: Deserializer<'de>,
     {
         let s = String::deserialize(d)?;
-        match s.rfind('.') {
-            None => {
-                // There is no decimal so just multiply
-                let parsed_amount = i64::from_str(&s)
-                    .map_err(|_| de::Error::custom("Failed to parse string field"))?;
-                Ok(Amount::new(parsed_amount * 10_000_000))
+        let amount: Amount = Amount::from_str(&s).map_err(|e| match e {
+            ParseAmountError::ExceedsDecimalLength => {
+                de::Error::custom("Amount has too many digits of precision.")
             }
-            Some(decimal_place) => {
-                let number_decimals = s.len() - (decimal_place + 1);
-                if number_decimals > 7 {
-                    Err(de::Error::custom(
-                        "Amount has too many digits of precision.",
-                    ))
-                } else {
-                    let s = s.replace(".", "");
-                    let parsed_amount = i64::from_str(&s)
-                        .map_err(|_| de::Error::custom("Failed to parse string field"))?;
-                    // Stellar sends a float that is reduced from true value by 10^7 so raise by 10
-                    // minus the amount we gained from removing decimal
-                    let required_power: u32 = (7 - number_decimals) as u32;
-                    Ok(Amount::new(parsed_amount * (10_i64.pow(required_power))))
-                }
-            }
-        }
+            ParseAmountError::IntError(err) => de::Error::custom(err.to_string()),
+        })?;
+        Ok(amount)
     }
 }
 
@@ -195,5 +179,78 @@ mod deserialize_amount_tests {
     fn it_errors_floats_with_more_than_7_decimals() {
         let amount = serde_json::from_str::<Amount>("\"0.212847948\"");
         assert!(amount.is_err());
+    }
+}
+
+/// Wrapping ParseAmountError around ParseIntError since ParseIntError's interior is private
+/// and thus not instantiable.
+#[derive(Debug)]
+pub enum ParseAmountError {
+    /// An error describing the case where the amount contains
+    /// too many digits of precision to parse correctly
+    ExceedsDecimalLength,
+    /// A wrapper around ParseIntError type
+    IntError(num::ParseIntError),
+}
+
+impl From<num::ParseIntError> for ParseAmountError {
+    fn from(error: num::ParseIntError) -> ParseAmountError {
+        ParseAmountError::IntError(error)
+    }
+}
+
+impl FromStr for Amount {
+    type Err = ParseAmountError;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s.rfind('.') {
+            None => {
+                // There is no decimal so just multiply
+                let parsed_amount = i64::from_str(&s)?;
+                Ok(Amount::new(parsed_amount * 10_000_000))
+            }
+            Some(decimal_place) => {
+                let number_decimals = s.len() - (decimal_place + 1);
+                if number_decimals > 7 {
+                    Err(ParseAmountError::ExceedsDecimalLength)
+                } else {
+                    let s = s.replace(".", "");
+                    let parsed_amount = i64::from_str(&s)?;
+                    // Stellar sends a float that is reduced from true value by 10^7 so raise by 10
+                    // minus the amount we gained from removing decimal
+                    let required_power: u32 = (7 - number_decimals) as u32;
+                    Ok(Amount::new(parsed_amount * (10_i64.pow(required_power))))
+                }
+            }
+        }
+    }
+}
+
+#[cfg(test)]
+mod from_str_amount_tests {
+    use super::*;
+
+    #[test]
+    fn it_raises_amount_by_ten_million() {
+        let amount: Amount = "2.12".parse().unwrap();
+        assert_eq!(amount, Amount(21_200_000));
+    }
+
+    #[test]
+    fn it_parses_the_smallest_value() {
+        let amount: Amount = "0.0000001".parse().unwrap();
+        assert_eq!(amount, Amount(1));
+    }
+
+    #[test]
+    fn it_handles_integer_strings() {
+        let amount: Amount = "212".parse().unwrap();
+        assert_eq!(amount, Amount(2_120_000_000));
+    }
+
+    #[test]
+    #[should_panic]
+    fn it_errors_floats_with_more_than_7_decimals() {
+        let _amount: Amount = "0.212847948".parse().unwrap();
     }
 }

@@ -4,7 +4,7 @@ use serde::{de, Deserialize, Deserializer};
 /// A path resource contains information about a payment path. A path can be used by code to
 /// populate necessary fields on path payment operation, such as path and sendMax.  The
 /// also describes assets this path hops through.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PaymentPath {
     path: Vec<AssetIdentifier>,
     source_amount: Amount,
