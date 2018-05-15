@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Account data can be seen
   - Account effects can be seen
   - Account offers can be seen
+  - Account operations can be seen
+  - Account payments can be seen
   - All effects can be seen
   - All ledgers can be seen
   - All operations can be seen
@@ -30,4 +32,3 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
   - Transaction effects can be seen
   - Transaction operations can be seen
   - Transaction payments can be seen
-  - Account operations can be seen
