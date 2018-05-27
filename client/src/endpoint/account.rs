@@ -2,7 +2,7 @@
 use super::{Body, Cursor, Direction, IntoRequest, Limit, Order, Records};
 use error::Result;
 use http::{Request, Uri};
-use resources::{Account, Datum, Effect, Offer, Operation, Transaction};
+use resources::{Account, Datum, Effect, Offer, Operation, Trade, Transaction};
 use std::str::FromStr;
 use uri::{self, TryFromUri, UriWrap};
 
@@ -134,6 +134,164 @@ mod account_tests {
             .unwrap();
         assert_eq!(request.uri().host().unwrap(), "horizon-testnet.stellar.org");
         assert_eq!(request.uri().path(), "/accounts/abc123/data/key");
+    }
+}
+
+
+
+
+
+/// Represents the trades for account endpoint on the stellar horizon server.
+/// The endpoint will return all the trades for a specific account
+///
+/// <https://www.stellar.org/developers/horizon/reference/endpoints/trades-for-account.html>
+///
+/// ## Example
+/// ```
+/// use stellar_client::sync::Client;
+/// use stellar_client::endpoint::{account, trade, Limit};
+///
+/// let client = Client::horizon_test().unwrap();
+///
+/// // Grab trade and associated account to ensure an account populated with trades
+/// let trade_ep = trade::All::default().with_limit(1);
+/// let all_trades       = client.request(trade_ep).unwrap();
+/// let trade            = &all_trades.records()[0];
+/// let account_id     = trade.selling_account();
+///
+/// // Now we issue a request for that account's trades
+/// let endpoint  = account::Trades::new(account_id);
+/// let acct_trades = client.request(endpoint).unwrap();
+///
+/// assert!(acct_trades.records().len() > 0);
+/// ```
+#[derive(Debug, Clone)]
+pub struct Trades {
+    account_id: String,
+    cursor: Option<String>,
+    order: Option<Direction>,
+    limit: Option<u32>,
+}
+
+impl_cursor!(Trades);
+impl_limit!(Trades);
+impl_order!(Trades);
+
+impl Trades {
+    /// Creates a new account::Trades endpoint struct. Hand this to the client in order to
+    /// request trades for a specific account.
+    ///
+    /// ```
+    /// use stellar_client::endpoint::account;
+    ///
+    /// let trades = account::Trades::new("abc123");
+    /// ```
+    pub fn new(account_id: &str) -> Self {
+        Self {
+            account_id: account_id.to_string(),
+            cursor: None,
+            order: None,
+            limit: None,
+        }
+    }
+
+    fn has_query(&self) -> bool {
+        self.order.is_some() || self.cursor.is_some() || self.limit.is_some()
+    }
+}
+
+impl IntoRequest for Trades {
+    type Response = Records<Trade>;
+
+    fn into_request(self, host: &str) -> Result<Request<Body>> {
+        let mut uri = format!("{}/accounts/{}/trades", host, self.account_id);
+        if self.has_query() {
+            uri.push_str("?");
+
+            if let Some(cursor) = self.cursor {
+                uri.push_str(&format!("cursor={}&", cursor));
+            }
+
+            if let Some(order) = self.order {
+                uri.push_str(&format!("order={}&", order.to_string()));
+            }
+
+            if let Some(limit) = self.limit {
+                uri.push_str(&format!("limit={}", limit));
+            }
+        }
+
+        let uri = Uri::from_str(&uri)?;
+        let request = Request::get(uri).body(Body::None)?;
+        Ok(request)
+    }
+}
+
+impl TryFromUri for Trades {
+    fn try_from_wrap(wrap: &UriWrap) -> ::std::result::Result<Self, uri::Error> {
+        match wrap.path() {
+            ["accounts", account_id, "trades"] => {
+                let params = wrap.params();
+                Ok(Self {
+                    account_id: account_id.to_string(),
+                    cursor: params.get_parse("cursor").ok(),
+                    order: params.get_parse("order").ok(),
+                    limit: params.get_parse("limit").ok(),
+                })
+            }
+            _ => Err(uri::Error::invalid_path()),
+        }
+    }
+}
+
+#[cfg(test)]
+mod trades_tests {
+    use super::*;
+
+    #[test]
+    fn it_leaves_off_the_params_if_not_specified() {
+        let trades = Trades::new("abc123");
+        let req = trades
+            .into_request("https://horizon-testnet.stellar.org")
+            .unwrap();
+        assert_eq!(req.uri().path(), "/accounts/abc123/trades");
+        assert_eq!(req.uri().query(), None);
+    }
+
+    #[test]
+    fn it_can_make_a_trades_uri() {
+        let trades = Trades::new("abc123");
+        let request = trades
+            .into_request("https://horizon-testnet.stellar.org")
+            .unwrap();
+        assert_eq!(request.uri().host().unwrap(), "horizon-testnet.stellar.org");
+        assert_eq!(request.uri().path(), "/accounts/abc123/trades");
+    }
+
+    #[test]
+    fn it_puts_the_query_params_on_the_uri() {
+        let ep = Trades::new("abc123")
+            .with_cursor("CURSOR")
+            .with_order(Direction::Desc)
+            .with_limit(123);
+        let req = ep.into_request("https://www.google.com").unwrap();
+        assert_eq!(req.uri().path(), "/accounts/abc123/trades");
+        assert_eq!(
+            req.uri().query(),
+            Some("cursor=CURSOR&order=desc&limit=123")
+        );
+    }
+
+    #[test]
+    fn it_parses_from_a_uri() {
+        let uri: Uri = "/accounts/abc123/trades?cursor=CURSOR&order=desc&limit=123"
+            .parse()
+            .unwrap();
+        let ep = Trades::try_from(&uri).unwrap();
+        assert_eq!(ep.account_id, "abc123");
+        assert_eq!(ep.limit, Some(123));
+        assert_eq!(ep.cursor, Some("CURSOR".to_string()));
+        assert_eq!(ep.order, Some(Direction::Desc));
     }
 }
 
