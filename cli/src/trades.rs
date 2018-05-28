@@ -34,26 +34,12 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let iter = sync::Iter::new(&client, endpoint);
 
     let mut res = Ok(());
+    let mut fmt = Formatter::start_stdout(Simple::new());
     pager.paginate(iter, |result| match result {
-        Ok(trade) => {
-            println!("id:                   {}", trade.id());
-            println!("offer_id:             {}", trade.offer_id());
-            println!("paging_token:         {}", trade.paging_token());
-            println!("ledger_close_time:    {}", trade.closed_at());
-            println!("base_account:         {}", trade.base_account());
-            println!("base_amount:          {}", trade.base_amount());
-            println!("base_asset_code:      {}", trade.base_asset().code());
-            println!("base_asset_issuer:    {}", trade.base_asset().issuer());
-            println!("counter_amount:       {}", trade.counter_amount());
-            println!("counter_account:      {}", trade.counter_account());
-            println!("counter_asset_code:   {}", trade.counter_asset().code());
-            println!("counter_asset_issuer: {}", trade.counter_asset().issuer());
-            println!("price:                {}", trade.price());
-            println!("seller:               {}", trade.selling_account());
-            println!();
-        }
+        Ok(txn) => fmt.render(&txn),
         Err(err) => res = Err(err.into()),
     });
+    let _ = fmt.stop();
     res
 }
 

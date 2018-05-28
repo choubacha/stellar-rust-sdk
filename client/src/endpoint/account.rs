@@ -137,10 +137,6 @@ mod account_tests {
     }
 }
 
-
-
-
-
 /// Represents the trades for account endpoint on the stellar horizon server.
 /// The endpoint will return all the trades for a specific account
 ///
@@ -154,13 +150,13 @@ mod account_tests {
 /// let client = Client::horizon_test().unwrap();
 ///
 /// // Grab trade and associated account to ensure an account populated with trades
-/// let trade_ep = trade::All::default().with_limit(1);
-/// let all_trades       = client.request(trade_ep).unwrap();
-/// let trade            = &all_trades.records()[0];
-/// let account_id     = trade.selling_account();
+/// let trade_ep   = trade::All::default().with_limit(1);
+/// let all_trades = client.request(trade_ep).unwrap();
+/// let trade      = &all_trades.records()[0];
+/// let account_id = trade.selling_account();
 ///
 /// // Now we issue a request for that account's trades
-/// let endpoint  = account::Trades::new(account_id);
+/// let endpoint    = account::Trades::new(account_id);
 /// let acct_trades = client.request(endpoint).unwrap();
 ///
 /// assert!(acct_trades.records().len() > 0);

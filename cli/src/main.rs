@@ -86,6 +86,17 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                 )
                 .subcommand(
                     listable!(
+                        SubCommand::with_name("trades")
+                            .about("Fetch trades for an account")
+                            .arg(
+                                Arg::with_name("ID")
+                                    .required(true)
+                                    .help("The identifier of the account to look up"),
+                            )
+                    ),
+                )
+                .subcommand(
+                    listable!(
                         SubCommand::with_name("transactions")
                             .about("Fetch transactions for an account")
                             .arg(
@@ -448,6 +459,7 @@ fn main() {
         ("account", Some(sub_m)) => match sub_m.subcommand() {
             ("data", Some(sub_m)) => account::data(&client, sub_m),
             ("details", Some(sub_m)) => account::details(&client, sub_m),
+            ("trades", Some(sub_m)) => account::trades(&client, sub_m),
             ("transactions", Some(sub_m)) => account::transactions(&client, sub_m),
             ("effects", Some(sub_m)) => account::effects(&client, sub_m),
             ("offers", Some(sub_m)) => account::offers(&client, sub_m),
