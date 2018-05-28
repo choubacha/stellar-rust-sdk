@@ -345,7 +345,7 @@ mod all_trades_tests {
 /// let client = Client::horizon_test().unwrap();
 ///
 /// // Grab a trade so that we know aggregations should exist.
-/// let trades = trade::All::default().with_order(Direction::Desc);
+/// let trades = trade::All::default().with_order(Direction::Asc);
 /// let trades = client.request(trades).unwrap();
 /// let trade = &trades.records()[0];
 /// let base = trade.base_asset();
@@ -359,9 +359,9 @@ mod all_trades_tests {
 ///
 /// // Place the start time in the past so we capture it.
 /// let agg = trade::Aggregations::new(base, counter)
-///     .with_start_time(now - 3_000_000_000)
+///     .with_start_time(0)
 ///     .with_end_time(now)
-///     .with_resolution(300_000);
+///     .with_resolution(300_000_000);
 ///
 /// let records = client.request(agg).unwrap();
 /// # assert!(records.records().len() > 0);
