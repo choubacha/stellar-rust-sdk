@@ -1,4 +1,4 @@
-use resources::{Amount, AssetIdentifier, asset::Flags};
+use resources::{asset::Flags, Amount, AssetIdentifier};
 use serde::{de, Deserialize, Deserializer};
 
 pub mod account;
@@ -437,8 +437,7 @@ impl<'de> Deserialize<'de> for Effect {
                 } => {
                     let flags = Flags::new(auth_required_flag, auth_revokable_flag);
                     Kind::Account(account::Kind::FlagsUpdated(account::FlagsUpdated::new(
-                        account,
-                        flags,
+                        account, flags,
                     )))
                 }
                 _ => {
@@ -475,9 +474,7 @@ impl<'de> Deserialize<'de> for Effect {
                     weight: Some(weight),
                     ..
                 } => Kind::Signer(signer::Kind::Created(signer::Created::new(
-                    account,
-                    public_key,
-                    weight,
+                    account, public_key, weight,
                 ))),
                 _ => {
                     return Err(de::Error::custom(
@@ -492,9 +489,7 @@ impl<'de> Deserialize<'de> for Effect {
                     weight: Some(weight),
                     ..
                 } => Kind::Signer(signer::Kind::Removed(signer::Removed::new(
-                    account,
-                    public_key,
-                    weight,
+                    account, public_key, weight,
                 ))),
                 _ => {
                     return Err(de::Error::custom(
@@ -509,9 +504,7 @@ impl<'de> Deserialize<'de> for Effect {
                     weight: Some(weight),
                     ..
                 } => Kind::Signer(signer::Kind::Updated(signer::Updated::new(
-                    account,
-                    public_key,
-                    weight,
+                    account, public_key, weight,
                 ))),
                 _ => {
                     return Err(de::Error::custom(

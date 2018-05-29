@@ -1,4 +1,4 @@
-use resources::{Amount, Operation, OperationKind, asset::Flags};
+use resources::{asset::Flags, Amount, Operation, OperationKind};
 use serde_json;
 
 fn account_merge_json() -> &'static str {
@@ -8,7 +8,6 @@ fn account_merge_json() -> &'static str {
 mod errors_on_missing_fields_for_type {
     use super::*;
 
-    #[cfg_attr(rustfmt, rustfmt_skip)]
     macro_rules! assert_err_on_missing_fields {
         ($type_to_check:ident, $type_i:expr) => {
             #[test]

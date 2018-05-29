@@ -5,7 +5,8 @@ use clap::ArgMatches;
 use error::Result;
 use fmt::{Formatter, Simple};
 use resolution::Resolution;
-use stellar_client::{endpoint::trade, sync::{self, Client}};
+use stellar_client::{endpoint::trade,
+                     sync::{self, Client}};
 
 pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let pager = Pager::from_arg(&matches);

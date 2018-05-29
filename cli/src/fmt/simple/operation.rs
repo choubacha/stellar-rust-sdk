@@ -1,6 +1,6 @@
 use super::Simple;
 use fmt::Render;
-use stellar_client::resources::{OperationKind as Kind, operation::*};
+use stellar_client::resources::{operation::*, OperationKind as Kind};
 
 impl Render<Operation> for Simple {
     fn render(&self, op: &Operation) -> Option<String> {

@@ -1,5 +1,6 @@
 use clap::{App, Arg, ArgMatches};
-use stellar_client::endpoint::{Direction::{Asc, Desc}, Order};
+use stellar_client::endpoint::{Direction::{Asc, Desc},
+                               Order};
 
 static ARG_NAME: &'static str = "order";
 static ASC: &'static str = "asc";

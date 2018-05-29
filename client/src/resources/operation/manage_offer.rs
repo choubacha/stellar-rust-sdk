@@ -1,4 +1,4 @@
-use resources::{Amount, AssetIdentifier, offer::PriceRatio};
+use resources::{offer::PriceRatio, Amount, AssetIdentifier};
 
 /// A “Manage Offer” operation can create, update or delete an offer to trade assets in the Stellar
 /// network. It specifies an issuer, a price and amount of a given asset to buy or sell.

@@ -1,4 +1,4 @@
-use super::{deserialize, amount::Amount};
+use super::{amount::Amount, deserialize};
 use chrono::prelude::*;
 
 /// Memos are a useful source for adding meta data to a transaction.

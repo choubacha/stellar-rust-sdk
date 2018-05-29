@@ -1,5 +1,5 @@
 use super::deserialize;
-use resources::{Amount, AssetIdentifier, asset::Flags, offer::PriceRatio};
+use resources::{asset::Flags, offer::PriceRatio, Amount, AssetIdentifier};
 use serde::{de, Deserialize, Deserializer};
 mod account_merge;
 mod allow_trust;
