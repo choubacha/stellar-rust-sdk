@@ -1,4 +1,4 @@
-use std::{fmt, error::Error, str::FromStr, string::ToString};
+use std::{error::Error, fmt, str::FromStr, string::ToString};
 /// Declares that this endpoint has an order field and can have it set.
 ///
 /// ## Example

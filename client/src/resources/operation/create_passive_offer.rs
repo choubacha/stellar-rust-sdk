@@ -1,4 +1,4 @@
-use resources::{Amount, AssetIdentifier, offer::PriceRatio};
+use resources::{offer::PriceRatio, Amount, AssetIdentifier};
 
 /// “Create Passive Offer” operation creates an offer that won’t consume a counter offer that
 /// exactly matches this offer. This is useful for offers just used as 1:1 exchanges for path

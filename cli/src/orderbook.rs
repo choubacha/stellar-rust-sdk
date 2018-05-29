@@ -2,7 +2,8 @@ use asset_identifier;
 use clap::ArgMatches;
 use error::Result;
 use fmt::{Formatter, Simple};
-use stellar_client::{endpoint::{orderbook, Limit}, sync::Client};
+use stellar_client::{endpoint::{orderbook, Limit},
+                     sync::Client};
 
 pub fn details(client: &Client, matches: &ArgMatches) -> Result<()> {
     let endpoint = {

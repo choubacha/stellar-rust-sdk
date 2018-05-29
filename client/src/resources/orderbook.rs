@@ -1,4 +1,4 @@
-use resources::{AssetIdentifier, offer::OfferSummary};
+use resources::{offer::OfferSummary, AssetIdentifier};
 
 /// Order books keep records of all offers to sell (asks)
 /// and offer to buy (bids) for a particular pair of assets.

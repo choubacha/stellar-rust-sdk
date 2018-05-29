@@ -14,12 +14,12 @@
 //! ```
 
 use super::{Host, HORIZON_TEST_URI, HORIZON_URI};
-use StellarError;
 use endpoint::IntoRequest;
 use error::{Error, Result};
 use http::{self, Uri};
 use reqwest;
 use serde_json;
+use StellarError;
 
 mod iter;
 
