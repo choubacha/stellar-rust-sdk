@@ -23,6 +23,16 @@ pub use self::path_payment::PathPayment;
 pub use self::payment::Payment;
 pub use self::set_options::SetOptions;
 
+/// Use this to quickly load all the operation structs into the current
+/// scope.
+pub mod prelude {
+    pub use super::{account_merge::AccountMerge, allow_trust::AllowTrust,
+                    change_trust::ChangeTrust, create_account::CreateAccount,
+                    create_passive_offer::CreatePassiveOffer, manage_data::ManageData,
+                    manage_offer::ManageOffer, path_payment::PathPayment, payment::Payment,
+                    set_options::SetOptions, Operation, OperationKind};
+}
+
 #[cfg(test)]
 mod test;
 
