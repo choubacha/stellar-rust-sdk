@@ -21,14 +21,6 @@ pub struct InvalidInputError {
     details: String,
 }
 
-impl InvalidInputError {
-    pub fn from_str(details: &str) -> InvalidInputError {
-        InvalidInputError {
-            details: details.to_string(),
-        }
-    }
-}
-
 impl fmt::Display for InvalidInputError {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "{}", self.details)
