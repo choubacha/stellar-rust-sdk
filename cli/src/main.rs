@@ -10,7 +10,6 @@ use pager::Pager;
 use stellar_client::{error::Error, sync::Client};
 
 mod account;
-mod asset_identifier;
 mod assets;
 mod cursor;
 mod effects;
@@ -201,7 +200,7 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                         .long("asset")
                         .takes_value(true)
                         .required(true)
-                        .help("Specifies destination asset for orderbook to return. format:  <asset_code>-<asset_issuer>, or xlm if lumens"),
+                        .help("Specifies destination asset for find-path to return. format:  <asset_code>-<asset_issuer>, or xlm if lumens"),
                 )
                 .arg(
                     Arg::with_name("amount")

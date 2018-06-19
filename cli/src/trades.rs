@@ -1,11 +1,11 @@
 use super::{cursor, ordering, pager::Pager};
-use asset_identifier;
 use chrono::{DateTime, Utc};
 use clap::ArgMatches;
 use error::Result;
 use fmt::{Formatter, Simple};
 use resolution::Resolution;
 use stellar_client::{endpoint::trade,
+                     resources::AssetIdentifier,
                      sync::{self, Client}};
 
 pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
@@ -23,8 +23,12 @@ pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
         if let (Some(base_str), Some(counter_str)) =
             (matches.value_of("base"), matches.value_of("counter"))
         {
-            let base = asset_identifier::from_str(base_str)?;
-            let counter = asset_identifier::from_str(counter_str)?;
+            let base = base_str
+                .parse::<AssetIdentifier>()
+                .map_err(|_| String::from("Base asset must be properly formatted asset"))?;
+            let counter = counter_str
+                .parse::<AssetIdentifier>()
+                .map_err(|_| String::from("Counter asset must be properly formatted asset"))?;
             endpoint = endpoint.with_asset_pair(base, counter);
         }
         endpoint = pager.assign(endpoint);
@@ -48,14 +52,16 @@ pub fn aggregations(client: &Client, matches: &ArgMatches) -> Result<()> {
     let pager = Pager::from_arg(&matches);
 
     let endpoint = {
-        let base_str = matches
+        let base = matches
             .value_of("base")
-            .expect("Base asset is a required field");
-        let counter_str = matches
+            .expect("Base asset is a required field")
+            .parse::<AssetIdentifier>()
+            .map_err(|_| String::from("Base asset must be properly formatted asset"))?;
+        let counter = matches
             .value_of("counter")
-            .expect("Counter asset is a required field");
-        let base = asset_identifier::from_str(base_str)?;
-        let counter = asset_identifier::from_str(counter_str)?;
+            .expect("Counter asset is a required field")
+            .parse::<AssetIdentifier>()
+            .map_err(|_| String::from("Counter asset must be properly formatted asset"))?;
         let mut endpoint = trade::Aggregations::new(&base, &counter);
         let resolution = matches
             .value_of("resolution")
