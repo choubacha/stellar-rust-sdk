@@ -1,8 +1,11 @@
-use resources::{asset::Flags,
-                effect::{account::Kind as AccountKind, data::Kind as DataKind,
-                         signer::Kind as SignerKind, trade::Kind as TradeKind,
-                         trustline::Kind as TrustlineKind, Effect, EffectKind},
-                Amount};
+use resources::{
+    asset::Flags,
+    effect::{
+        account::Kind as AccountKind, data::Kind as DataKind, signer::Kind as SignerKind,
+        trade::Kind as TradeKind, trustline::Kind as TrustlineKind, Effect, EffectKind,
+    },
+    Amount,
+};
 use serde_json;
 
 fn account_created_json() -> &'static str {

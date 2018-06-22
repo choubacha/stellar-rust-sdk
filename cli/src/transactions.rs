@@ -2,8 +2,9 @@ use super::{cursor, ordering, pager::Pager};
 use clap::ArgMatches;
 use error::Result;
 use fmt::{Formatter, Simple};
-use stellar_client::{endpoint::transaction,
-                     sync::{self, Client}};
+use stellar_client::{
+    endpoint::transaction, sync::{self, Client},
+};
 
 pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
     let pager = Pager::from_arg(&matches);

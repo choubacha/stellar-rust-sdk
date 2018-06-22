@@ -202,8 +202,11 @@ impl All {
     }
 
     fn has_query(&self) -> bool {
-        self.order.is_some() || self.cursor.is_some() || self.limit.is_some()
-            || self.offer_id.is_some() || self.asset_pair.is_some()
+        self.order.is_some()
+            || self.cursor.is_some()
+            || self.limit.is_some()
+            || self.offer_id.is_some()
+            || self.asset_pair.is_some()
     }
 }
 
