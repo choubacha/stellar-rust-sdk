@@ -1,7 +1,8 @@
 use super::Simple;
 use fmt::Render;
-use stellar_client::resources::{effect::{Effect, EffectKind as Kind},
-                                AssetIdentifier};
+use stellar_client::resources::{
+    effect::{Effect, EffectKind as Kind}, AssetIdentifier,
+};
 
 impl Render<Effect> for Simple {
     fn render(&self, effect: &Effect) -> Option<String> {

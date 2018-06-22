@@ -2,10 +2,9 @@ use super::pager::Pager;
 use clap::ArgMatches;
 use error::Result;
 use fmt::{Formatter, Simple};
-use stellar_client::{endpoint::payment,
-                     resources::{Amount, AssetIdentifier},
-                     sync,
-                     sync::Client};
+use stellar_client::{
+    endpoint::payment, resources::{Amount, AssetIdentifier}, sync, sync::Client,
+};
 
 pub fn find_path(client: &Client, matches: &ArgMatches) -> Result<()> {
     let pager = Pager::from_arg(&matches);
