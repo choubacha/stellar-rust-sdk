@@ -81,7 +81,7 @@ impl Client {
         self.host == Host::HorizonTest
     }
 
-    /// Constructs a new stellar client connected to the horizon test network.
+    /// Constructs a new stellar client connected to the horizon prod network.
     ///
     /// ## Examples
     ///
