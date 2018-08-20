@@ -5,7 +5,9 @@ use error::Result;
 use fmt::{Formatter, Simple};
 use resolution::Resolution;
 use stellar_client::{
-    endpoint::trade, resources::AssetIdentifier, sync::{self, Client},
+    endpoint::trade,
+    resources::AssetIdentifier,
+    sync::{self, Client},
 };
 
 pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {
