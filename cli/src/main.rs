@@ -455,7 +455,8 @@ fn build_app<'a, 'b>() -> App<'a, 'b> {
                                 .long("resolution")
                                 .takes_value(true)
                                 .required(true)
-                                .help("Segment duration in format <number><unit> where units are s, m, h, d.  ie: 10h == 10 hours"),
+                                .possible_values(&["1m", "5m", "15m", "1h", "1d", "1w"])
+                                .help("The resolution of each segment. Limited to a set of valid inputs")
                         )
                         .arg(
                             Arg::with_name("base")

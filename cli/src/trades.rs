@@ -69,7 +69,7 @@ pub fn aggregations(client: &Client, matches: &ArgMatches) -> Result<()> {
             .value_of("resolution")
             .expect("Resolution is a required field");
         let resolution: Resolution = resolution.parse()?;
-        endpoint = endpoint.with_resolution(resolution.to_ms());
+        endpoint = endpoint.with_resolution(resolution.inner());
         let start_time = matches
             .value_of("start_time")
             .expect("Start time is a required field")
