@@ -901,12 +901,13 @@ mod payments_tests {
 /// ## Example
 /// ```
 /// use stellar_client::sync::Client;
-/// use stellar_client::endpoint::{account, trade, Limit};
+/// use stellar_client::endpoint::{account, trade, Order, Direction::Desc, Limit};
 ///
 /// let client = Client::horizon_test().unwrap();
 ///
 /// // Grab trades and associated base account to ensure an account with offers
-/// let trades      = client.request(trade::All::default().with_limit(1)).unwrap();
+/// let trades      = trade::All::default().with_order(Desc).with_limit(1);
+/// let trades      = client.request(trades).unwrap();
 /// let trade       = &trades.records()[0];
 /// let account_id  = trade.base_account();
 ///
