@@ -58,7 +58,8 @@ impl<'de> Deserialize<'de> for StellarError {
         D: Deserializer<'de>,
     {
         let int = Intermediate::deserialize(d)?;
-        let kind: Kind = int.url
+        let kind: Kind = int
+            .url
             .parse()
             .map_err(|_| de::Error::custom("Error decoding kind"))?;
         Ok(StellarError {

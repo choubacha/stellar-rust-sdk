@@ -3,7 +3,8 @@ use clap::ArgMatches;
 use error::Result;
 use fmt::{Formatter, Simple};
 use stellar_client::{
-    endpoint::asset, sync::{self, Client},
+    endpoint::asset,
+    sync::{self, Client},
 };
 
 /// Using a client and the arguments from the command line, iterates over the results

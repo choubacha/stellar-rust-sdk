@@ -2,7 +2,9 @@ use clap::ArgMatches;
 use error::Result;
 use fmt::{Formatter, Simple};
 use stellar_client::{
-    endpoint::{orderbook, Limit}, resources::AssetIdentifier, sync::Client,
+    endpoint::{orderbook, Limit},
+    resources::AssetIdentifier,
+    sync::Client,
 };
 
 pub fn details(client: &Client, matches: &ArgMatches) -> Result<()> {

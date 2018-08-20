@@ -130,7 +130,8 @@ mod account_tests {
     #[test]
     fn it_can_make_an_account_data_uri() {
         let data = Data::new("abc123", "key");
-        let request = data.into_request("https://horizon-testnet.stellar.org")
+        let request = data
+            .into_request("https://horizon-testnet.stellar.org")
             .unwrap();
         assert_eq!(request.uri().host().unwrap(), "horizon-testnet.stellar.org");
         assert_eq!(request.uri().path(), "/accounts/abc123/data/key");
@@ -578,7 +579,8 @@ mod effects_tests {
             .with_cursor("CURSOR")
             .with_order(Direction::Asc)
             .with_limit(123);
-        let req = ep.into_request("https://horizon-testnet.stellar.org")
+        let req = ep
+            .into_request("https://horizon-testnet.stellar.org")
             .unwrap();
         assert_eq!(req.uri().path(), "/accounts/abc123/effects");
         assert_eq!(req.uri().query(), Some("cursor=CURSOR&order=asc&limit=123"));

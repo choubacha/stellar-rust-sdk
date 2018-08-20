@@ -3,7 +3,8 @@ use clap::ArgMatches;
 use error::Result;
 use fmt::{Formatter, Simple};
 use stellar_client::{
-    endpoint::payment, sync::{self, Client},
+    endpoint::payment,
+    sync::{self, Client},
 };
 
 pub fn all(client: &Client, matches: &ArgMatches) -> Result<()> {

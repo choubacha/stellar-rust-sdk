@@ -290,7 +290,8 @@ mod effects_tests {
             .with_cursor("CURSOR")
             .with_limit(123)
             .with_order(Direction::Desc);
-        let req = ep.into_request("https://horizon-testnet.stellar.org")
+        let req = ep
+            .into_request("https://horizon-testnet.stellar.org")
             .unwrap();
         assert_eq!(req.uri().path(), "/transactions/abc123/effects");
         assert_eq!(

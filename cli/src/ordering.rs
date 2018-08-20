@@ -1,6 +1,7 @@
 use clap::{App, Arg, ArgMatches};
 use stellar_client::endpoint::{
-    Direction::{Asc, Desc}, Order,
+    Direction::{Asc, Desc},
+    Order,
 };
 
 static ARG_NAME: &'static str = "order";
