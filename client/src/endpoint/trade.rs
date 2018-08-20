@@ -364,7 +364,7 @@ mod all_trades_tests {
 /// let agg = trade::Aggregations::new(base, counter)
 ///     .with_start_time(0)
 ///     .with_end_time(now)
-///     .with_resolution(300_000_000);
+///     .with_resolution(trade::SegmentResolution::OneWeek);
 ///
 /// let records = client.request(agg).unwrap();
 /// # assert!(records.records().len() > 0);
@@ -382,6 +382,36 @@ pub struct Aggregations {
 impl_limit!(Aggregations);
 impl_order!(Aggregations);
 
+/// The segment resolution used when querying for trade aggregations.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum SegmentResolution {
+    /// Represents a one minute segment.
+    OneMin,
+    /// Represents a five minute segment.
+    FiveMin,
+    /// Represents a fifteen minute segment.
+    FifteenMin,
+    /// Represents an hour long segment.
+    OneHour,
+    /// Represents a day long segment.
+    OneDay,
+    /// Respresents a week long segment.
+    OneWeek,
+}
+
+impl From<SegmentResolution> for u64 {
+    fn from(res: SegmentResolution) -> u64 {
+        match res {
+            SegmentResolution::OneMin => 60000,
+            SegmentResolution::FiveMin => 300000,
+            SegmentResolution::FifteenMin => 900000,
+            SegmentResolution::OneHour => 3600000,
+            SegmentResolution::OneDay => 86400000,
+            SegmentResolution::OneWeek => 604800000,
+        }
+    }
+}
+
 impl Aggregations {
     /// Creates a new aggregations endpoint. There are some defaults but generally
     /// these can be constructed with the with_* commands.
@@ -391,7 +421,7 @@ impl Aggregations {
                 base: base.clone(),
                 counter: counter.clone(),
             },
-            resolution: 300_000,
+            resolution: SegmentResolution::OneMin.into(),
             start_time: 0,
             end_time: 0,
             order: None,
@@ -413,10 +443,10 @@ impl Aggregations {
     /// let counter = AssetIdentifier::native();
     ///
     /// let endpoint = trade::Aggregations::new(&base, &counter)
-    ///     .with_resolution(300_000);
+    ///     .with_resolution(trade::SegmentResolution::FiveMin);
     /// ```
-    pub fn with_resolution(mut self, r: u64) -> Self {
-        self.resolution = r;
+    pub fn with_resolution(mut self, r: SegmentResolution) -> Self {
+        self.resolution = r.into();
         self
     }
 
@@ -536,7 +566,7 @@ mod aggregation_tests {
     fn converts_to_request() {
         let agg = Aggregations::new(&AssetIdentifier::native(), &AssetIdentifier::native())
             .with_limit(123)
-            .with_resolution(1)
+            .with_resolution(SegmentResolution::OneMin)
             .with_start_time(10)
             .with_end_time(20)
             .with_order(Direction::Desc);
@@ -547,7 +577,7 @@ mod aggregation_tests {
             Some(
                 "base_asset_type=native&\
                  counter_asset_type=native&\
-                 resolution=1&\
+                 resolution=60000&\
                  start_time=10&\
                  end_time=20&\
                  order=desc&\
