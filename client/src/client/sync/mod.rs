@@ -19,11 +19,14 @@ use error::{Error, Result};
 use http::{self, Uri};
 use reqwest;
 use serde_json;
+use std::time::Duration;
 use StellarError;
 
 mod iter;
 
 pub use self::iter::Iter;
+
+const DEFAULT_TIMEOUT: Duration = Duration::from_secs(60);
 
 /// A client that can issue requests to a horizon api in a synchronous
 /// fashion, meaning that the functions will block until the response
@@ -51,7 +54,10 @@ impl Client {
     }
 
     fn build(host: Host) -> Result<Self> {
-        let inner = reqwest::Client::new();
+        let inner = reqwest::ClientBuilder::new()
+            .timeout(Some(DEFAULT_TIMEOUT))
+            .build()
+            .expect("Http client failed to build");
         Ok(Client { host, inner })
     }
 
