@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ## [Unreleased]
 
+## [0.1.2] - 2018-08-20
+
 ### Added
 - Updated Flags to be public (and plural) so that it's accessible in the effects.
 - Added data effects to the resources module. These are undocumented in the stellar resource online but appear in the all effects endpoint.
@@ -14,6 +16,9 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Fixed
 - Removed source_amount from payment operations as it's not in use.
+- Increased timeout to 60 to counter the long find-path endpoint
+- Fixed some minor documentation error
+- Restricted aggregation resolution to the defined set.
 
 ## [0.1.0] - 2018-04-20
 
