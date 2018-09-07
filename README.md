@@ -1,8 +1,8 @@
 # stellar-rust-sdk
 A lightweight client SDK for the stellar horizon api. Written in rust.
 
-[![Travis](https://img.shields.io/travis/kbacha/stellar-sdk.svg)](https://travis-ci.org/kbacha/stellar-sdk)
-[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/stellar-sdk)
+[![Travis](https://img.shields.io/travis/kbacha/stellar-rust-sdk.svg)](https://travis-ci.org/kbacha/stellar-rust-sdk)
+[![Gitter](https://img.shields.io/gitter/room/nwjs/nw.js.svg)](https://gitter.im/stellar-rust-sdk)
 [![Crates.io](https://img.shields.io/crates/v/stellar-client.svg)](https://crates.io/crates/stellar-client)
 [![Docs.rs](https://docs.rs/stellar-client/badge.svg)](https://docs.rs/stellar-client/)
 
@@ -94,7 +94,7 @@ cargo doc -p stellar-resources --open
 
 ## Contributing
 
-We welcome contributors! Please see our [contributing](https://github.com/kbacha/stellar-sdk/blob/master/CONTRIBUTING.md) guide for information
+We welcome contributors! Please see our [contributing](https://github.com/kbacha/stellar-rust-sdk/blob/master/CONTRIBUTING.md) guide for information
 on how to contribute to our repo!
 
 ## TODO

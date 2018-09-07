@@ -1,11 +1,11 @@
 [package]
 name = "stellar-client"
-version = "0.1.2"
+version = "0.1.3"
 authors = ["Kevin Bacha <chewbacha@gmail.com>"]
 
 readme = "../README.md"
-repository = "https://github.com/kbacha/stellar-sdk"
-homepage = "https://github.com/kbacha/stellar-sdk"
+repository = "https://github.com/kbacha/stellar-rust-sdk"
+homepage = "https://github.com/kbacha/stellar-rust-sdk"
 
 description = "A client interface to the stellar Horizon API"
 
@@ -24,7 +24,7 @@ categories = [
 license = "MIT"
 
 [badges]
-travis-ci = { repository = "kbacha/stellar-sdk" }
+travis-ci = { repository = "kbacha/stellar-rust-sdk" }
 
 [dependencies]
 base64 = "0.9"

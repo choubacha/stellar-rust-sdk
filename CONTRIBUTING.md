@@ -1,4 +1,4 @@
-# Contributing to Stellar-sdk
+# Contributing to Stellar Rust SDK
 
 The following is an ever growing set of guidelines for contributing to the stellar sdk.
 
@@ -35,7 +35,7 @@ addition, we prefer that examples are documented in doctests so that people that
 this sdk will have code examples that are tested.
 
 We run the tests on Travis currently, and they need to pass in order to merge:
-[![Travis](https://img.shields.io/travis/kbacha/stellar-sdk.svg)](https://travis-ci.org/kbacha/stellar-sdk)
+[![Travis](https://img.shields.io/travis/kbacha/stellar-rust-sdk.svg)](https://travis-ci.org/kbacha/stellar-rust-sdk)
 
 #### Doctests
 
