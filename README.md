@@ -1,4 +1,4 @@
-# stellar-sdk
+# stellar-rust-sdk
 A lightweight client SDK for the stellar horizon api. Written in rust.
 
 [![Travis](https://img.shields.io/travis/kbacha/stellar-sdk.svg)](https://travis-ci.org/kbacha/stellar-sdk)
