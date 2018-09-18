@@ -7,7 +7,11 @@ use chrono::prelude::*;
 /// To learn more about the concept of memos in the Stellar network, take a look at the Stellar memo description here:
 /// <https://www.stellar.org/developers/guides/concepts/transactions.html#memo>
 #[derive(Deserialize, Debug, Clone, PartialEq, Eq)]
-#[serde(rename_all = "lowercase", tag = "memo_type", content = "memo")]
+#[serde(
+    rename_all = "lowercase",
+    tag = "memo_type",
+    content = "memo"
+)]
 pub enum Memo {
     ///  A string encoded using either ASCII or UTF-8, up to 28-bytes long.
     Text(String),

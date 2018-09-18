@@ -76,8 +76,8 @@ pub fn aggregations(client: &Client, matches: &ArgMatches) -> Result<()> {
             .parse::<DateTime<Utc>>()
             .map_err(|_| {
                 String::from("Start time should be in ISO 8601 format, ex: x2017-11-28T12:00:09Z")
-            })?
-            .timestamp() as u64 * 1_000;
+            })?.timestamp() as u64
+            * 1_000;
         endpoint = endpoint.with_start_time(start_time);
 
         let end_time = matches
@@ -86,8 +86,8 @@ pub fn aggregations(client: &Client, matches: &ArgMatches) -> Result<()> {
             .parse::<DateTime<Utc>>()
             .map_err(|_| {
                 String::from("Start time should be in ISO 8601 format, ex: x2017-11-28T12:00:09Z")
-            })?
-            .timestamp() as u64 * 1_000;
+            })?.timestamp() as u64
+            * 1_000;
         endpoint = endpoint.with_end_time(end_time);
         endpoint = pager.assign(endpoint);
         endpoint

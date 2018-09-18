@@ -147,8 +147,7 @@ mod tests {
         Deeper and deeper,
             The further I go
     --
-"
-                .to_string()
+".to_string()
         );
     }
 }

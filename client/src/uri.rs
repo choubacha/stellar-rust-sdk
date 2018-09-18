@@ -80,8 +80,7 @@ impl<'a> QueryParams<'a> {
                 } else {
                     None
                 }
-            })
-            .collect()
+            }).collect()
     }
 
     /// Retrieves a value from the query params. If it exists you get
