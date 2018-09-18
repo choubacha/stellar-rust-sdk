@@ -299,8 +299,7 @@ mod all_trades_tests {
                     "MOBI",
                     "GA6HCMBLTZS5VYYBCATRBRZ3BZJMAFUDKYYF6AH6MVCMGWMRDNSWJPIH",
                 ),
-            )
-            .with_offer_id(123)
+            ).with_offer_id(123)
             .with_cursor("CURSOR")
             .with_limit(123)
             .with_order(Direction::Desc);
